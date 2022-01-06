@@ -10,18 +10,19 @@ class Othello():
         self.turn = 1
     
     # Accepts a list of initial black and white tiles to be filled with its respective colors
-    def initial_position(self, initial_white, initial_black):
+    def set_initial_position(self, initial_white, initial_black):
         for tile in initial_white:
-            self.board[tile] == 1
+            self.board[tile[0]][tile[1]] = 1
         for tile in initial_black:
-            self.board[tile] == 2
+            self.board[tile[0]][tile[1]] = 2
     
     # Prints the state of the board in the terminal
-    def print(self):
+    def terminal_print(self):
         for i in range(self.height):
             for j in range(self.width):
                 print(self.board[i][j], end="   ")
             print("")
+        print("")
     
     # Returns the current state of the board
     def board_state(self):
@@ -31,6 +32,7 @@ class Othello():
     def player_turn(self):
         return self.turn
     
+    # Returns True if a move is valid, otherwise False
     def valid_move(self, move):
         pass
     
@@ -50,16 +52,22 @@ class Othello():
 def main():
     ot = Othello(8, 8)
     ot.print()
+    init_white = [(3, 3), (4, 4)]
+    init_black = [(3, 4), (4, 3)]
+    ot.set_initial_position(init_white, init_black)
+    ot.print()
     
     # main functionality here
     while(True):
         color = ("White" if ot.player_turn == 1 else "Black")
-        print(f"It is player {ot.player_turn}'s turn ({color} pieces)")
+        print(f"It is player {ot.player_turn()}'s turn ({color} pieces)")
+        
         while(True):
             move_y = int(input("Enter tile's height: "))
             move_x = int(input("Enter tile's width: "))
             if ot.valid_move((move_y, move_x)):
                 break
+            
         ot.make_move((move_y, move_x))
         if ot.check_victory() != 0:
             break
