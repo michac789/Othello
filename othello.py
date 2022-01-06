@@ -56,11 +56,35 @@ class Othello():
     
     # Updates the board with the current move and change player's turn
     def make_move(self, move):
-        pass
+        direction_list = [(i, j) for i in range(-1, 2, 1) for j in range(-1, 2, 1) if i != 0 or j != 0]
+        for direction in direction_list:
+            #print(f"DEBUG dir: {direction}")
+            if self.valid_tile(move[0] + direction[0], move[0] + direction[1]):
+                if self.board[move[0] + direction[0]][move[1] + direction[1]] == self.turn % 2 + 1:
+                    #print("here")
+                    k, change = 1, False
+                    while(True):
+                        k += 1
+                        #print(self.board[move[0] + direction[0] * k][move[1] + direction[1] * k])
+                        if not self.valid_tile(move[0] + direction[0] * k, move[1] + direction[1] * k):
+                            break
+                        if self.board[move[0] + direction[0] * k][move[1] + direction[1] * k] == 0:
+                            break
+                        if self.board[move[0] + direction[0] * k][move[1] + direction[1] * k] == self.turn:
+                            #print("reached")
+                            change = True
+                            break
+                    #print("heyo")
+                    #print(k)
+                    if change:
+                        for m in range(k):
+                            self.board[move[0] + direction[0] * m][move[1] + direction[1] * m] = self.turn
+        self.turn = self.turn % 2 + 1
+                    
     
     # Check for a certain board state and turn, return 1 if white wins, 2 if black wins, 0 if neither wins
     def check_victory(self):
-        pass
+        return 0
     
     # Returns a list containing all possible valid moves
     def possible_move(self):
