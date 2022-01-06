@@ -31,11 +31,14 @@ class Othello():
     def player_turn(self):
         return self.turn
     
+    def valid_move(self, move):
+        pass
+    
     # Returns a list containing all possible valid moves
     def possible_move(self):
         pass
     
-    # Updates the board with the current move
+    # Updates the board with the current move and change player's turn
     def make_move(self, move):
         pass
     
@@ -49,10 +52,18 @@ def main():
     ot.print()
     
     # main functionality here
-    
-    # loop through the game
-
+    while(True):
+        color = ("White" if ot.player_turn == 1 else "Black")
+        print(f"It is player {ot.player_turn}'s turn ({color} pieces)")
+        while(True):
+            move_y = int(input("Enter tile's height: "))
+            move_x = int(input("Enter tile's width: "))
+            if ot.valid_move((move_y, move_x)):
+                break
+        ot.make_move((move_y, move_x))
+        if ot.check_victory() != 0:
+            break
+        
 
 if __name__ == "__main__":
     main()
-    
