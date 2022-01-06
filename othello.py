@@ -9,13 +9,17 @@ class Othello():
         self.width = width
         self.board = [[0 for i in range(self.width)] for j in range(self.height)]
         self.turn = 1
+        self.white_tiles = 0
+        self.black_tiles = 0
     
     # Accepts a list of initial black and white tiles to be filled with its respective colors
     def set_initial_position(self, initial_white, initial_black):
         for tile in initial_white:
             self.board[tile[0]][tile[1]] = 1
+            self.white_tiles += 1
         for tile in initial_black:
             self.board[tile[0]][tile[1]] = 2
+            self.black_tiles += 1
     
     # Prints the state of the board in the terminal
     def terminal_print(self):
@@ -41,7 +45,7 @@ class Othello():
     def valid_move(self, move):
         direction_list = [(i, j) for i in range(-1, 2, 1) for j in range(-1, 2, 1) if i != 0 or j != 0]
         for direction in direction_list:
-            if self.valid_tile(move[0] + direction[0], move[0] + direction[1]):
+            if self.valid_tile(move[0] + direction[0], move[1] + direction[1]):
                 if self.board[move[0] + direction[0]][move[1] + direction[1]] == self.turn % 2 + 1:
                     k = 1
                     while(True):
@@ -61,7 +65,6 @@ class Othello():
             #print(f"DEBUG dir: {direction}")
             if self.valid_tile(move[0] + direction[0], move[0] + direction[1]):
                 if self.board[move[0] + direction[0]][move[1] + direction[1]] == self.turn % 2 + 1:
-                    #print("here")
                     k, change = 1, False
                     while(True):
                         k += 1
@@ -71,11 +74,8 @@ class Othello():
                         if self.board[move[0] + direction[0] * k][move[1] + direction[1] * k] == 0:
                             break
                         if self.board[move[0] + direction[0] * k][move[1] + direction[1] * k] == self.turn:
-                            #print("reached")
                             change = True
                             break
-                    #print("heyo")
-                    #print(k)
                     if change:
                         for m in range(k):
                             self.board[move[0] + direction[0] * m][move[1] + direction[1] * m] = self.turn
@@ -84,6 +84,8 @@ class Othello():
     
     # Check for a certain board state and turn, return 1 if white wins, 2 if black wins, 0 if neither wins
     def check_victory(self):
+        if self.black_tiles + self.white_tiles == self.height * self.width or self.white_tiles == 0 or self.black_tiles == 0:
+            return (1 if self.white_tiles > self.black_tiles else 2)
         return 0
     
     # Returns a list containing all possible valid moves
