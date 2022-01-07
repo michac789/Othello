@@ -82,7 +82,7 @@ class Othello():
         self.turn = self.turn % 2 + 1
                     
     
-    # Check for a certain board state and turn, return 1 if white wins, 2 if black wins, 0 if neither wins
+    # Check for a certain board state and turn, return 1 if white wins, 2 if black wins, 3 if draw, 0 if neither wins
     def check_victory(self):
         if self.black_tiles + self.white_tiles == self.height * self.width or self.white_tiles == 0 or self.black_tiles == 0:
             return (1 if self.white_tiles > self.black_tiles else 2)
