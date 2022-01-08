@@ -137,10 +137,6 @@ def main():
     ot.set_initial_position(init_white, init_black)
     ot.terminal_print()
     
-    tile = (0, 6)
-    print(ot.tile_point(tile))
-    sys.exit()
-    
     # main functionality here
     while(True):
         color = ("White" if ot.player_turn() == 1 else "Black")
@@ -157,7 +153,7 @@ def main():
         ot.terminal_print()
         if ot.check_victory() != 0:
             break
-        
+
 
 if __name__ == "__main__":
     main()

@@ -8,10 +8,11 @@ from othello import Othello
 HEIGHT = 8
 WIDTH = 8
 
-# Define RGB values of different colors here
+# Define RGB values of different colors for various components here
 black = (0, 0, 0)
 white = (255, 255, 255)
 tile_color = (0, 160, 0)
+tile_border = (110, 38, 14)
 board_color = (50, 50, 50)
 
 # Initialize game with 9:16 aspect ratio
@@ -32,12 +33,20 @@ tile_size = int(min(board_width / WIDTH, board_height / HEIGHT))
 board_start = (board_padding, board_padding)
 piece_radius = math.floor(tile_size / 2 - 5)
 
-while True:
-    game_state = "start"
-    screen.fill(black)
+# Initialize game
+ot = Othello(8, 8)
+init_white = [(3, 3), (4, 4)]
+init_black = [(3, 4), (4, 3)]
+ot.set_initial_position(init_white, init_black)
     
+while True:
+
+    # Terminate application when the game is quit
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.ext()
+        
+    game_state = "start"
+    screen.fill(black)
             
     if game_state == "start":
         title = smallFont.render("Hello Othello", True, white)
@@ -48,16 +57,11 @@ while True:
     
     # rect = pygame.Rect(30, 30, 100, 100)
     # pygame.draw.rect(screen, board_color, rect)
-        
-    ot = Othello(8, 8)
-    init_white = [(3, 3), (4, 4)]
-    init_black = [(3, 4), (4, 3)]
-    ot.set_initial_position(init_white, init_black)
     
     tiles = []
-    for i in range(8):
+    for i in range(HEIGHT):
         row_tiles = []
-        for j in range(8):
+        for j in range(WIDTH):
             rect = pygame.Rect(
                 board_start[0] + j * tile_size,
                 board_start[1] + i * tile_size,
@@ -65,10 +69,11 @@ while True:
             )
             pygame.draw.rect(screen, tile_color, rect)
             pygame.draw.rect(screen, board_color, rect, 3)
-    for i in range(8):
-        for j in range(8):
-            if ot.board [i][j] == 1:
-                circ = pygame.draw.circle(screen, white, (board_start[0] + j * tile_size + tile_size / 2, board_start[1] + i * tile_size + tile_size / 2), piece_radius)
+    for i in range(HEIGHT):
+        for j in range(WIDTH):
+            if ot.board[i][j] != 0:
+                circ = pygame.draw.circle(screen, tile_border, (board_start[0] + j * tile_size + tile_size / 2, board_start[1] + i * tile_size + tile_size / 2), piece_radius + 2)
+                circ = pygame.draw.circle(screen, (white if ot.board[i][j] == 1 else black), (board_start[0] + j * tile_size + tile_size / 2, board_start[1] + i * tile_size + tile_size / 2), piece_radius)
     
     pygame.display.flip()
 
