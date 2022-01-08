@@ -75,5 +75,7 @@ while True:
                 circ = pygame.draw.circle(screen, tile_border, (board_start[0] + j * tile_size + tile_size / 2, board_start[1] + i * tile_size + tile_size / 2), piece_radius + 2)
                 circ = pygame.draw.circle(screen, (white if ot.board[i][j] == 1 else black), (board_start[0] + j * tile_size + tile_size / 2, board_start[1] + i * tile_size + tile_size / 2), piece_radius)
     
+    #left, _, right = pygame.mouse.get_pressed()
+    
     pygame.display.flip()
 

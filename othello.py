@@ -91,10 +91,26 @@ class Othello():
             return (1 if self.white_tiles > self.black_tiles else 2)
         return 0
     
-    # Returns a list containing all possible valid moves
-    def possible_move(self):
-        # TO-DO
-        pass
+    # Returns a list containing all possible valid moves (tiles that can be clicked) in a certain state
+    def possible_moves(self):
+        all_tiles = [(i, j) for i in range(self.height) for j in range(self.width)]
+        possible_moves = []
+        for move in all_tiles:
+            direction_list = [(i, j) for i in range(-1, 2, 1) for j in range(-1, 2, 1) if i != 0 or j != 0]
+            for direction in direction_list:
+                if self.valid_tile(move[0] + direction[0], move[1] + direction[1]):
+                    if self.board[move[0] + direction[0]][move[1] + direction[1]] == self.turn % 2 + 1:
+                        k = 1
+                        while(True):
+                            k += 1
+                            if not self.valid_tile(move[0] + direction[0] * k, move[1] + direction[1] * k):
+                                break
+                            if self.board[move[0] + direction[0] * k][move[1] + direction[1] * k] == 0:
+                                break
+                            if self.board[move[0] + direction[0] * k][move[1] + direction[1] * k] == self.turn:
+                                possible_moves.append(move)
+        return possible_moves
+    
     
     # Level 1 AI: return random move
     def level1(self):
@@ -142,6 +158,7 @@ def main():
         color = ("White" if ot.player_turn() == 1 else "Black")
         print(f"It is player {ot.player_turn()}'s turn ({color} pieces)")
         
+        print(ot.possible_moves())
         while(True):
             move_y = int(input("Enter tile's height: "))
             move_x = int(input("Enter tile's width: "))
