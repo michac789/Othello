@@ -1,4 +1,5 @@
 import sys
+import operator
 
 
 class Othello():
@@ -11,12 +12,14 @@ class Othello():
         self.turn = 1
         self.white_tiles = 0
         self.black_tiles = 0
+        self.surrounding_tiles = [(i, j) for i in range(-1, 2, 1) for j in range(-1, 2, 1) if i != 0 or j != 0]
         self.tiles_corner = [(0, 0), (0, self.width - 1), (self.height - 1, 0), (self.height - 1, self.width - 1)]
         self.tiles_near_corner = [(0, 1), (1, 0), (1, 1), (0, self.width - 2), (1, self.width - 2), (1, self.width - 1), (self.height - 2, 0), (self.height - 1, 1), (self.height - 2, 1), (self.height - 2, self.width - 1), (self.height - 1, self.width - 2), (self.height - 2, self.width - 2)]
         self.tiles_edge = [(i, j) for i in range(self.height) for j in range(self.width) if i == 0 or i != self.height - 1 or j != 0 or j != self.width - 1]
     
-    # Accepts a list of initial black and white tiles to be filled with its respective colors
+    # Accepts a list of initial white and black tiles to be filled with its respective colors, clear previous board
     def set_initial_position(self, initial_white, initial_black):
+        self.board = [[0 for i in range(self.width)] for j in range(self.height)]
         for tile in initial_white:
             self.board[tile[0]][tile[1]] = 1
             self.white_tiles += 1
@@ -32,14 +35,25 @@ class Othello():
             print("")
         print("")
     
-    # Returns True if (tile_y, tile_x) is a valid tile on the board, otherwise False
-    def valid_tile(self, tile_y, tile_x):
-        return (True if 0 <= tile_y < self.height and 0 <= tile_x < self.width else False)
+    # Returns True if 'tile' is a valid tile on the board, otherwise False
+    def valid_tile(self, tile):
+        return (True if 0 <= tile[0] < self.height and 0 <= tile[1] < self.width else False)
+    
+    # Returns a list of all surrounding valid tiles, given a single tile
+    def get_surrounding_tiles(self, tile):
+        tiles = [tuple(map(operator.add, tile, s_tile)) for s_tile in self.surrounding_tiles]
+        return [tile for tile in tiles if self.valid_tile(tile)]
+    
+    # Returns True if a tile is landlocked (surrounded in every direction with another tile), otherwise False
+    def landlocked(self, tile):
+        for tile in self.surrounding_tiles:
+            if self.valid_tile(tile) and self.board[tile[0]][tile[1]] != 0: return False
+        return True
     
     # Returns True if a move is valid, otherwise False
     def valid_move(self, move):
-        direction_list = [(i, j) for i in range(-1, 2, 1) for j in range(-1, 2, 1) if i != 0 or j != 0]
-        for direction in direction_list:
+        surrounding_tiles = [(i, j) for i in range(-1, 2, 1) for j in range(-1, 2, 1) if i != 0 or j != 0]
+        for direction in surrounding_tiles:
             if self.valid_tile(move[0] + direction[0], move[1] + direction[1]):
                 if self.board[move[0] + direction[0]][move[1] + direction[1]] == self.turn % 2 + 1:
                     k = 1
@@ -55,8 +69,8 @@ class Othello():
     
     # Updates the board with the current move and change player's turn
     def make_move(self, move):
-        direction_list = [(i, j) for i in range(-1, 2, 1) for j in range(-1, 2, 1) if i != 0 or j != 0]
-        for direction in direction_list:
+        surrounding_tiles = [(i, j) for i in range(-1, 2, 1) for j in range(-1, 2, 1) if i != 0 or j != 0]
+        for direction in surrounding_tiles:
             #print(f"DEBUG dir: {direction}")
             if self.valid_tile(move[0] + direction[0], move[0] + direction[1]):
                 if self.board[move[0] + direction[0]][move[1] + direction[1]] == self.turn % 2 + 1:
@@ -86,10 +100,13 @@ class Othello():
     # Returns a list containing all possible valid moves (tiles that can be clicked) in a certain state
     def possible_moves(self):
         all_tiles = [(i, j) for i in range(self.height) for j in range(self.width)]
+        
+        
+        all_tiles = [(i, j) for i in range(self.height) for j in range(self.width)]
         possible_moves = []
         for move in all_tiles:
-            direction_list = [(i, j) for i in range(-1, 2, 1) for j in range(-1, 2, 1) if i != 0 or j != 0]
-            for direction in direction_list:
+            surrounding_tiles = [(i, j) for i in range(-1, 2, 1) for j in range(-1, 2, 1) if i != 0 or j != 0]
+            for direction in surrounding_tiles:
                 if self.valid_tile(move[0] + direction[0], move[1] + direction[1]):
                     if self.board[move[0] + direction[0]][move[1] + direction[1]] == self.turn % 2 + 1:
                         k = 1
@@ -145,10 +162,12 @@ def main():
     ot.set_initial_position(init_white, init_black)
     ot.terminal_print()
     
+    sys.exit()
+    
     # main functionality here
     while(True):
-        color = ("White" if ot.player_turn() == 1 else "Black")
-        print(f"It is player {ot.player_turn()}'s turn ({color} pieces)")
+        color = ("White" if ot.turn == 1 else "Black")
+        print(f"It is player {ot.turn}'s turn ({color} pieces)")
         
         print(ot.possible_moves())
         while(True):
