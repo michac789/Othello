@@ -58,6 +58,7 @@ while True:
     # rect = pygame.Rect(30, 30, 100, 100)
     # pygame.draw.rect(screen, board_color, rect)
     
+    # Draw board
     tiles = []
     for i in range(HEIGHT):
         row_tiles = []
@@ -69,13 +70,28 @@ while True:
             )
             pygame.draw.rect(screen, tile_color, rect)
             pygame.draw.rect(screen, board_color, rect, 3)
+            row_tiles.append(rect)
+        tiles.append(row_tiles)
+
     for i in range(HEIGHT):
         for j in range(WIDTH):
             if ot.board[i][j] != 0:
                 circ = pygame.draw.circle(screen, tile_border, (board_start[0] + j * tile_size + tile_size / 2, board_start[1] + i * tile_size + tile_size / 2), piece_radius + 2)
                 circ = pygame.draw.circle(screen, (white if ot.board[i][j] == 1 else black), (board_start[0] + j * tile_size + tile_size / 2, board_start[1] + i * tile_size + tile_size / 2), piece_radius)
     
-    #left, _, right = pygame.mouse.get_pressed()
+    left, _, right = pygame.mouse.get_pressed()
+    mouse = pygame.mouse.get_pos()
+
+    if left == 1:
+        for i in range(HEIGHT):
+            for j in range(WIDTH):
+                #print(i, j)
+                if tiles[i][j].collidepoint(mouse):
+                    ot.make_move((i, j))
+                    # ot.terminal_print()
+                    # if ot.check_victory() != 0:
+                    #     break
+    
     
     pygame.display.flip()
 
