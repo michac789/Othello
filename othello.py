@@ -11,6 +11,9 @@ class Othello():
         self.turn = 1
         self.white_tiles = 0
         self.black_tiles = 0
+        self.tiles_corner = [(0, 0), (0, self.width - 1), (self.height - 1, 0), (self.height - 1, self.width - 1)]
+        self.tiles_near_corner = [(0, 1), (1, 0), (1, 1), (0, self.width - 2), (1, self.width - 2), (1, self.width - 1), (self.height - 2, 0), (self.height - 1, 1), (self.height - 2, 1), (self.height - 2, self.width - 1), (self.height - 1, self.width - 2), (self.height - 2, self.width - 2)]
+        self.tiles_edge = [(i, j) for i in range(self.height) for j in range(self.width) if i == 0 or i != self.height - 1 or j != 0 or j != self.width - 1]
     
     # Accepts a list of initial black and white tiles to be filled with its respective colors
     def set_initial_position(self, initial_white, initial_black):
@@ -90,6 +93,39 @@ class Othello():
     
     # Returns a list containing all possible valid moves
     def possible_move(self):
+        # TO-DO
+        pass
+    
+    # Level 1 AI: return random move
+    def level1(self):
+        pass
+    
+    # Level 2 AI: minimax algorithm with depth 2
+    def level2(self):
+        pass
+    
+    # Level 3 AI: minimax algorithm with depth 4
+    def level3(self):
+        pass
+    
+    # Return the point of a tile (for minimax algorithm)
+    def tile_point(self, tile):
+        return (4 if tile in self.tiles_corner else 3 if tile in self.tiles_near_corner else 2 if tile in self.tiles_edge else 1)
+    
+    # Return the score of a board position
+    def heuristic_eval(self):
+        score = 0
+        for i in range(self.height):
+            for j in range(self.width):
+                tile_point = self.tile_point((i, j))
+                if self.board[i][j] == 1:
+                    score += tile_point
+                elif self.board[i][j] == 2:
+                    score -= tile_point
+        return score
+    
+    # Return move with greatest minimax value (white max, black min)
+    def minimax(self):
         pass
 
 
@@ -100,6 +136,10 @@ def main():
     init_black = [(3, 4), (4, 3)]
     ot.set_initial_position(init_white, init_black)
     ot.terminal_print()
+    
+    tile = (0, 6)
+    print(ot.tile_point(tile))
+    sys.exit()
     
     # main functionality here
     while(True):

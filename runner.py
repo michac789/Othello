@@ -69,6 +69,6 @@ while True:
         for j in range(8):
             if ot.board [i][j] == 1:
                 circ = pygame.draw.circle(screen, white, (board_start[0] + j * tile_size + tile_size / 2, board_start[1] + i * tile_size + tile_size / 2), piece_radius)
-
     
     pygame.display.flip()
+
