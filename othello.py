@@ -32,14 +32,6 @@ class Othello():
             print("")
         print("")
     
-    # Returns the current state of the board
-    def board_state(self):
-        return self.board
-    
-    # Returns the current player's turn
-    def player_turn(self):
-        return self.turn
-    
     # Returns True if (tile_y, tile_x) is a valid tile on the board, otherwise False
     def valid_tile(self, tile_y, tile_x):
         return (True if 0 <= tile_y < self.height and 0 <= tile_x < self.width else False)
