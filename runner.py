@@ -1,5 +1,6 @@
 import pygame
 import sys
+import math
 
 from othello import Othello
 
@@ -29,6 +30,7 @@ board_width = ((9 / 16) * width) - (2 * board_padding)
 board_height = height - (2 * board_padding)
 tile_size = int(min(board_width / WIDTH, board_height / HEIGHT))
 board_start = (board_padding, board_padding)
+piece_radius = math.floor(tile_size / 2 - 5)
 
 while True:
     game_state = "start"
@@ -61,9 +63,12 @@ while True:
                 board_start[1] + i * tile_size,
                 tile_size, tile_size
             )
-            #if ot.board [i][j] == 1:
-                #circ = pygame.draw.circle(screen, WHITE, (60, 50), 10)
             pygame.draw.rect(screen, tile_color, rect)
             pygame.draw.rect(screen, board_color, rect, 3)
+    for i in range(8):
+        for j in range(8):
+            if ot.board [i][j] == 1:
+                circ = pygame.draw.circle(screen, white, (board_start[0] + j * tile_size + tile_size / 2, board_start[1] + i * tile_size + tile_size / 2), piece_radius)
+
     
     pygame.display.flip()
