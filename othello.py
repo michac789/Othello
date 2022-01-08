@@ -46,10 +46,29 @@ class Othello():
     
     # Returns True if a tile is landlocked (surrounded in every direction with another tile), otherwise False
     def landlocked(self, tile):
-        for tile in self.surrounding_tiles:
-            if self.valid_tile(tile) and self.board[tile[0]][tile[1]] != 0: return False
-        return True
-    
+        # for tile in self.surrounding_tiles:
+        #     if self.valid_tile(tile) and self.board[tile[0]][tile[1]] != 0: return False
+        # return True
+        return False
+
+    # Returns a list of all possible valid moves (tiles that can be clicked) in a certain state
+    def get_possible_moves(self):
+        possible_moves = set()
+        all_tiles = [(i, j) for i in range(self.height) for j in range(self.width)]
+        for tile in all_tiles:
+            if not self.landlocked(tile):
+                for t in self.surrounding_tiles:
+                    if self.valid_tile((tile[0] + t[0], tile[1] + t[1])):
+                        if self.board[tile[0] + t[0]][tile[1] + t[1]] == self.turn % 2 + 1:
+                            k = 1
+                            while True:
+                                k += 1
+                                if not self.valid_tile((tile[0] + t[0] * k, tile[1] + t[1] * k)): break
+                                if self.board[tile[0] + t[0] * k][tile[1] + t[1] * k] == 0: break
+                                if self.board[tile[0] + t[0] * k][tile[1] + t[1] * k] == self.turn:
+                                    possible_moves.add(tile)
+        return list(possible_moves)
+
     # Returns True if a move is valid, otherwise False
     def valid_move(self, move):
         surrounding_tiles = [(i, j) for i in range(-1, 2, 1) for j in range(-1, 2, 1) if i != 0 or j != 0]
@@ -66,7 +85,7 @@ class Othello():
                         if self.board[move[0] + direction[0] * k][move[1] + direction[1] * k] == self.turn:
                             return True
         return False
-    
+
     # Updates the board with the current move and change player's turn
     def make_move(self, move):
         surrounding_tiles = [(i, j) for i in range(-1, 2, 1) for j in range(-1, 2, 1) if i != 0 or j != 0]
@@ -96,30 +115,6 @@ class Othello():
         if self.black_tiles + self.white_tiles == self.height * self.width or self.white_tiles == 0 or self.black_tiles == 0:
             return (1 if self.white_tiles > self.black_tiles else 2)
         return 0
-    
-    # Returns a list containing all possible valid moves (tiles that can be clicked) in a certain state
-    def possible_moves(self):
-        all_tiles = [(i, j) for i in range(self.height) for j in range(self.width)]
-        
-        
-        all_tiles = [(i, j) for i in range(self.height) for j in range(self.width)]
-        possible_moves = []
-        for move in all_tiles:
-            surrounding_tiles = [(i, j) for i in range(-1, 2, 1) for j in range(-1, 2, 1) if i != 0 or j != 0]
-            for direction in surrounding_tiles:
-                if self.valid_tile(move[0] + direction[0], move[1] + direction[1]):
-                    if self.board[move[0] + direction[0]][move[1] + direction[1]] == self.turn % 2 + 1:
-                        k = 1
-                        while(True):
-                            k += 1
-                            if not self.valid_tile(move[0] + direction[0] * k, move[1] + direction[1] * k):
-                                break
-                            if self.board[move[0] + direction[0] * k][move[1] + direction[1] * k] == 0:
-                                break
-                            if self.board[move[0] + direction[0] * k][move[1] + direction[1] * k] == self.turn:
-                                possible_moves.append(move)
-        return possible_moves
-    
     
     # Level 1 AI: return random move
     def level1(self):
