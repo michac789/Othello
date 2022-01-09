@@ -4,14 +4,14 @@ import operator
 
 class Othello():
     
-    # Initialize an empty board and variables needed; 0: empty, 1: white, 2: black
+    # Initialize an empty board and variables needed; 0: empty, 1: black, 2: white
     def __init__(self, height, width):
         self.height = height
         self.width = width
         self.board = [[0 for i in range(self.width)] for j in range(self.height)]
         
         # By default, black goes first; keep track for number of white and black tiles
-        self.turn = 2
+        self.turn = 1
         self.white_tiles = 0
         self.black_tiles = 0
         
@@ -26,10 +26,10 @@ class Othello():
         self.board = [[0 for i in range(self.width)] for j in range(self.height)]
         self.white_tiles, self.black_tiles = 0, 0
         for tile in initial_white:
-            self.board[tile[0]][tile[1]] = 1
+            self.board[tile[0]][tile[1]] = 2
             self.white_tiles += 1
         for tile in initial_black:
-            self.board[tile[0]][tile[1]] = 2
+            self.board[tile[0]][tile[1]] = 1
             self.black_tiles += 1
     
     # Prints the state of the board in the terminal
@@ -135,7 +135,7 @@ def main():
     
     # Loop through while the game is not ended
     while(True):
-        color = ("White" if ot.turn == 1 else "Black")
+        color = ("White" if ot.turn == 2 else "Black")
         print(f"It is player {color}'s turn.")
         
         # Ensure a valid move is given by the user
@@ -154,7 +154,7 @@ def main():
             break
     
     # Display the winner when someone wins
-    winner = ("White" if ot.check_victory() == 1 else "Black")
+    winner = ("White" if ot.check_victory() == 2 else "Black")
     print(f"Congratulations! {winner} wins the game!")
 
 def check_int(input):

@@ -9,53 +9,59 @@ from helper import *
 class Game():
     
     def __init__(self):
+        # Initialize default board size and othello object
         self.dim_height = 8
         self.dim_width = 8
-        
         self.ot = Othello(8, 8)
         
+        # Initialize pygame, set title, set default screen size with 9:16 resizable aspect ratio
         self.screen_width = 800
         self.screen_height = 450
+        pygame.init()
+        pygame.display.set_caption("Othello")
+        self.screen = pygame.display.set_mode((800, 450), pygame.RESIZABLE)
+        
+        # Compute various component sizes relative to screen_width and screen_height
         self.board_padding = self.screen_height / 15
-        
-        self.size = width, height = 800, 450
-        self.screen = pygame.display.set_mode(self.size, pygame.RESIZABLE)
-        
-        # Compute board sizes
         self.board_width = ((9 / 16) * self.screen_width) - (2 * self.board_padding)
         self.board_height = self.screen_height - (2 * self.board_padding)
         self.tile_size = int(min(self.board_width / self.dim_width, self.board_height / self.dim_height))
         self.board_start = (self.board_padding, self.board_padding)
         self.piece_radius = math.floor(self.tile_size / 2 - 5)
         
-        self.game_state = "start"
-        self.game_prep = False
+        # Keep track of game menus and states (state machine updator)
+        # Menu: start, play, pre_classic, pre_custom, pre_puzzle, tutorial, leaderboard
+        # State (when menu is play): prep, play, end
+        self.game_menu = "start"
+        self.game_state = "prep"
+    
+    # Resize components relative to the overall screen width and height while maintaining 9:16 ratio
+    def resize(self):
+        self.board_padding = self.screen_height / 15
+        self.board_width = ((9 / 16) * self.screen_width) - (2 * self.board_padding)
+        self.board_height = self.screen_height - (2 * self.board_padding)
+        self.tile_size = int(min(self.board_width / self.dim_width, self.board_height / self.dim_height))
+        self.board_start = (self.board_padding, self.board_padding)
+        self.piece_radius = math.floor(self.tile_size / 2 - 5)
         
     def run(self):
-        # Initialize game with 9:16 resizable aspect ratio
-        pygame.init()
-        pygame.display.set_caption("Othello")
-
-        
         while True:
-            # Terminate application when the game is quit
+            # Terminate application when the game is quit, smart resizable window feature
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: sys.ext()
                 elif event.type == pygame.VIDEORESIZE:
-                    print("dfsf")
-                    screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
-                    #screen.blit(surface, screen)
-                    # TO-DO: resize feature
+                    pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
+                    self.screen_height, self.screen_width = event.h, event.w
+                    self.resize()
 
-                if self.game_state == "start":
-                    self.state_mainmenu()
-                    continue
-                
-                if self.game_state == "play":
-                    self.state_play()
-                    continue
-                
-                pygame.display.flip()
+            # Based on 'state machine' concept, launch different states of the game depending on self.game_state
+            if self.game_menu == "start":
+                self.state_mainmenu()
+            elif self.game_menu == "play":
+                self.state_play()
+            # TODO
+            elif self.game_menu == "pre_classic":
+                pass
                 
     def state_mainmenu(self):
         # Display title
@@ -73,24 +79,24 @@ class Game():
         pygame.draw.rect(self.screen, white, buttonRect)
         self.screen.blit(buttonText, buttonTextRect)
         
-        # Change the game_state to "play" if play button is left-clicked
+        # Change the game_menu to "play" if play button is left-clicked
         left, _, _ = pygame.mouse.get_pressed()
         if left == 1:
             mouse = pygame.mouse.get_pos()
             if buttonRect.collidepoint(mouse):
-                self.game_state = "play"
+                self.game_menu = "play"
         
         pygame.display.flip()
 
     def state_play(self):
         
         # Initialize game with default settings (first time only)
-        if not self.game_prep:
+        if self.game_state == "prep":
             init_white = [(3, 3), (4, 4)]
             init_black = [(3, 4), (4, 3)]
             self.ot.set_initial_position(init_white, init_black)
-            self.ot.turn = 2
-            self.game_prep = True
+            self.ot.turn = 1
+            self.game_state = "play"
         
         # Draw board and all the tiles
         self.screen.fill(black)
@@ -111,7 +117,7 @@ class Game():
                 coordinate = (self.board_start[0] + j * self.tile_size + self.tile_size / 2, self.board_start[1] + i * self.tile_size + self.tile_size / 2)
                 if self.ot.board[i][j] != 0:
                     circ = pygame.draw.circle(self.screen, tile_border_color, coordinate, self.piece_radius + 2)
-                    circ = pygame.draw.circle(self.screen, (white if self.ot.board[i][j] == 1 else black), coordinate, self.piece_radius)
+                    circ = pygame.draw.circle(self.screen, (white if self.ot.board[i][j] == 2 else black), coordinate, self.piece_radius)
                 if (i, j) in moves:
                     circ = pygame.draw.circle(self.screen, moves_color, coordinate, self.piece_radius, int(self.piece_radius / 2))
         
@@ -124,16 +130,13 @@ class Game():
                     if tiles[i][j].collidepoint(mouse):
                         if (i, j) in moves:
                             self.ot.make_move((i, j))
-                        # ot.terminal_print()
-                        # if ot.check_victory() != 0:
-                        #     break
         
         pygame.display.flip()         
-            
 
 
 def main():
     game = Game()
     game.run()
 
-main()
+if __name__ == "__main__":
+    main()
