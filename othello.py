@@ -43,11 +43,6 @@ class Othello():
     # Returns True if 'tile' is a valid tile on the board, otherwise False
     def is_valid_tile(self, tile):
         return (True if 0 <= tile[0] < self.height and 0 <= tile[1] < self.width else False)
-    
-    # Returns a list of all surrounding valid tiles, given a single tile
-    def get_surrounding_tiles(self, tile):
-        tiles = [tuple(map(operator.add, tile, s_tile)) for s_tile in self.surrounding_tiles]
-        return [tile for tile in tiles if self.is_valid_tile(tile)]
 
     # Returns a list of all possible valid moves (tiles that can be clicked) in a certain state
     def get_possible_moves(self):
@@ -84,13 +79,11 @@ class Othello():
                         for m in range(k):
                             self.board[move[0] + t[0] * m][move[1] + t[1] * m] = self.turn
         self.turn = self.turn % 2 + 1
-        white_count, black_count = 0, 0
+        self.white_tiles, self.black_tiles = 0, 0
         for row in self.board:
             for piece in row:
-                if piece == 1: white_count += 1
-                if piece == 2: black_count += 1
-        self.white_tiles = white_count
-        self.black_tiles = black_count
+                if piece == 1: self.white_tiles += 1
+                if piece == 2: self.black_tiles += 1
     
     # Check for a certain board state and turn, return 1 if white wins, 2 if black wins, 3 if draw, 0 if neither wins
     def check_victory(self):

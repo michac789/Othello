@@ -2,6 +2,8 @@ import pygame
 import sys
 import math
 
+from pygame import surface
+
 from othello import Othello
 
 # Global variable for size of the board
@@ -16,14 +18,15 @@ tile_border_color = (110, 38, 14)
 board_color = (50, 50, 50)
 moves_color = (100, 100, 100)
 
-# Initialize game with 9:16 aspect ratio
+# Initialize game with 9:16 resizable aspect ratio
 pygame.init()
+pygame.display.set_caption("Othello")
 size = width, height = 800, 450
-screen = pygame.display.set_mode(size)
+screen = pygame.display.set_mode(size, pygame.RESIZABLE)
 
 # Define various fonts here
 OPEN_SANS = "OpenSans-Regular.ttf"
-smallFont = pygame.font.Font("OpenSans-Regular.ttf", 20)
+smallFont = pygame.font.Font(OPEN_SANS, 20)
 hugeFont = pygame.font.Font(OPEN_SANS, 40)
 
 titleFont = pygame.font.Font(OPEN_SANS, 50)
@@ -37,12 +40,6 @@ tile_size = int(min(board_width / WIDTH, board_height / HEIGHT))
 board_start = (board_padding, board_padding)
 piece_radius = math.floor(tile_size / 2 - 5)
 
-# Initialize game (CHANGED TO LATER PARTS)
-# ot = Othello(8, 8)
-# init_white = [(3, 3), (4, 4)]
-# init_black = [(3, 4), (4, 3)]
-# ot.set_initial_position(init_white, init_black)
-
 # States: start (for main menu)
 game_state = "start"
 game_prep = False
@@ -55,9 +52,14 @@ def main():
         # Terminate application when the game is quit
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.ext()
-            
-        screen.fill(black)
-                
+            elif event.type == pygame.VIDEORESIZE:
+                print("dfsf")
+                global screen
+                screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
+                #screen.blit(surface, screen)
+                # TO-DO: resize feature
+        
+        
         if game_state == "start":
             state_mainmenu()
             continue
@@ -65,6 +67,8 @@ def main():
         if game_state == "play":
             state_play()
             continue
+        
+        pygame.display.flip()
 
 
 def state_mainmenu():
@@ -84,9 +88,9 @@ def state_mainmenu():
     pygame.draw.rect(screen, white, buttonRect)
     screen.blit(buttonText, buttonTextRect)
     
-    # Change the game_state to "play" if play button is clicked
-    click, _, _ = pygame.mouse.get_pressed()
-    if click == 1:
+    # Change the game_state to "play" if play button is left-clicked
+    left, _, _ = pygame.mouse.get_pressed()
+    if left == 1:
         mouse = pygame.mouse.get_pos()
         if buttonRect.collidepoint(mouse):
             global game_state
@@ -143,5 +147,5 @@ def state_play():
                     #     break
     
     pygame.display.flip()
-        
+    
 main()
