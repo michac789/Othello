@@ -9,7 +9,7 @@ class Othello():
         self.height = height
         self.width = width
         self.board = [[0 for i in range(self.width)] for j in range(self.height)]
-        self.turn = 1
+        self.turn = 2
         self.white_tiles = 0
         self.black_tiles = 0
         self.surrounding_tiles = [(i, j) for i in range(-1, 2, 1) for j in range(-1, 2, 1) if i != 0 or j != 0]
@@ -56,7 +56,7 @@ class Othello():
         possible_moves = set()
         all_tiles = [(i, j) for i in range(self.height) for j in range(self.width)]
         for tile in all_tiles:
-            if not self.landlocked(tile):
+            if not self.landlocked(tile) and self.board[tile[0]][tile[1]] == 0:
                 for t in self.surrounding_tiles:
                     if self.valid_tile((tile[0] + t[0], tile[1] + t[1])):
                         if self.board[tile[0] + t[0]][tile[1] + t[1]] == self.turn % 2 + 1:
@@ -70,26 +70,25 @@ class Othello():
         return list(possible_moves)
 
     # Returns True if a move is valid, otherwise False
-    def valid_move(self, move):
-        surrounding_tiles = [(i, j) for i in range(-1, 2, 1) for j in range(-1, 2, 1) if i != 0 or j != 0]
-        for direction in surrounding_tiles:
-            if self.valid_tile(move[0] + direction[0], move[1] + direction[1]):
-                if self.board[move[0] + direction[0]][move[1] + direction[1]] == self.turn % 2 + 1:
-                    k = 1
-                    while(True):
-                        k += 1
-                        if not self.valid_tile(move[0] + direction[0] * k, move[1] + direction[1] * k):
-                            break
-                        if self.board[move[0] + direction[0] * k][move[1] + direction[1] * k] == 0:
-                            break
-                        if self.board[move[0] + direction[0] * k][move[1] + direction[1] * k] == self.turn:
-                            return True
-        return False
+    # def valid_move(self, move):
+    #     surrounding_tiles = [(i, j) for i in range(-1, 2, 1) for j in range(-1, 2, 1) if i != 0 or j != 0]
+    #     for direction in surrounding_tiles:
+    #         if self.valid_tile(move[0] + direction[0], move[1] + direction[1]):
+    #             if self.board[move[0] + direction[0]][move[1] + direction[1]] == self.turn % 2 + 1:
+    #                 k = 1
+    #                 while(True):
+    #                     k += 1
+    #                     if not self.valid_tile(move[0] + direction[0] * k, move[1] + direction[1] * k):
+    #                         break
+    #                     if self.board[move[0] + direction[0] * k][move[1] + direction[1] * k] == 0:
+    #                         break
+    #                     if self.board[move[0] + direction[0] * k][move[1] + direction[1] * k] == self.turn:
+    #                         return True
+    #     return False
 
-    # Updates the board with the current move and change player's turn
+    # Updates the board with the current move, assuming that the 'move' parameter should already be valid
     def make_move(self, move):
-        surrounding_tiles = [(i, j) for i in range(-1, 2, 1) for j in range(-1, 2, 1) if i != 0 or j != 0]
-        for direction in surrounding_tiles:
+        for direction in self.surrounding_tiles:
             #print(f"DEBUG dir: {direction}")
             if self.valid_tile(move[0] + direction[0], move[0] + direction[1]):
                 if self.board[move[0] + direction[0]][move[1] + direction[1]] == self.turn % 2 + 1:
@@ -97,10 +96,8 @@ class Othello():
                     while(True):
                         k += 1
                         #print(self.board[move[0] + direction[0] * k][move[1] + direction[1] * k])
-                        if not self.valid_tile(move[0] + direction[0] * k, move[1] + direction[1] * k):
-                            break
-                        if self.board[move[0] + direction[0] * k][move[1] + direction[1] * k] == 0:
-                            break
+                        if not self.valid_tile(move[0] + direction[0] * k, move[1] + direction[1] * k): break
+                        if self.board[move[0] + direction[0] * k][move[1] + direction[1] * k] == 0: break
                         if self.board[move[0] + direction[0] * k][move[1] + direction[1] * k] == self.turn:
                             change = True
                             break
