@@ -70,7 +70,7 @@ class Othello():
     # Updates the board with the current move, assuming that the 'move' parameter should already be valid
     def make_move(self, move):
         for t in self.surrounding_tiles:
-            if self.is_valid_tile((move[0] + t[0], move[0] + t[1])):
+            if self.is_valid_tile((move[0] + t[0], move[1] + t[1])):
                 if self.board[move[0] + t[0]][move[1] + t[1]] == self.turn % 2 + 1:
                     k, change = 1, False
                     while(True):
@@ -132,30 +132,44 @@ class Othello():
 
 
 def main():
+    
+    # Initialize the game (apply standard game settings)
     ot = Othello(8, 8)
-    ot.terminal_print()
     init_white = [(3, 3), (4, 4)]
     init_black = [(3, 4), (4, 3)]
     ot.set_initial_position(init_white, init_black)
     ot.terminal_print()
     
-    # main functionality here
+    # Loop through while the game is not ended
     while(True):
         color = ("White" if ot.turn == 1 else "Black")
-        print(f"It is player {ot.turn}'s turn ({color} pieces)")
+        print(f"It is player {color}'s turn.")
         
-        print(ot.possible_moves())
+        # Ensure a valid move is given by the user
         while(True):
-            move_y = int(input("Enter tile's height: "))
-            move_x = int(input("Enter tile's width: "))
-            if ot.valid_move((move_y, move_x)):
+            moves = ot.get_possible_moves()
+            move_y = input("Enter tile's height: ")
+            move_x = input("Enter tile's width: ")
+            if check_int(move_y) and check_int(move_x) and (int(move_y), int(move_x)) in moves:
                 break
-            print("Invalid move, please try another move.")
-            
-        ot.make_move((move_y, move_x))
+            print("Invalid move!")
+        
+        # Make move, print the board, end the game if someone wins
+        ot.make_move((int(move_y), int(move_x)))
         ot.terminal_print()
         if ot.check_victory() != 0:
             break
+    
+    # Display the winner when someone wins
+    winner = ("White" if ot.check_victory() == 1 else "Black")
+    print(f"Congratulations! {winner} wins the game!")
+
+def check_int(input):
+    try:
+        x = int(input)
+        return True
+    except ValueError:
+        return False
 
 
 if __name__ == "__main__":

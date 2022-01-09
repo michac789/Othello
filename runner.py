@@ -36,7 +36,7 @@ tile_size = int(min(board_width / WIDTH, board_height / HEIGHT))
 board_start = (board_padding, board_padding)
 piece_radius = math.floor(tile_size / 2 - 5)
 
-# Initialize game
+# Initialize game (CHANGED TO LATER PARTS)
 ot = Othello(8, 8)
 init_white = [(3, 3), (4, 4)]
 init_black = [(3, 4), (4, 3)]
@@ -44,6 +44,7 @@ ot.set_initial_position(init_white, init_black)
 
 # States: start (for main menu)
 game_state = "start"
+# base: main menu
 
 def main():
     while True:
@@ -57,11 +58,7 @@ def main():
         if game_state == "start":
             state_mainmenu()
             continue
-            # do something here
-        
-        # rect = pygame.Rect(30, 30, 100, 100)
-        # pygame.draw.rect(screen, board_color, rect)
-        
+
         # Draw board
         tiles = []
         for i in range(HEIGHT):
@@ -115,13 +112,13 @@ def state_mainmenu():
     pygame.draw.rect(screen, white, buttonRect)
     screen.blit(buttonText, buttonTextRect)
     
+    # Change the game_state to "play" if play button is clicked
     click, _, _ = pygame.mouse.get_pressed()
     if click == 1:
         mouse = pygame.mouse.get_pos()
         if buttonRect.collidepoint(mouse):
-            print("Hjdfhjdf")
+            global game_state
             game_state = "play"
-    
     
     pygame.display.flip()
     
@@ -129,4 +126,3 @@ def state_play():
     pass
         
 main()
-
