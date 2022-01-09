@@ -2,6 +2,7 @@ import unittest
 
 from othello import *
 
+
 class is_valid_tile_func(unittest.TestCase):
     
     def setUp(self):
