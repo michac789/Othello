@@ -66,12 +66,12 @@ class Othello():
     # Updates the board with the current move, assuming that the 'move' parameter should already be valid
     def make_move(self, move):
         for t in self.surrounding_tiles:
-            if self.is_valid_tile(move[0] + t[0], move[0] + t[1]):
+            if self.is_valid_tile((move[0] + t[0], move[0] + t[1])):
                 if self.board[move[0] + t[0]][move[1] + t[1]] == self.turn % 2 + 1:
                     k, change = 1, False
                     while(True):
                         k += 1
-                        if not self.is_valid_tile(move[0] + t[0] * k, move[1] + t[1] * k): break
+                        if not self.is_valid_tile((move[0] + t[0] * k, move[1] + t[1] * k)): break
                         if self.board[move[0] + t[0] * k][move[1] + t[1] * k] == 0: break
                         if self.board[move[0] + t[0] * k][move[1] + t[1] * k] == self.turn:
                             change = True
@@ -80,7 +80,6 @@ class Othello():
                         for m in range(k):
                             self.board[move[0] + t[0] * m][move[1] + t[1] * m] = self.turn
         self.turn = self.turn % 2 + 1
-                    
     
     # Check for a certain board state and turn, return 1 if white wins, 2 if black wins, 3 if draw, 0 if neither wins
     def check_victory(self):

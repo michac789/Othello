@@ -64,23 +64,6 @@ class get_surrounding_tiles_func(unittest.TestCase):
         self.assertCountEqual(self.ot.get_surrounding_tiles((4, 4)), expected)
 
 
-class landlocked_func(unittest.TestCase):
-    
-    def setUp(self):
-        self.ot = Othello(6, 6)
-        
-    def test_1(self):
-        self.ot.board = [[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]]
-        self.ot.board = [[0,0,0,0,0,0],[0,0,1,2,2,0],[0,0,2,1,1,0],[0,0,1,2,1,0],[0,0,0,0,0,0],[0,0,0,0,0,0]]
-        #self.assertTrue(self.ot.landlocked((2, 3)))
-
-
-class valid_move_func(unittest.TestCase):
-    
-    def setUp(self):
-        self.ot = Othello(6, 6)
-
-
 class get_possible_moves_func(unittest.TestCase):
 
     def setUp(self):
@@ -112,7 +95,39 @@ class get_possible_moves_func(unittest.TestCase):
 
 
 class make_move_func(unittest.TestCase):
-    pass
+
+    def setUp(self):
+        self.ot = Othello(6, 6)
+        
+    def test_simulate_game_1(self):
+        self.ot.board = [[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,1,2,0,0],[0,0,2,1,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]]
+        self.ot.turn = 2
+        
+        self.ot.make_move((1, 2))
+        expected = [[0,0,0,0,0,0],[0,0,2,0,0,0],[0,0,2,2,0,0],[0,0,2,1,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]]
+        self.assertCountEqual(self.ot.board, expected)
+        self.assertEqual(self.ot.turn, 1)
+        
+        self.ot.make_move((1, 3))
+        expected = [[0,0,0,0,0,0],[0,0,2,1,0,0],[0,0,2,1,0,0],[0,0,2,1,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]]
+        self.assertCountEqual(self.ot.board, expected)
+        self.assertEqual(self.ot.turn, 2)
+        
+        self.ot.make_move((2, 4))
+        expected = [[0,0,0,0,0,0],[0,0,2,1,0,0],[0,0,2,2,2,0],[0,0,2,1,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]]
+        self.assertCountEqual(self.ot.board, expected)
+        self.assertEqual(self.ot.turn, 1)
+        
+        self.ot.make_move((3, 1))
+        expected = [[0,0,0,0,0,0],[0,0,2,1,0,0],[0,0,1,2,2,0],[0,1,1,1,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]]
+        self.assertCountEqual(self.ot.board, expected)
+        self.assertEqual(self.ot.turn, 2)
+
+
+class check_victory_func(unittest.TestCase):
+
+    def setUp(self):
+        self.ot = Othello(6, 6)
 
 
 if __name__ == "__main__":
