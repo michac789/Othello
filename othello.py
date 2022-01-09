@@ -9,11 +9,14 @@ class Othello():
         self.height = height
         self.width = width
         self.board = [[0 for i in range(self.width)] for j in range(self.height)]
+        
+        # By default, black goes first; keep track for number of white and black tiles
         self.turn = 2
         self.white_tiles = 0
         self.black_tiles = 0
         
         self.surrounding_tiles = [(i, j) for i in range(-1, 2, 1) for j in range(-1, 2, 1) if i != 0 or j != 0]
+        
         self.tiles_corner = [(0, 0), (0, self.width - 1), (self.height - 1, 0), (self.height - 1, self.width - 1)]
         self.tiles_near_corner = [(0, 1), (1, 0), (1, 1), (0, self.width - 2), (1, self.width - 2), (1, self.width - 1), (self.height - 2, 0), (self.height - 1, 1), (self.height - 2, 1), (self.height - 2, self.width - 1), (self.height - 1, self.width - 2), (self.height - 2, self.width - 2)]
         self.tiles_edge = [(i, j) for i in range(self.height) for j in range(self.width) if i == 0 or i != self.height - 1 or j != 0 or j != self.width - 1]
@@ -21,6 +24,7 @@ class Othello():
     # Accepts a list of initial white and black tiles to be filled with its respective colors, clear previous board
     def set_initial_position(self, initial_white, initial_black):
         self.board = [[0 for i in range(self.width)] for j in range(self.height)]
+        self.white_tiles, self.black_tiles = 0, 0
         for tile in initial_white:
             self.board[tile[0]][tile[1]] = 1
             self.white_tiles += 1
@@ -80,6 +84,13 @@ class Othello():
                         for m in range(k):
                             self.board[move[0] + t[0] * m][move[1] + t[1] * m] = self.turn
         self.turn = self.turn % 2 + 1
+        white_count, black_count = 0, 0
+        for row in self.board:
+            for piece in row:
+                if piece == 1: white_count += 1
+                if piece == 2: black_count += 1
+        self.white_tiles = white_count
+        self.black_tiles = black_count
     
     # Check for a certain board state and turn, return 1 if white wins, 2 if black wins, 3 if draw, 0 if neither wins
     def check_victory(self):
@@ -127,8 +138,6 @@ def main():
     init_black = [(3, 4), (4, 3)]
     ot.set_initial_position(init_white, init_black)
     ot.terminal_print()
-    
-    sys.exit()
     
     # main functionality here
     while(True):

@@ -107,21 +107,29 @@ class make_move_func(unittest.TestCase):
         expected = [[0,0,0,0,0,0],[0,0,2,0,0,0],[0,0,2,2,0,0],[0,0,2,1,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]]
         self.assertCountEqual(self.ot.board, expected)
         self.assertEqual(self.ot.turn, 1)
+        self.assertEqual(self.ot.white_tiles, 1)
+        self.assertEqual(self.ot.black_tiles, 4)
         
         self.ot.make_move((1, 3))
         expected = [[0,0,0,0,0,0],[0,0,2,1,0,0],[0,0,2,1,0,0],[0,0,2,1,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]]
         self.assertCountEqual(self.ot.board, expected)
         self.assertEqual(self.ot.turn, 2)
+        self.assertEqual(self.ot.white_tiles, 3)
+        self.assertEqual(self.ot.black_tiles, 3)
         
         self.ot.make_move((2, 4))
         expected = [[0,0,0,0,0,0],[0,0,2,1,0,0],[0,0,2,2,2,0],[0,0,2,1,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]]
         self.assertCountEqual(self.ot.board, expected)
         self.assertEqual(self.ot.turn, 1)
+        self.assertEqual(self.ot.white_tiles, 2)
+        self.assertEqual(self.ot.black_tiles, 5)
         
         self.ot.make_move((3, 1))
         expected = [[0,0,0,0,0,0],[0,0,2,1,0,0],[0,0,1,2,2,0],[0,1,1,1,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]]
         self.assertCountEqual(self.ot.board, expected)
         self.assertEqual(self.ot.turn, 2)
+        self.assertEqual(self.ot.white_tiles, 5)
+        self.assertEqual(self.ot.black_tiles, 3)
 
 
 class check_victory_func(unittest.TestCase):
