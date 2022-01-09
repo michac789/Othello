@@ -12,6 +12,7 @@ class Othello():
         self.turn = 2
         self.white_tiles = 0
         self.black_tiles = 0
+        
         self.surrounding_tiles = [(i, j) for i in range(-1, 2, 1) for j in range(-1, 2, 1) if i != 0 or j != 0]
         self.tiles_corner = [(0, 0), (0, self.width - 1), (self.height - 1, 0), (self.height - 1, self.width - 1)]
         self.tiles_near_corner = [(0, 1), (1, 0), (1, 1), (0, self.width - 2), (1, self.width - 2), (1, self.width - 1), (self.height - 2, 0), (self.height - 1, 1), (self.height - 2, 1), (self.height - 2, self.width - 1), (self.height - 1, self.width - 2), (self.height - 2, self.width - 2)]
@@ -36,74 +37,48 @@ class Othello():
         print("")
     
     # Returns True if 'tile' is a valid tile on the board, otherwise False
-    def valid_tile(self, tile):
+    def is_valid_tile(self, tile):
         return (True if 0 <= tile[0] < self.height and 0 <= tile[1] < self.width else False)
     
     # Returns a list of all surrounding valid tiles, given a single tile
     def get_surrounding_tiles(self, tile):
         tiles = [tuple(map(operator.add, tile, s_tile)) for s_tile in self.surrounding_tiles]
-        return [tile for tile in tiles if self.valid_tile(tile)]
-    
-    # Returns True if a tile is landlocked (surrounded in every direction with another tile), otherwise False
-    def landlocked(self, tile):
-        # for tile in self.surrounding_tiles:
-        #     if self.valid_tile(tile) and self.board[tile[0]][tile[1]] != 0: return False
-        # return True
-        return False
+        return [tile for tile in tiles if self.is_valid_tile(tile)]
 
     # Returns a list of all possible valid moves (tiles that can be clicked) in a certain state
     def get_possible_moves(self):
         possible_moves = set()
         all_tiles = [(i, j) for i in range(self.height) for j in range(self.width)]
         for tile in all_tiles:
-            if not self.landlocked(tile) and self.board[tile[0]][tile[1]] == 0:
+            if self.board[tile[0]][tile[1]] == 0:
                 for t in self.surrounding_tiles:
-                    if self.valid_tile((tile[0] + t[0], tile[1] + t[1])):
+                    if self.is_valid_tile((tile[0] + t[0], tile[1] + t[1])):
                         if self.board[tile[0] + t[0]][tile[1] + t[1]] == self.turn % 2 + 1:
                             k = 1
                             while True:
                                 k += 1
-                                if not self.valid_tile((tile[0] + t[0] * k, tile[1] + t[1] * k)): break
+                                if not self.is_valid_tile((tile[0] + t[0] * k, tile[1] + t[1] * k)): break
                                 if self.board[tile[0] + t[0] * k][tile[1] + t[1] * k] == 0: break
                                 if self.board[tile[0] + t[0] * k][tile[1] + t[1] * k] == self.turn:
                                     possible_moves.add(tile)
         return list(possible_moves)
 
-    # Returns True if a move is valid, otherwise False
-    # def valid_move(self, move):
-    #     surrounding_tiles = [(i, j) for i in range(-1, 2, 1) for j in range(-1, 2, 1) if i != 0 or j != 0]
-    #     for direction in surrounding_tiles:
-    #         if self.valid_tile(move[0] + direction[0], move[1] + direction[1]):
-    #             if self.board[move[0] + direction[0]][move[1] + direction[1]] == self.turn % 2 + 1:
-    #                 k = 1
-    #                 while(True):
-    #                     k += 1
-    #                     if not self.valid_tile(move[0] + direction[0] * k, move[1] + direction[1] * k):
-    #                         break
-    #                     if self.board[move[0] + direction[0] * k][move[1] + direction[1] * k] == 0:
-    #                         break
-    #                     if self.board[move[0] + direction[0] * k][move[1] + direction[1] * k] == self.turn:
-    #                         return True
-    #     return False
-
     # Updates the board with the current move, assuming that the 'move' parameter should already be valid
     def make_move(self, move):
-        for direction in self.surrounding_tiles:
-            #print(f"DEBUG dir: {direction}")
-            if self.valid_tile(move[0] + direction[0], move[0] + direction[1]):
-                if self.board[move[0] + direction[0]][move[1] + direction[1]] == self.turn % 2 + 1:
+        for t in self.surrounding_tiles:
+            if self.is_valid_tile(move[0] + t[0], move[0] + t[1]):
+                if self.board[move[0] + t[0]][move[1] + t[1]] == self.turn % 2 + 1:
                     k, change = 1, False
                     while(True):
                         k += 1
-                        #print(self.board[move[0] + direction[0] * k][move[1] + direction[1] * k])
-                        if not self.valid_tile(move[0] + direction[0] * k, move[1] + direction[1] * k): break
-                        if self.board[move[0] + direction[0] * k][move[1] + direction[1] * k] == 0: break
-                        if self.board[move[0] + direction[0] * k][move[1] + direction[1] * k] == self.turn:
+                        if not self.is_valid_tile(move[0] + t[0] * k, move[1] + t[1] * k): break
+                        if self.board[move[0] + t[0] * k][move[1] + t[1] * k] == 0: break
+                        if self.board[move[0] + t[0] * k][move[1] + t[1] * k] == self.turn:
                             change = True
                             break
                     if change:
                         for m in range(k):
-                            self.board[move[0] + direction[0] * m][move[1] + direction[1] * m] = self.turn
+                            self.board[move[0] + t[0] * m][move[1] + t[1] * m] = self.turn
         self.turn = self.turn % 2 + 1
                     
     
