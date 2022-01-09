@@ -71,20 +71,25 @@ class Game():
         titleRect.center = (self.screen_width / 2, 50)
         self.screen.blit(title, titleRect)
         
-        # Display play button
-        buttonRect = pygame.Rect((self.screen_width / 4), (9 / 16) * self.screen_height, self.screen_width / 2, 50)
-        buttonText = buttonFont.render("Play Game", True, black)
-        buttonTextRect = buttonText.get_rect()
-        buttonTextRect.center = buttonRect.center
-        pygame.draw.rect(self.screen, white, buttonRect)
-        self.screen.blit(buttonText, buttonTextRect)
+        # Display buttons (classic mode, custom mode, puzzle mode)
+        button_texts = ["Classic Mode", "Custom Mode", "Puzzle Mode"]
+        button_dict = {}
+        for i in range(3):
+            buttonRect = pygame.Rect((self.screen_width / 4), ((6 + 2 * i) / 16) * self.screen_height, self.screen_width / 2, self.screen_height / 10)
+            button_dict[i] = buttonRect
+            buttonText = buttonFont.render(button_texts[i], True, black)
+            buttonTextRect = buttonText.get_rect()
+            buttonTextRect.center = buttonRect.center
+            pygame.draw.rect(self.screen, white, buttonRect)
+            self.screen.blit(buttonText, buttonTextRect)
         
         # Change the game_menu to "play" if play button is left-clicked
         left, _, _ = pygame.mouse.get_pressed()
         if left == 1:
             mouse = pygame.mouse.get_pos()
-            if buttonRect.collidepoint(mouse):
-                self.game_menu = "play"
+            if button_dict[0].collidepoint(mouse): self.game_menu = "play"
+            #if button_dict[1].collidepoint(mouse): self.game_menu = "???" #TODO
+            #if button_dict[1].collidepoint(mouse): self.game_menu = "???" #TODO
         
         pygame.display.flip()
 
