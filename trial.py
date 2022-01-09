@@ -1,3 +1,2 @@
 from othello import *
 
-

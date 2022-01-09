@@ -12,8 +12,9 @@ WIDTH = 8
 black = (0, 0, 0)
 white = (255, 255, 255)
 tile_color = (0, 160, 0)
-tile_border = (110, 38, 14)
+tile_border_color = (110, 38, 14)
 board_color = (50, 50, 50)
+moves_color = (100, 100, 100)
 
 # Initialize game with 9:16 aspect ratio
 pygame.init()
@@ -102,6 +103,7 @@ def state_play():
         init_white = [(3, 3), (4, 4)]
         init_black = [(3, 4), (4, 3)]
         ot.set_initial_position(init_white, init_black)
+        ot.turn = 2
         game_prep = True
     
     # Draw board and all the tiles
@@ -115,24 +117,27 @@ def state_play():
             pygame.draw.rect(screen, board_color, rect, 3)
             row_tiles.append(rect)
         tiles.append(row_tiles)
-
-    # Draw each pieces that are present in the board
+    
+    # Draw each pieces that are present in the board, including all tiles with possible move
+    moves = ot.get_possible_moves()
     for i in range(HEIGHT):
         for j in range(WIDTH):
+            coordinate = (board_start[0] + j * tile_size + tile_size / 2, board_start[1] + i * tile_size + tile_size / 2)
             if ot.board[i][j] != 0:
-                coordinate = (board_start[0] + j * tile_size + tile_size / 2, board_start[1] + i * tile_size + tile_size / 2)
-                circ = pygame.draw.circle(screen, tile_border, coordinate, piece_radius + 2)
+                circ = pygame.draw.circle(screen, tile_border_color, coordinate, piece_radius + 2)
                 circ = pygame.draw.circle(screen, (white if ot.board[i][j] == 1 else black), coordinate, piece_radius)
+            if (i, j) in moves:
+                circ = pygame.draw.circle(screen, moves_color, coordinate, piece_radius, int(piece_radius / 2))
     
-    # ..         
+    # Update changes when a valid tile is clicked
     left, _, right = pygame.mouse.get_pressed()
     mouse = pygame.mouse.get_pos()
-    
     if left == 1:
         for i in range(HEIGHT):
             for j in range(WIDTH):
                 if tiles[i][j].collidepoint(mouse):
-                    ot.make_move((i, j))
+                    if (i, j) in moves:
+                        ot.make_move((i, j))
                     # ot.terminal_print()
                     # if ot.check_victory() != 0:
                     #     break
