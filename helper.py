@@ -8,6 +8,7 @@ tile_color = (0, 160, 0)
 tile_border_color = (110, 38, 14)
 board_color = (50, 50, 50)
 moves_color = (100, 100, 100)
+score_color = (104, 43, 203)
 
 # Define all fonts used here
 init()
