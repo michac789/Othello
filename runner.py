@@ -9,10 +9,12 @@ from helper import *
 class Game():
     
     def __init__(self):
-        # Initialize default board size and othello object
+        # Default board size and configuration (changeable from custom mode)
         self.dim_height = 8
         self.dim_width = 8
-        self.ot = Othello(8, 8)
+        self.init_white = [(3, 3), (4, 4)]
+        self.init_black = [(3, 4), (4, 3)]
+        self.ot = Othello(self.dim_height, self.dim_width)
         
         # Initialize pygame, set title, set default screen size with 9:16 resizable aspect ratio
         self.screen_width = 800
@@ -35,6 +37,7 @@ class Game():
         self.game_menu = "start"
         self.game_state = "prep"
         
+        # Keep track of recent move
         self.recent_move = None
     
     # Resize components relative to the overall screen width and height while maintaining 9:16 ratio
@@ -60,6 +63,7 @@ class Game():
             if self.game_menu == "start":
                 self.state_mainmenu()
             elif self.game_menu == "play":
+                self.set_config()
                 self.state_play()
             # TODO
             elif self.game_menu == "pre_classic":
@@ -94,16 +98,17 @@ class Game():
             #if button_dict[1].collidepoint(mouse): self.game_menu = "???" #TODO
         
         pygame.display.flip()
+        
+    def set_config(self):
+        self.init_white = [(1, 1), (2, 2)]
+        self.init_black = [(1, 2), (2, 1)]
+        self.dim_height, self.dim_width = 4, 4
 
     def state_play(self):
-        
-        # Initialize game with default settings (first time only)
+        # Initialize game with the required settings
         if self.game_state == "prep":
-            init_white = [(1, 1), (2, 2)]#init_white = [(3, 3), (4, 4)]
-            init_black = [(1, 2), (2, 1)]#init_black = [(3, 4), (4, 3)]
-            self.ot = Othello(4, 4)
-            self.dim_height, self.dim_width = 4, 4
-            self.ot.set_initial_position(init_white, init_black)
+            self.ot = Othello(self.dim_height, self.dim_width)
+            self.ot.set_initial_position(self.init_white, self.init_black)
             self.ot.turn = 1
             self.game_state = "play"
         
@@ -140,6 +145,7 @@ class Game():
         Time1, Time2 = 0, 0
         b1, b2, b3, b4 = f"{self.ot.get_color(self.ot.turn)}'s move (Turn: {self.ot.move_no + 1})", "No winner yet.", "Undo", "Quit"
         if self.game_state == "end":
+            b1 = f"No more moves! ({self.ot.move_no} turns)"
             b2 = f"{self.ot.get_color(self.ot.check_victory)} wins!"
         button_texts = [f"{Time1}", f"{Time2}", "Black", "White", f"{self.ot.black_tiles}", f"{self.ot.white_tiles}", b1, b2, b3, b4]
 
