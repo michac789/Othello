@@ -37,8 +37,10 @@ class Game():
         self.game_menu = "start"
         self.game_state = "prep"
         
-        # Keep track of recent move
-        self.recent_move = None
+        # Keep track of recent move and stored move (used to end game when no 2 consecutive moves); prefilled with distinct placeholder
+        self.recent_move = (-1, -1)
+        self.stored_move = (-2, -2)
+        self.skip_index = -1
     
     # Resize components relative to the overall screen width and height while maintaining 9:16 ratio
     def resize(self):
@@ -57,7 +59,7 @@ class Game():
                 elif event.type == pygame.VIDEORESIZE:
                     pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
                     self.screen_height, self.screen_width = event.h, event.w
-                    self.resize()
+            self.resize()
 
             # Based on 'state machine' concept, launch different states of the game depending on self.game_state
             if self.game_menu == "start":
@@ -100,8 +102,8 @@ class Game():
         pygame.display.flip()
         
     def set_config(self):
-        self.init_white = [(1, 1), (2, 2)]
-        self.init_black = [(1, 2), (2, 1)]
+        self.init_white = [(0, 0), (0, 1), (0, 2), (0, 3)]
+        self.init_black = [(1, 0), (1, 1), (1, 2), (1, 3)]
         self.dim_height, self.dim_width = 4, 4
 
     def state_play(self):
@@ -124,8 +126,21 @@ class Game():
                 row_tiles.append(rect)
             tiles.append(row_tiles)
         
-        # Draw each pieces that are present in the board, including all tiles with possible move
+        # Continue to next turn if there are no moves available; end game if no moves in 2 consecutive turns
         moves = self.ot.get_possible_moves()
+        if len(moves) == 0:
+            if self.skip_index != self.ot.turn and self.ot.skip_turn == 1:
+                self.ot.skip_turn = 2
+            if self.recent_move != self.stored_move:
+                self.ot.skip_turn = 1
+                self.skip_index = self.ot.turn
+                self.ot.turn = self.ot.turn % 2 + 1
+            self.stored_move = self.recent_move
+        else:
+            self.ot.skip_turn = 0
+            self.skip_index = -1
+        
+        # Draw each pieces that are present in the board, including all tiles with possible moves
         for i in range(self.dim_height):
             for j in range(self.dim_width):
                 coordinate = (self.board_start[0] + j * self.tile_size + self.tile_size / 2, self.board_start[1] + i * self.tile_size + self.tile_size / 2)
@@ -185,8 +200,6 @@ class Game():
                 self.game_menu = "start"
                 self.game_state = "prep"
                 self.recent_move = None
-        
-
         
         pygame.display.flip()         
 
