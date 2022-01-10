@@ -1,6 +1,7 @@
 import sys
 import operator
 import random
+from unittest.result import TestResult
 
 
 class Othello():
@@ -136,24 +137,48 @@ class Othello():
 # This is used only for initial testing purposes using the terminal
 def main():
     
-    # Initialize the game (apply standard game settings)
+    # Initialize the game (apply standard game settings; can be customized here)
     ot = Othello(8, 8)
     init_white = [(3, 3), (4, 4)]
     init_black = [(3, 4), (4, 3)]
     ot.set_initial_position(init_white, init_black)
     ot.terminal_print()
     
+    # Testing purpose
+    ot = Othello(4, 4)
+    init_white = [(1, 1), (2, 2)]
+    init_black = [(1, 2), (2, 1)]
+    ot.set_initial_position(init_white, init_black)
+    ot.terminal_print()
+    
+    # Prompt for game mode
+    while True:
+        print("1: human vs human")
+        print("2: human vs ai")
+        mode = input("Enter mode here: ")
+        if mode in ["1", "2"]:
+            break
+    if mode == "1":
+        human_vs_human(ot)
+    else:
+        while True:
+            level = input("Choose AI level (between 1 to 5): ")
+            if check_int(level) and 1 <= int(level) <= 5:
+                break
+        human_vs_ai(ot, int(level))
+    
+def human_vs_human(ot):
     # Loop through while the game is not ended
     while(True):
-        color = ("White" if ot.turn == 2 else "Black")
-        print(f"It is player {color}'s turn.")
+        print(f"It is {ot.get_color(ot.turn)}'s turn (Player {ot.turn})")
         
         # Ensure a valid move is given by the user
         moves = ot.get_possible_moves()
         while(True):
             if len(moves) == 0:
-                print("No moves possible")
+                print("No move possible.")
                 ot.skip_turn = 1
+                ot.turn = ot.turn % 2 + 1
                 if ot.skip_turn == 1: ot.skip_turn += 1
                 break
             move_y = input("Enter tile's height: ")
@@ -169,9 +194,15 @@ def main():
             if ot.check_victory() != 0:
                 break
     
-    # Display the winner when someone wins
-    winner = ("White" if ot.check_victory() == 2 else "Black")
-    print(f"Congratulations! {winner} wins the game!")
+    # Display the winner or draw when game is over
+    if ot.check_victory() == 3:
+        print("Game Draw.")
+    else:
+        winner = ("White" if ot.check_victory() == 2 else "Black")
+        print(f"Congratulations! {winner} wins the game!")
+
+def human_vs_ai(ot, lv):
+    pass #TODO
 
 def check_int(input):
     try:
