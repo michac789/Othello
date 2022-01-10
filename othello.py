@@ -101,17 +101,27 @@ class Othello():
             return (2 if self.white_tiles > self.black_tiles else 1 if self.white_tiles < self.black_tiles else 3)
         return 0
     
+    # Returns True and create computer move where possible, otherwise returns False
+    def make_computer_move(self, level):
+        moves = self.get_possible_moves()
+        if len(moves) == 0: return False
+        if level == 1: move = self.level1(moves)
+        if level == 2: move = self.level2(moves)
+        if level == 3: move = self.level3(moves)
+        self.make_move(move)
+        return True
+    
     # Level 1 AI: return random move
-    def level1(self):
-        return random.choice(self.get_possible_moves())
+    def level1(self, moves):
+        return random.choice(moves)
     
     # Level 2 AI: minimax algorithm with depth 2
     def level2(self):
-        pass
+        raise NotImplementedError
     
     # Level 3 AI: minimax algorithm with depth 4
     def level3(self):
-        pass
+        raise NotImplementedError
     
     # Return the point of a tile (for minimax algorithm)
     def tile_point(self, tile):
@@ -202,7 +212,47 @@ def human_vs_human(ot):
         print(f"Congratulations! {winner} wins the game!")
 
 def human_vs_ai(ot, lv):
-    pass #TODO
+    # Loop through while the game is not ended; human is player 1 (goes first)
+    while(True):
+        print(f"It is your turn")
+        
+        # Ensure a valid move is given by the user
+        moves = ot.get_possible_moves()
+        while(True):
+            if len(moves) == 0:
+                print("No move possible.")
+                ot.skip_turn = 1
+                ot.turn = ot.turn % 2 + 1
+                if ot.skip_turn == 1: ot.skip_turn += 1
+                break
+            move_y = input("Enter tile's height: ")
+            move_x = input("Enter tile's width: ")
+            if check_int(move_y) and check_int(move_x) and (int(move_y), int(move_x)) in moves:
+                break
+            print("Invalid move!")
+        
+        # Make move, print the board, end the game if someone wins
+        if len(moves) != 0:
+            ot.make_move((int(move_y), int(move_x)))
+            ot.terminal_print()
+            if ot.check_victory() != 0:
+                break
+            
+        # Make computer move
+        if lv == 1: move = ot.level1()
+        if lv == 2: move = ot.level2()
+        ot.make_move(move)
+        
+        #
+        if ot.check_victory() != 0:
+            break
+    
+    # Display the winner or draw when game is over
+    if ot.check_victory() == 3:
+        print("Game Draw.")
+    else:
+        winner = ("White" if ot.check_victory() == 2 else "Black")
+        print(f"Congratulations! {winner} wins the game!")
 
 def check_int(input):
     try:
