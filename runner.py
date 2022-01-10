@@ -129,17 +129,25 @@ class Game():
                     circ = pygame.draw.circle(self.screen, moves_color, coordinate, self.piece_radius, int(self.piece_radius / 2))
                 if self.recent_move == (i, j):
                     circ = pygame.draw.circle(self.screen, recent_move_color, coordinate, self.piece_radius / 3)
-                    
-        # Display scoreboard
-        button_texts = ["Black", "White", f"{self.ot.black_tiles}", f"{self.ot.white_tiles}"]
-        button_dict = {}
+        
+        # Message to be displayed on screen
+        Time1, Time2 = 0, 0
+        b1, b2, b3, b4 = "Turn", "Winner", "Undo", "Quit"
+        button_texts = [f"{Time1}", f"{Time2}", "Black", "White", f"{self.ot.black_tiles}", f"{self.ot.white_tiles}", b1, b2, b3, b4]
+        
+        # Display various user interfaces (scoreboards & buttons)
         scoreRect = pygame.Rect((self.screen_width * 0.55), (self.screen_height * 0.1), (self.screen_width * 0.4), (self.screen_height * 0.3))
         pygame.draw.rect(self.screen, white, scoreRect)
-        for i in range(4):
-            if i == 0 or i == 1:
-                buttonRect = pygame.Rect((self.screen_width * (0.58 + i * 0.18)), (self.screen_height * 0.3), self.screen_width / 6, self.screen_height / 15)
+        button_dict = {}
+        for i in range(10):
+            if i == 2 or i == 3:
+                buttonRect = pygame.Rect((self.screen_width * (0.58 + (i - 2) * 0.18)), (self.screen_height * 0.3), self.screen_width / 6, self.screen_height / 15)
+            elif i == 4 or i == 5:
+                buttonRect = pygame.Rect((self.screen_width * (0.22 + (i - 2) * 0.18)), (self.screen_height * 0.12), self.screen_width / 6, self.screen_height / 5)
+            elif i == 6 or i == 7:
+                buttonRect = pygame.Rect((self.screen_width * 0.55), (self.screen_height * (0.45 + (i - 6) / 6)), self.screen_width * 0.4, self.screen_height / 8)
             else:
-                buttonRect = pygame.Rect((self.screen_width * (0.22 + i * 0.18)), (self.screen_height * 0.12), self.screen_width / 6, self.screen_height / 5)
+                buttonRect = pygame.Rect((self.screen_width * (0.55 + (i - 8) * 0.2)), (self.screen_height * 0.79), self.screen_width * 0.18, self.screen_height / 8)
             button_dict[i] = buttonRect
             buttonText = smallFont.render(button_texts[i], True, black)
             buttonTextRect = buttonText.get_rect()
@@ -147,21 +155,9 @@ class Game():
             pygame.draw.rect(self.screen, score_color, buttonRect)
             self.screen.blit(buttonText, buttonTextRect)
             
-        # Display other buttons and utilities
-        button_texts = ["Turn", "Winner", "Undo", "Quit"]
-        for i in range(4, 8, 1):
-            if i == 4 or i == 5:
-                buttonRect = pygame.Rect((self.screen_width * 0.55), (self.screen_height * (0.45 + (i - 4) / 6)), self.screen_width * 0.4, self.screen_height / 8)
-            else:
-                buttonRect = pygame.Rect((self.screen_width * (0.55 + (i - 6) * 0.2)), (self.screen_height * 0.79), self.screen_width * 0.18, self.screen_height / 8)
-            button_dict[i] = buttonRect
-            buttonText = smallFont.render(button_texts[i - 4], True, black)
-            buttonTextRect = buttonText.get_rect()
-            buttonTextRect.center = buttonRect.center
-            pygame.draw.rect(self.screen, score_color, buttonRect)
-            self.screen.blit(buttonText, buttonTextRect)
+        #print(button_dict)
         
-        # Update changes when a valid tile is clicked
+        # Update changes when a valid tile is clicked, or when a button is clicked
         left, _, _ = pygame.mouse.get_pressed()
         mouse = pygame.mouse.get_pos()
         if left == 1:
@@ -171,9 +167,10 @@ class Game():
                         if (i, j) in moves:
                             self.ot.make_move((i, j))
                             self.recent_move = (i, j)
+            if button_dict[9].collidepoint(mouse): # Quit button (back to main menu)
+                self.game_menu = "start"
         
-
-        
+        # Check if victory
         if self.ot.check_victory() != 0:
             print("Game over")
             print(f"{self.ot.get_color(self.ot.check_victory)} wins!")
@@ -194,7 +191,6 @@ if __name__ == "__main__":
 # TODO
 """
 - Detect victory or draws when there are no moves left
-- Quit / Back to main menu button when playing
 - AI simple level 1 (random moves)
 - Custom othello sizes and vs ai mode
 - etc.. (coming soon)

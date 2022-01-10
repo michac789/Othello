@@ -1,5 +1,6 @@
 import sys
 import operator
+import random
 
 
 class Othello():
@@ -14,6 +15,7 @@ class Othello():
         self.turn = 1
         self.white_tiles = 0
         self.black_tiles = 0
+        self.skip_turn = 0
         self.surrounding_tiles = [(i, j) for i in range(-1, 2, 1) for j in range(-1, 2, 1) if i != 0 or j != 0]
         
         self.tiles_corner = [(0, 0), (0, self.width - 1), (self.height - 1, 0), (self.height - 1, self.width - 1)]
@@ -64,7 +66,15 @@ class Othello():
                                 if self.board[tile[0] + t[0] * k][tile[1] + t[1] * k] == self.turn:
                                     possible_moves.add(tile)
         return list(possible_moves)
-
+    
+    # Updates the black and white piece count based on the current state of the board
+    def update_piece_count(self):
+        self.white_tiles, self.black_tiles = 0, 0
+        for row in self.board:
+            for piece in row:
+                if piece == 1: self.black_tiles += 1
+                if piece == 2: self.white_tiles += 1
+    
     # Updates the board with the current move, assuming that the 'move' parameter should already be valid
     def make_move(self, move):
         for t in self.surrounding_tiles:
@@ -82,21 +92,17 @@ class Othello():
                         for m in range(k):
                             self.board[move[0] + t[0] * m][move[1] + t[1] * m] = self.turn
         self.turn = self.turn % 2 + 1
-        self.white_tiles, self.black_tiles = 0, 0
-        for row in self.board:
-            for piece in row:
-                if piece == 1: self.white_tiles += 1
-                if piece == 2: self.black_tiles += 1
+        self.update_piece_count()
     
-    # Check for a certain board state and turn, return 2 if white wins, 1 if black wins, 3 if draw, 0 if neither wins
+    # Check for a certain board state, return 2 if white wins, 1 if black wins, 3 if draw, 0 if neither wins
     def check_victory(self):
-        if self.black_tiles + self.white_tiles == self.height * self.width or self.white_tiles == 0 or self.black_tiles == 0:
-            return (2 if self.white_tiles > self.black_tiles else 1)
+        if self.black_tiles + self.white_tiles == self.height * self.width or self.skip_turn == 2:
+            return (2 if self.white_tiles > self.black_tiles else 1 if self.white_tiles < self.black_tiles else 3)
         return 0
     
     # Level 1 AI: return random move
     def level1(self):
-        pass
+        return random.choice(self.get_possible_moves())
     
     # Level 2 AI: minimax algorithm with depth 2
     def level2(self):
@@ -127,6 +133,7 @@ class Othello():
         pass
 
 
+# This is used only for initial testing purposes using the terminal
 def main():
     
     # Initialize the game (apply standard game settings)
@@ -142,8 +149,13 @@ def main():
         print(f"It is player {color}'s turn.")
         
         # Ensure a valid move is given by the user
+        moves = ot.get_possible_moves()
         while(True):
-            moves = ot.get_possible_moves()
+            if len(moves) == 0:
+                print("No moves possible")
+                ot.skip_turn = 1
+                if ot.skip_turn == 1: ot.skip_turn += 1
+                break
             move_y = input("Enter tile's height: ")
             move_x = input("Enter tile's width: ")
             if check_int(move_y) and check_int(move_x) and (int(move_y), int(move_x)) in moves:
@@ -151,10 +163,11 @@ def main():
             print("Invalid move!")
         
         # Make move, print the board, end the game if someone wins
-        ot.make_move((int(move_y), int(move_x)))
-        ot.terminal_print()
-        if ot.check_victory() != 0:
-            break
+        if len(moves) != 0:
+            ot.make_move((int(move_y), int(move_x)))
+            ot.terminal_print()
+            if ot.check_victory() != 0:
+                break
     
     # Display the winner when someone wins
     winner = ("White" if ot.check_victory() == 2 else "Black")

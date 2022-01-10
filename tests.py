@@ -33,38 +33,6 @@ class is_valid_tile_func(unittest.TestCase):
         self.assertFalse(self.ot.is_valid_tile((5, -1)))
 
 
-class get_surrounding_tiles_func(unittest.TestCase):
-    
-    def setUp(self):
-        self.ot = Othello(6, 6)
-        
-    def test_corner(self):
-        expected = [(0, 1), (1, 0), (1, 1)]
-        self.assertCountEqual(self.ot.get_surrounding_tiles((0, 0)), expected)
-        expected = [(0, 4), (1, 4), (1, 5)]
-        self.assertCountEqual(self.ot.get_surrounding_tiles((0, 5)), expected)
-        expected = [(4, 0), (4, 1), (5, 1)]
-        self.assertCountEqual(self.ot.get_surrounding_tiles((5, 0)), expected)
-        expected = [(4, 4), (4, 5), (5, 4)]
-        self.assertCountEqual(self.ot.get_surrounding_tiles((5, 5)), expected)
-        
-    def test_edge(self):
-        expected = [(3, 0), (3, 1), (4, 1), (5, 0), (5, 1)]
-        self.assertCountEqual(self.ot.get_surrounding_tiles((4, 0)), expected)
-        expected = [(0, 2), (1, 2), (1, 3), (1, 4), (0, 4)]
-        self.assertCountEqual(self.ot.get_surrounding_tiles((0, 3)), expected)
-        expected = [(2, 4), (2, 5), (3, 4), (4, 4), (4, 5)]
-        self.assertCountEqual(self.ot.get_surrounding_tiles((3, 5)), expected)
-        expected = [(4, 1), (4, 2), (4, 3), (5, 1), (5, 3)]
-        self.assertCountEqual(self.ot.get_surrounding_tiles((5, 2)), expected)
-    
-    def test_center(self):
-        expected = [(2, 1), (2, 2), (2, 3), (3, 1), (3, 3), (4, 1), (4, 2), (4, 3)]
-        self.assertCountEqual(self.ot.get_surrounding_tiles((3, 2)), expected)
-        expected = [(3, 3), (3, 4), (3, 5), (4, 3), (4, 5), (5, 3), (5, 4), (5, 5)]
-        self.assertCountEqual(self.ot.get_surrounding_tiles((4, 4)), expected)
-
-
 class get_possible_moves_func(unittest.TestCase):
 
     def setUp(self):
@@ -108,35 +76,48 @@ class make_move_func(unittest.TestCase):
         expected = [[0,0,0,0,0,0],[0,0,2,0,0,0],[0,0,2,2,0,0],[0,0,2,1,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]]
         self.assertCountEqual(self.ot.board, expected)
         self.assertEqual(self.ot.turn, 1)
-        self.assertEqual(self.ot.white_tiles, 1)
-        self.assertEqual(self.ot.black_tiles, 4)
+        self.assertEqual(self.ot.black_tiles, 1)
+        self.assertEqual(self.ot.white_tiles, 4)
         
         self.ot.make_move((1, 3))
         expected = [[0,0,0,0,0,0],[0,0,2,1,0,0],[0,0,2,1,0,0],[0,0,2,1,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]]
         self.assertCountEqual(self.ot.board, expected)
         self.assertEqual(self.ot.turn, 2)
-        self.assertEqual(self.ot.white_tiles, 3)
         self.assertEqual(self.ot.black_tiles, 3)
+        self.assertEqual(self.ot.white_tiles, 3)
         
         self.ot.make_move((2, 4))
         expected = [[0,0,0,0,0,0],[0,0,2,1,0,0],[0,0,2,2,2,0],[0,0,2,1,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]]
         self.assertCountEqual(self.ot.board, expected)
         self.assertEqual(self.ot.turn, 1)
-        self.assertEqual(self.ot.white_tiles, 2)
-        self.assertEqual(self.ot.black_tiles, 5)
+        self.assertEqual(self.ot.black_tiles, 2)
+        self.assertEqual(self.ot.white_tiles, 5)
         
         self.ot.make_move((3, 1))
         expected = [[0,0,0,0,0,0],[0,0,2,1,0,0],[0,0,1,2,2,0],[0,1,1,1,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]]
         self.assertCountEqual(self.ot.board, expected)
         self.assertEqual(self.ot.turn, 2)
-        self.assertEqual(self.ot.white_tiles, 5)
-        self.assertEqual(self.ot.black_tiles, 3)
+        self.assertEqual(self.ot.black_tiles, 5)
+        self.assertEqual(self.ot.white_tiles, 3)
 
 
 class check_victory_func(unittest.TestCase):
 
     def setUp(self):
         self.ot = Othello(6, 6)
+        
+    def test_full_board(self):
+        self.ot.board = [[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,1,2,0,0],[0,0,2,1,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]]
+        self.ot.turn = 2
+        pass
+    
+    def test_no_move(self):
+        self.ot.board = [[1,1,1,1,1,1],[1,1,1,1,1,1],[1,1,1,1,1,1],[1,1,1,1,1,1],[2,2,0,0,0,0],[2,2,0,0,0,0]]
+        self.ot.update_piece_count()
+        self.ot.turn = 2
+        self.assertEqual(len(self.ot.get_possible_moves()), 0)
+        self.ot.skip_turn = 2
+        self.assertEqual(self.ot.check_victory(), 1)
 
 
 if __name__ == "__main__":
