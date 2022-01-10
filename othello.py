@@ -1,7 +1,6 @@
 import sys
 import operator
 import random
-from unittest.result import TestResult
 
 
 class Othello():
@@ -17,6 +16,7 @@ class Othello():
         self.white_tiles = 0
         self.black_tiles = 0
         self.skip_turn = 0
+        self.move_no = 0
         self.surrounding_tiles = [(i, j) for i in range(-1, 2, 1) for j in range(-1, 2, 1) if i != 0 or j != 0]
         
         self.tiles_corner = [(0, 0), (0, self.width - 1), (self.height - 1, 0), (self.height - 1, self.width - 1)]
@@ -26,7 +26,7 @@ class Othello():
     # Accepts a list of initial white and black tiles to be filled with its respective colors, clear previous board
     def set_initial_position(self, initial_white, initial_black):
         self.board = [[0 for i in range(self.width)] for j in range(self.height)]
-        self.white_tiles, self.black_tiles = 0, 0
+        self.white_tiles, self.black_tiles, self.move_no = 0, 0, 0
         for tile in initial_white:
             self.board[tile[0]][tile[1]] = 2
             self.white_tiles += 1
@@ -93,6 +93,7 @@ class Othello():
                         for m in range(k):
                             self.board[move[0] + t[0] * m][move[1] + t[1] * m] = self.turn
         self.turn = self.turn % 2 + 1
+        self.move_no += 1
         self.update_piece_count()
     
     # Check for a certain board state, return 2 if white wins, 1 if black wins, 3 if draw, 0 if neither wins
@@ -211,7 +212,7 @@ def human_vs_human(ot):
         winner = ("White" if ot.check_victory() == 2 else "Black")
         print(f"Congratulations! {winner} wins the game!")
 
-def human_vs_ai(ot, lv):
+def human_vs_ai(ot, level):
     # Loop through while the game is not ended; human is player 1 (goes first)
     while(True):
         print(f"It is your turn")
@@ -239,20 +240,18 @@ def human_vs_ai(ot, lv):
                 break
             
         # Make computer move
-        if lv == 1: move = ot.level1()
-        if lv == 2: move = ot.level2()
-        ot.make_move(move)
-        
-        #
+        if ot.make_computer_move(level):
+            ot.terminal_print()
         if ot.check_victory() != 0:
             break
     
     # Display the winner or draw when game is over
     if ot.check_victory() == 3:
         print("Game Draw.")
-    else:
-        winner = ("White" if ot.check_victory() == 2 else "Black")
-        print(f"Congratulations! {winner} wins the game!")
+    elif ot.check_victory() == 1:
+        print(f"Congratulations, you win against computer level {level}.")
+    elif ot.check_victory() == 2:
+        print(f"Computer level {level} wins, try again!")
 
 def check_int(input):
     try:

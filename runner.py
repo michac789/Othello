@@ -99,8 +99,10 @@ class Game():
         
         # Initialize game with default settings (first time only)
         if self.game_state == "prep":
-            init_white = [(3, 3), (4, 4)]
-            init_black = [(3, 4), (4, 3)]
+            init_white = [(1, 1), (2, 2)]#init_white = [(3, 3), (4, 4)]
+            init_black = [(1, 2), (2, 1)]#init_black = [(3, 4), (4, 3)]
+            self.ot = Othello(4, 4)
+            self.dim_height, self.dim_width = 4, 4
             self.ot.set_initial_position(init_white, init_black)
             self.ot.turn = 1
             self.game_state = "play"
@@ -130,11 +132,17 @@ class Game():
                 if self.recent_move == (i, j):
                     circ = pygame.draw.circle(self.screen, recent_move_color, coordinate, self.piece_radius / 3)
         
+        # Check if victory
+        if self.ot.check_victory() != 0:
+            self.game_state = "end"
+        
         # Message to be displayed on screen
         Time1, Time2 = 0, 0
-        b1, b2, b3, b4 = "Turn", "Winner", "Undo", "Quit"
+        b1, b2, b3, b4 = f"{self.ot.get_color(self.ot.turn)}'s move (Turn: {self.ot.move_no + 1})", "No winner yet.", "Undo", "Quit"
+        if self.game_state == "end":
+            b2 = f"{self.ot.get_color(self.ot.check_victory)} wins!"
         button_texts = [f"{Time1}", f"{Time2}", "Black", "White", f"{self.ot.black_tiles}", f"{self.ot.white_tiles}", b1, b2, b3, b4]
-        
+
         # Display various user interfaces (scoreboards & buttons)
         scoreRect = pygame.Rect((self.screen_width * 0.55), (self.screen_height * 0.1), (self.screen_width * 0.4), (self.screen_height * 0.3))
         pygame.draw.rect(self.screen, white, scoreRect)
@@ -169,14 +177,10 @@ class Game():
                             self.recent_move = (i, j)
             if button_dict[9].collidepoint(mouse): # Quit button (back to main menu)
                 self.game_menu = "start"
+                self.game_state = "prep"
+                self.recent_move = None
         
-        # Check if victory
-        if self.ot.check_victory() != 0:
-            print("Game over")
-            print(f"{self.ot.get_color(self.ot.check_victory)} wins!")
-            self.game_state = "end"
-        if self.game_state == "end":
-            pass
+
         
         pygame.display.flip()         
 
