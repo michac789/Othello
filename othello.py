@@ -14,7 +14,6 @@ class Othello():
         self.turn = 1
         self.white_tiles = 0
         self.black_tiles = 0
-        
         self.surrounding_tiles = [(i, j) for i in range(-1, 2, 1) for j in range(-1, 2, 1) if i != 0 or j != 0]
         
         self.tiles_corner = [(0, 0), (0, self.width - 1), (self.height - 1, 0), (self.height - 1, self.width - 1)]
@@ -39,6 +38,10 @@ class Othello():
                 print(self.board[i][j], end="   ")
             print("")
         print("")
+    
+    # Return the color given the turn number
+    def get_color(self, turn):
+        return ("Black" if turn == 1 else "White")
     
     # Returns True if 'tile' is a valid tile on the board, otherwise False
     def is_valid_tile(self, tile):
@@ -85,10 +88,10 @@ class Othello():
                 if piece == 1: self.white_tiles += 1
                 if piece == 2: self.black_tiles += 1
     
-    # Check for a certain board state and turn, return 1 if white wins, 2 if black wins, 3 if draw, 0 if neither wins
+    # Check for a certain board state and turn, return 2 if white wins, 1 if black wins, 3 if draw, 0 if neither wins
     def check_victory(self):
         if self.black_tiles + self.white_tiles == self.height * self.width or self.white_tiles == 0 or self.black_tiles == 0:
-            return (1 if self.white_tiles > self.black_tiles else 2)
+            return (2 if self.white_tiles > self.black_tiles else 1)
         return 0
     
     # Level 1 AI: return random move

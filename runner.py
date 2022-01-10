@@ -144,7 +144,7 @@ class Game():
             self.screen.blit(buttonText, buttonTextRect)
         
         # Update changes when a valid tile is clicked
-        left, _, right = pygame.mouse.get_pressed()
+        left, _, _ = pygame.mouse.get_pressed()
         mouse = pygame.mouse.get_pos()
         if left == 1:
             for i in range(self.dim_height):
@@ -152,6 +152,14 @@ class Game():
                     if tiles[i][j].collidepoint(mouse):
                         if (i, j) in moves:
                             self.ot.make_move((i, j))
+        
+        # Display winner when game is over
+        if self.ot.check_victory() != 0:
+            print("Game over")
+            print(f"{self.ot.get_color(self.ot.check_victory)} wins!")
+            self.game_state = "end"
+        if self.game_state == "end":
+            pass
         
         pygame.display.flip()         
 
@@ -162,3 +170,13 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# TODO
+"""
+- Detect victory or draws when there are no moves left
+- Feature: show latest move (ex: using a red dot)
+- Quit / Back to main menu button when playing
+- AI simple level 1 (random moves)
+- Custom othello sizes and vs ai mode
+- etc.. (coming soon)
+"""
