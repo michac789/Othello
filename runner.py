@@ -1,6 +1,7 @@
 import pygame
 import sys
 import math
+import tkinter
 
 from othello import Othello
 from helper import *
@@ -9,12 +10,12 @@ from helper import *
 class Game():
     
     def __init__(self):
-        # Default board size and configuration (changeable from custom mode)
+        # Default normal board size and configuration (changeable from custom mode or set_config method)
         self.dim_height = 8
         self.dim_width = 8
         self.init_white = [(3, 3), (4, 4)]
         self.init_black = [(3, 4), (4, 3)]
-        self.ot = Othello(self.dim_height, self.dim_width)
+        self.ot = None
         
         # Initialize pygame, set title, set default screen size with 9:16 resizable aspect ratio
         self.screen_width = 800
@@ -37,12 +38,15 @@ class Game():
         self.game_menu = "start"
         self.game_state = "prep"
         
-        # Keep track of recent move and stored move (used to end game when no 2 consecutive moves); prefilled with distinct placeholder
+        # Keep track of recent move, tracker used to end game when no 2 consecutive moves possible
         self.recent_move = (-1, -1)
         self.stored_move = (-2, -2)
         self.skip_index = -1
+        
+        # Confirmation window displayer
+        self.confirmation_action = "" #TODO - Add confirmation
     
-    # Resize components relative to the overall screen width and height while maintaining 9:16 ratio
+    # Resize components relative to the overall screen width and height
     def resize(self):
         self.board_padding = self.screen_height / 15
         self.board_width = ((9 / 16) * self.screen_width) - (2 * self.board_padding)
@@ -53,7 +57,7 @@ class Game():
         
     def run(self):
         while True:
-            # Terminate application when the game is quit, smart resizable window feature
+            # Terminate application when the game is quit, resizable window feature
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: sys.ext()
                 elif event.type == pygame.VIDEORESIZE:
@@ -70,7 +74,17 @@ class Game():
             # TODO
             elif self.game_menu == "pre_classic":
                 pass
-                
+
+    def set_config(self):
+        self.init_white = [(0, 0), (0, 1), (0, 2), (0, 3)]
+        self.init_black = [(1, 0), (1, 1), (1, 2), (1, 3)]
+        self.dim_height, self.dim_width = 24, 24
+        self.init_white = [(5, 5), (6, 6)]
+        self.init_black = [(5, 6), (6, 5)]
+        self.recent_move = (-1, -1)
+        self.stored_move = (-2, -2)
+        self.skip_index = -1
+    
     def state_mainmenu(self):
         # Display title
         self.screen.fill(black)
@@ -100,11 +114,6 @@ class Game():
             #if button_dict[1].collidepoint(mouse): self.game_menu = "???" #TODO
         
         pygame.display.flip()
-        
-    def set_config(self):
-        self.init_white = [(0, 0), (0, 1), (0, 2), (0, 3)]
-        self.init_black = [(1, 0), (1, 1), (1, 2), (1, 3)]
-        self.dim_height, self.dim_width = 4, 4
 
     def state_play(self):
         # Initialize game with the required settings
@@ -126,7 +135,7 @@ class Game():
                 row_tiles.append(rect)
             tiles.append(row_tiles)
         
-        # Continue to next turn if there are no moves available; end game if no moves in 2 consecutive turns
+        # Continue to next turn if there are no moves available; end game if no available moves in 2 consecutive turns
         moves = self.ot.get_possible_moves()
         if len(moves) == 0:
             if self.skip_index != self.ot.turn and self.ot.skip_turn == 1:
@@ -140,7 +149,7 @@ class Game():
             self.ot.skip_turn = 0
             self.skip_index = -1
         
-        # Draw each pieces that are present in the board, including all tiles with possible moves
+        # Draw each pieces that are present in the board, including all tiles with possible moves, showing recent move made
         for i in range(self.dim_height):
             for j in range(self.dim_width):
                 coordinate = (self.board_start[0] + j * self.tile_size + self.tile_size / 2, self.board_start[1] + i * self.tile_size + self.tile_size / 2)
@@ -158,33 +167,31 @@ class Game():
         
         # Message to be displayed on screen
         Time1, Time2 = 0, 0
-        b1, b2, b3, b4 = f"{self.ot.get_color(self.ot.turn)}'s move (Turn: {self.ot.move_no + 1})", "No winner yet.", "Undo", "Quit"
+        b1, b2, b3, b4, b5 = f"{self.ot.get_color(self.ot.turn)}'s move (Turn: {self.ot.move_no + 1})", "No winner yet.", "Undo", "Reset", "Quit"
         if self.game_state == "end":
             b1 = f"No more moves! ({self.ot.move_no} turns)"
             b2 = f"{self.ot.get_color(self.ot.check_victory)} wins!"
-        button_texts = [f"{Time1}", f"{Time2}", "Black", "White", f"{self.ot.black_tiles}", f"{self.ot.white_tiles}", b1, b2, b3, b4]
+        button_texts = [f"{Time1}", f"{Time2}", "Black", "White", f"{self.ot.black_tiles}", f"{self.ot.white_tiles}", b1, b2, b3, b4, b5]
 
-        # Display various user interfaces (scoreboards & buttons)
+        # Display various user interfaces (scoreboards, messages, buttons)
         scoreRect = pygame.Rect((self.screen_width * 0.55), (self.screen_height * 0.1), (self.screen_width * 0.4), (self.screen_height * 0.3))
         pygame.draw.rect(self.screen, white, scoreRect)
         button_dict = {}
-        for i in range(10):
+        for i in range(len(button_texts)):
             if i == 2 or i == 3:
                 buttonRect = pygame.Rect((self.screen_width * (0.58 + (i - 2) * 0.18)), (self.screen_height * 0.3), self.screen_width / 6, self.screen_height / 15)
             elif i == 4 or i == 5:
-                buttonRect = pygame.Rect((self.screen_width * (0.22 + (i - 2) * 0.18)), (self.screen_height * 0.12), self.screen_width / 6, self.screen_height / 5)
+                buttonRect = pygame.Rect((self.screen_width * (0.58 + (i - 4) * 0.18)), (self.screen_height * 0.12), self.screen_width / 6, self.screen_height / 5)
             elif i == 6 or i == 7:
                 buttonRect = pygame.Rect((self.screen_width * 0.55), (self.screen_height * (0.45 + (i - 6) / 6)), self.screen_width * 0.4, self.screen_height / 8)
             else:
-                buttonRect = pygame.Rect((self.screen_width * (0.55 + (i - 8) * 0.2)), (self.screen_height * 0.79), self.screen_width * 0.18, self.screen_height / 8)
+                buttonRect = pygame.Rect((self.screen_width * (0.55 + (i - 8) * 0.13)), (self.screen_height * 0.79), self.screen_width * 0.12, self.screen_height / 8)
             button_dict[i] = buttonRect
             buttonText = smallFont.render(button_texts[i], True, black)
             buttonTextRect = buttonText.get_rect()
             buttonTextRect.center = buttonRect.center
             pygame.draw.rect(self.screen, score_color, buttonRect)
             self.screen.blit(buttonText, buttonTextRect)
-            
-        #print(button_dict)
         
         # Update changes when a valid tile is clicked, or when a button is clicked
         left, _, _ = pygame.mouse.get_pressed()
@@ -196,10 +203,13 @@ class Game():
                         if (i, j) in moves:
                             self.ot.make_move((i, j))
                             self.recent_move = (i, j)
-            if button_dict[9].collidepoint(mouse): # Quit button (back to main menu)
+            if button_dict[9].collidepoint(mouse): # Reset board button (restart game with the same configuration)
+                self.game_state = "prep"
+                self.set_config()
+            if button_dict[10].collidepoint(mouse): # Quit button (back to main menu)
                 self.game_menu = "start"
                 self.game_state = "prep"
-                self.recent_move = None
+                self.set_config()
         
         pygame.display.flip()         
 
@@ -213,7 +223,6 @@ if __name__ == "__main__":
 
 # TODO
 """
-- Detect victory or draws when there are no moves left
 - AI simple level 1 (random moves)
 - Custom othello sizes and vs ai mode
 - etc.. (coming soon)
