@@ -1,7 +1,6 @@
 import pygame
 import sys
 import math
-import tkinter
 
 from othello import Othello
 from helper import *
@@ -69,7 +68,6 @@ class Game():
             if self.game_menu == "start":
                 self.state_mainmenu()
             elif self.game_menu == "play":
-                self.set_config()
                 self.state_play()
             # TODO
             elif self.game_menu == "pre_classic":
@@ -78,9 +76,9 @@ class Game():
     def set_config(self):
         self.init_white = [(0, 0), (0, 1), (0, 2), (0, 3)]
         self.init_black = [(1, 0), (1, 1), (1, 2), (1, 3)]
-        self.dim_height, self.dim_width = 24, 24
-        self.init_white = [(5, 5), (6, 6)]
-        self.init_black = [(5, 6), (6, 5)]
+        self.dim_height, self.dim_width = 4, 4
+        # self.init_white = [(5, 5), (6, 6)]
+        # self.init_black = [(5, 6), (6, 5)]
         self.recent_move = (-1, -1)
         self.stored_move = (-2, -2)
         self.skip_index = -1
@@ -118,6 +116,7 @@ class Game():
     def state_play(self):
         # Initialize game with the required settings
         if self.game_state == "prep":
+            self.set_config()
             self.ot = Othello(self.dim_height, self.dim_width)
             self.ot.set_initial_position(self.init_white, self.init_black)
             self.ot.turn = 1
@@ -135,7 +134,7 @@ class Game():
                 row_tiles.append(rect)
             tiles.append(row_tiles)
         
-        # Continue to next turn if there are no moves available; end game if no available moves in 2 consecutive turns
+        # Continue to next turn if there are no moves available; end game if no moves in 2 consecutive turns
         moves = self.ot.get_possible_moves()
         if len(moves) == 0:
             if self.skip_index != self.ot.turn and self.ot.skip_turn == 1:
