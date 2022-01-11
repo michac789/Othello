@@ -1,6 +1,7 @@
 import pygame
 import sys
 import math
+import time
 
 from othello import Othello
 from helper import *
@@ -191,24 +192,55 @@ class Game():
             buttonTextRect.center = buttonRect.center
             pygame.draw.rect(self.screen, score_color, buttonRect)
             self.screen.blit(buttonText, buttonTextRect)
+            
+        # Display confirmation screen and yes/no buttons
+        if self.confirmation_action != "":
+            confRectborder = pygame.Rect((self.screen_width / 4), (self.screen_height / 4), (self.screen_width / 2), (self.screen_height / 2))
+            confRect = pygame.Rect((self.screen_width / 4 + 3), (self.screen_height / 4 + 3), (self.screen_width / 2 - 6), (self.screen_height / 2 - 6))
+            confText1 = confFont1.render(f"Confirm {self.confirmation_action}?", True, black)
+            confText2 = confFont2.render("Warning! This cannot be undone!", True, black)
+            confTextRect1 = confText1.get_rect(center = (self.screen_width / 2, self.screen_height * 0.35))
+            confTextRect2 = confText2.get_rect(center = (self.screen_width / 2, self.screen_height * 0.45))
+            pygame.draw.rect(self.screen, conf_screen_border_color, confRectborder)
+            pygame.draw.rect(self.screen, conf_screen_color, confRect)
+            self.screen.blit(confText1, confTextRect1)
+            self.screen.blit(confText2, confTextRect2)
+            yes, no = confFont3.render("Yes", True, black), confFont3.render("No", True, black)
+            yes_rect = yes.get_rect(center = (self.screen_width * 0.45, self.screen_height * 0.55))
+            no_rect = no.get_rect(center = (self.screen_width * 0.55, self.screen_height * 0.55))
+            self.screen.blit(yes, yes_rect)
+            self.screen.blit(no, no_rect)
+            left, _, _ = pygame.mouse.get_pressed()
+            mouse = pygame.mouse.get_pos()
+            if left == 1:
+                if yes_rect.collidepoint(mouse):
+                    if self.confirmation_action == "Quit":
+                        self.game_menu = "start"
+                        self.game_state = "prep"
+                        self.set_config()
+                    if self.confirmation_action == "Reset":
+                        self.game_state = "prep"
+                        self.set_config()
+                    self.confirmation_action = ""
+                    time.sleep(0.2)
+                if no_rect.collidepoint(mouse):
+                    self.confirmation_action = ""
         
         # Update changes when a valid tile is clicked, or when a button is clicked
-        left, _, _ = pygame.mouse.get_pressed()
-        mouse = pygame.mouse.get_pos()
-        if left == 1:
-            for i in range(self.dim_height):
-                for j in range(self.dim_width):
-                    if tiles[i][j].collidepoint(mouse):
-                        if (i, j) in moves:
-                            self.ot.make_move((i, j))
-                            self.recent_move = (i, j)
-            if button_dict[9].collidepoint(mouse): # Reset board button (restart game with the same configuration)
-                self.game_state = "prep"
-                self.set_config()
-            if button_dict[10].collidepoint(mouse): # Quit button (back to main menu)
-                self.game_menu = "start"
-                self.game_state = "prep"
-                self.set_config()
+        if self.confirmation_action == "":
+            left, _, _ = pygame.mouse.get_pressed()
+            mouse = pygame.mouse.get_pos()
+            if left == 1:
+                for i in range(self.dim_height):
+                    for j in range(self.dim_width):
+                        if tiles[i][j].collidepoint(mouse):
+                            if (i, j) in moves:
+                                self.ot.make_move((i, j))
+                                self.recent_move = (i, j)
+                if button_dict[9].collidepoint(mouse): # Reset board button (restart game with the same configuration)
+                    self.confirmation_action = "Reset"
+                if button_dict[10].collidepoint(mouse): # Quit button (back to main menu)
+                    self.confirmation_action = "Quit"
         
         pygame.display.flip()         
 
