@@ -44,7 +44,9 @@ class Game():
         self.skip_index = -1
         
         # Confirmation window displayer
-        self.confirmation_action = "" #TODO - Add confirmation
+        self.confirmation_action = ""
+        self.hover_yes = False
+        self.hover_no = False
     
     # Resize components relative to the overall screen width and height
     def resize(self):
@@ -193,7 +195,7 @@ class Game():
             pygame.draw.rect(self.screen, score_color, buttonRect)
             self.screen.blit(buttonText, buttonTextRect)
             
-        # Display confirmation screen and yes/no buttons
+        # Display confirmation screen and yes/no buttons, proceed with action when 'yes' is clicked, back to game when 'no' is clicked
         if self.confirmation_action != "":
             confRectborder = pygame.Rect((self.screen_width / 4), (self.screen_height / 4), (self.screen_width / 2), (self.screen_height / 2))
             confRect = pygame.Rect((self.screen_width / 4 + 3), (self.screen_height / 4 + 3), (self.screen_width / 2 - 6), (self.screen_height / 2 - 6))
@@ -206,6 +208,8 @@ class Game():
             self.screen.blit(confText1, confTextRect1)
             self.screen.blit(confText2, confTextRect2)
             yes, no = confFont3.render("Yes", True, black), confFont3.render("No", True, black)
+            if self.hover_yes: yes = confFont4.render("Yes", True, conf_hover_color)
+            if self.hover_no: no = confFont4.render("No", True, conf_hover_color)
             yes_rect = yes.get_rect(center = (self.screen_width * 0.45, self.screen_height * 0.55))
             no_rect = no.get_rect(center = (self.screen_width * 0.55, self.screen_height * 0.55))
             self.screen.blit(yes, yes_rect)
@@ -225,6 +229,9 @@ class Game():
                     time.sleep(0.2)
                 if no_rect.collidepoint(mouse):
                     self.confirmation_action = ""
+            self.hover_yes, self.hover_no = False, False
+            if yes_rect.collidepoint(mouse): self.hover_yes = True
+            if no_rect.collidepoint(mouse): self.hover_no = True
         
         # Update changes when a valid tile is clicked, or when a button is clicked
         if self.confirmation_action == "":
@@ -237,6 +244,8 @@ class Game():
                             if (i, j) in moves:
                                 self.ot.make_move((i, j))
                                 self.recent_move = (i, j)
+                if button_dict[8].collidepoint(mouse):
+                    raise NotImplementedError
                 if button_dict[9].collidepoint(mouse): # Reset board button (restart game with the same configuration)
                     self.confirmation_action = "Reset"
                 if button_dict[10].collidepoint(mouse): # Quit button (back to main menu)

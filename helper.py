@@ -12,6 +12,7 @@ score_color = (104, 43, 203)
 recent_move_color = (255, 0, 0)
 conf_screen_border_color = (30, 45, 240)
 conf_screen_color = (75, 145, 200)
+conf_hover_color = (159, 200, 45)
 
 # Define all fonts used here
 init()
@@ -23,3 +24,4 @@ buttonFont = font.Font(OPEN_SANS, 30)
 confFont1 =  font.Font(OPEN_SANS, 25)
 confFont2 =  font.Font(OPEN_SANS, 15)
 confFont3 = font.Font(OPEN_SANS, 30)
+confFont4 = font.Font(OPEN_SANS, 35)
