@@ -90,11 +90,6 @@ class Game():
                 self.state_play()
 
     def set_config(self):
-        self.init_white = [(0, 0), (0, 1), (0, 2), (0, 3)]
-        self.init_black = [(1, 0), (1, 1), (1, 2), (1, 3)]
-        self.dim_height, self.dim_width = 4, 4
-        # self.init_white = [(5, 5), (6, 6)]
-        # self.init_black = [(5, 6), (6, 5)]
         self.recent_move = (-1, -1)
         self.stored_move = (-2, -2)
         self.skip_index = -1
@@ -185,10 +180,18 @@ class Game():
             for i in range(4, 14, 1):
                 if button_dict[i].collidepoint(mouse):
                     self.classic_choose(i)
+            if button_dict[14].collidepoint(mouse): self.game_menu = "start"
+            if button_dict[15].collidepoint(mouse):
+                self.init_white, self.init_black = [(3, 3), (4, 4)], [(3, 4), (4, 3)]
+                self.dim_height, self.dim_width = 8, 8
+                self.game_menu = "play"
                 
         pygame.display.flip()
     
-    def state_pre_custom(self): #TODO
+    def state_pre_custom(self): #TODO        
+        self.init_white = [(0, 0), (0, 1), (0, 2), (0, 3)]
+        self.init_black = [(1, 0), (1, 1), (1, 2), (1, 3)]
+        self.dim_height, self.dim_width = 4, 4
         self.game_menu = "play"
         time.sleep(0.2)
         # TEMPORARY PLACEHOLDER TODO
@@ -249,7 +252,7 @@ class Game():
         b1, b2, b3, b4, b5 = f"{self.ot.get_color(self.ot.turn)}'s move (Turn: {self.ot.move_no + 1})", "No winner yet.", "Undo", "Reset", "Quit"
         if self.game_state == "end":
             b1 = f"No more moves! ({self.ot.move_no} turns)"
-            b2 = f"{self.ot.get_color(self.ot.check_victory)} wins!"
+            b2 = f"{self.ot.get_color(self.ot.check_victory())} wins!"
         button_texts = [f"{Time1}", f"{Time2}", "Black", "White", f"{self.ot.black_tiles}", f"{self.ot.white_tiles}", b1, b2, b3, b4, b5]
 
         # Display various user interfaces (scoreboards, messages, buttons)
@@ -340,6 +343,10 @@ if __name__ == "__main__":
 
 # TODO
 """
+- Add Timer Feature
+- Pre_custom UI
+- Fix UI, texts and colors
+- Add Undo Feature
 - AI simple level 1 (random moves)
 - Custom othello sizes and vs ai mode
 - etc.. (coming soon)
