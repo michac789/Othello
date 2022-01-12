@@ -1,3 +1,4 @@
+from random import random
 import pygame
 import sys
 import math
@@ -47,6 +48,9 @@ class Game():
         self.confirmation_action = ""
         self.hover_yes = False
         self.hover_no = False
+        
+        # Choose modes in 'pre_classic' state
+        self.classic_mode = "Human" # 'Human' by default for 2V2
     
     # Resize components relative to the overall screen width and height
     def resize(self):
@@ -70,11 +74,14 @@ class Game():
             # Based on 'state machine' concept, launch different states of the game depending on self.game_state
             if self.game_menu == "start":
                 self.state_mainmenu()
+            elif self.game_menu == "pre_classic":
+                self.state_pre_classic()
+            elif self.game_menu == "pre_custom":
+                self.state_pre_custom()
+            elif self.game_menu == "pre_puzzle":
+                raise NotImplementedError
             elif self.game_menu == "play":
                 self.state_play()
-            # TODO
-            elif self.game_menu == "pre_classic":
-                pass
 
     def set_config(self):
         self.init_white = [(0, 0), (0, 1), (0, 2), (0, 3)]
@@ -107,14 +114,59 @@ class Game():
             self.screen.blit(buttonText, buttonTextRect)
         
         # Change the game_menu to "play" if play button is left-clicked
+        states = ["pre_classic", "pre_custom", "pre_puzzle"]
         left, _, _ = pygame.mouse.get_pressed()
         if left == 1:
             mouse = pygame.mouse.get_pos()
-            if button_dict[0].collidepoint(mouse): self.game_menu = "play"
-            #if button_dict[1].collidepoint(mouse): self.game_menu = "???" #TODO
-            #if button_dict[1].collidepoint(mouse): self.game_menu = "???" #TODO
+            for i in range(3):
+                if button_dict[i].collidepoint(mouse): self.game_menu = states[i]
         
         pygame.display.flip()
+        
+    def state_pre_classic(self):
+        # Display game mode as main title
+        self.screen.fill(black)
+        title = titleFont.render("Classic Mode", True, white)
+        titleRect = title.get_rect()
+        titleRect.center = (self.screen_width / 2, 50)
+        self.screen.blit(title, titleRect)
+        
+        # Display various buttons
+        button_texts = ["Choose your opponent:",
+                        "Choose time constraint:", "Allow undo move:", "",
+                        "Human VS Human", "Human VS AI", "No Limit", "5 Min", "10 Min", "15 Mins", "20 Mins", "30 Mins", "Yes", "No",
+                        "Back to Menu", "Play Game"]
+        button_dict = {}
+        for i in range(len(button_texts)):
+            if 0 <= i <= 3:
+                buttonRect = pygame.Rect(self.board_start[0], self.board_height * (0.25 + 0.3 * i), self.screen_width / 3, self.screen_height / 10)
+                buttonText = preptextFont.render(button_texts[i], True, white)
+            if 4 <= i <= 5:
+                buttonRect = pygame.Rect(self.screen_width * (0.4 + 0.3 * (i - 4)), self.screen_height * 0.25, self.screen_width * 0.27, self.screen_height / 5)
+                buttonText = preptextFont.render(button_texts[i], True, black)
+            if 6 <= i <= 13:
+                buttonRect = pygame.Rect(self.screen_width * (0.4 + 0.2 * ((i - 6) % 3)), self.screen_height * (0.5 + 0.12 * math.floor((i - 6) / 3)), self.screen_width * 0.15, self.screen_height / 12)
+                buttonText = preptextFont.render(button_texts[i], True, black)
+            if 14 <= i <= 15:
+                buttonRect = pygame.Rect(self.screen_width * (0.1 + 0.5 * (i - 14)), self.screen_height * 0.88, self.screen_width * 0.3, self.screen_height / 10)
+                buttonText = preptextFont.render(button_texts[i], True, black)
+            button_dict[i] = buttonRect
+            buttonTextRect = buttonText.get_rect()
+            buttonTextRect.center = buttonRect.center
+            if 0 <= i <= 3: pygame.draw.rect(self.screen, black, buttonRect)
+            else: pygame.draw.rect(self.screen, white, buttonRect)
+            self.screen.blit(buttonText, buttonTextRect)
+            
+        # Buttons functionality when clicked
+        left, _, _ = pygame.mouse.get_pressed()
+        mouse = pygame.mouse.get_pos()
+        if left == 1:
+            pass
+                
+        pygame.display.flip()
+    
+    def state_pre_custom(self): #TODO
+        raise NotImplementedError
 
     def state_play(self):
         # Initialize game with the required settings
