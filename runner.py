@@ -1,4 +1,3 @@
-from random import random
 import pygame
 import sys
 import math
@@ -56,6 +55,10 @@ class Game():
         self.classic_ai_level = 1 # Level 1 AI (easiest) by default, available up to level 6 (hopefully) #TODO
         self.classic_ai_black = False # AI goes later (second turn) as white by default, can be set to true so AI makes first turn
         self.classic_chosen = [False for i in range(16)]
+        
+        # Keep track of time
+        self.timer_player1 = None
+        self.timer_player2 = None
     
     # Resize components relative to the overall screen width and height
     def resize(self):
@@ -107,6 +110,7 @@ class Game():
         else: self.classic_chosen[int(self.classic_time / 5 + 6)] = True
         if self.classic_undo == True: self.classic_chosen[12] = True
         else: self.classic_chosen[13] = True
+        if self.classic_time > 0: self.timer_player1, self.timer_player2 = 6000 * self.classic_time, 6000 * self.classic_time
     
     def state_mainmenu(self):
         # Display title
@@ -185,6 +189,7 @@ class Game():
                 self.init_white, self.init_black = [(3, 3), (4, 4)], [(3, 4), (4, 3)]
                 self.dim_height, self.dim_width = 8, 8
                 self.game_menu = "play"
+                time.sleep(0.2)
                 
         pygame.display.flip()
     
@@ -204,6 +209,10 @@ class Game():
             self.ot.set_initial_position(self.init_white, self.init_black)
             self.ot.turn = 1
             self.game_state = "play"
+            
+        if self.timer_player1 != None:
+            pass
+        
         
         # Draw board and all the tiles
         self.screen.fill(black)
@@ -230,6 +239,9 @@ class Game():
         else:
             self.ot.skip_turn = 0
             self.skip_index = -1
+        
+        time_left_1 = pygame.time.get_ticks()
+        print(time_left_1)
         
         # Draw each pieces that are present in the board, including all tiles with possible moves, showing recent move made
         for i in range(self.dim_height):
@@ -343,6 +355,8 @@ if __name__ == "__main__":
 
 # TODO
 """
+- Add music
+- Add SFX
 - Add Timer Feature
 - Pre_custom UI
 - Fix UI, texts and colors

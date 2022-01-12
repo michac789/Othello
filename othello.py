@@ -18,6 +18,7 @@ class Othello():
         self.skip_turn = 0
         self.move_no = 0
         self.surrounding_tiles = [(i, j) for i in range(-1, 2, 1) for j in range(-1, 2, 1) if i != 0 or j != 0]
+        self.force_win = -1
         
         self.tiles_corner = [(0, 0), (0, self.width - 1), (self.height - 1, 0), (self.height - 1, self.width - 1)]
         self.tiles_near_corner = [(0, 1), (1, 0), (1, 1), (0, self.width - 2), (1, self.width - 2), (1, self.width - 1), (self.height - 2, 0), (self.height - 1, 1), (self.height - 2, 1), (self.height - 2, self.width - 1), (self.height - 1, self.width - 2), (self.height - 2, self.width - 2)]
@@ -98,6 +99,7 @@ class Othello():
     
     # Check for a certain board state, return 2 if white wins, 1 if black wins, 3 if draw, 0 if neither wins
     def check_victory(self):
+        if self.force_win != -1: return (self.force_win)
         if self.black_tiles + self.white_tiles == self.height * self.width or self.skip_turn == 2:
             return (2 if self.white_tiles > self.black_tiles else 1 if self.white_tiles < self.black_tiles else 3)
         return 0
