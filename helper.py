@@ -13,6 +13,7 @@ recent_move_color = (255, 0, 0)
 conf_screen_border_color = (30, 45, 240)
 conf_screen_color = (75, 145, 200)
 conf_hover_color = (159, 200, 45)
+prep_chosen_color = (255, 210, 10)
 
 # Define all fonts used here
 init()

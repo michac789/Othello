@@ -50,7 +50,12 @@ class Game():
         self.hover_no = False
         
         # Choose modes in 'pre_classic' state
-        self.classic_mode = "Human" # 'Human' by default for 2V2
+        self.classic_mode = "Human" # 'Human' by default for 2 players, or 'AI' against computer
+        self.classic_time = -1 # '-1' for no time limit by default, or 5/10/15/20/30 mins for each player
+        self.classic_undo = True # Allow undo move by default, can be set to False
+        self.classic_ai_level = 1 # Level 1 AI (easiest) by default, available up to level 6 (hopefully) #TODO
+        self.classic_ai_black = False # AI goes later (second turn) as white by default, can be set to true so AI makes first turn
+        self.classic_chosen = [False for i in range(16)]
     
     # Resize components relative to the overall screen width and height
     def resize(self):
@@ -60,7 +65,8 @@ class Game():
         self.tile_size = int(min(self.board_width / self.dim_width, self.board_height / self.dim_height))
         self.board_start = (self.board_padding, self.board_padding)
         self.piece_radius = math.floor(self.tile_size / 2 - 5)
-        
+    
+    # This function is called for every frame in the game
     def run(self):
         while True:
             # Terminate application when the game is quit, resizable window feature
@@ -92,6 +98,20 @@ class Game():
         self.recent_move = (-1, -1)
         self.stored_move = (-2, -2)
         self.skip_index = -1
+    
+    # Handles all the choosing mode buttons and its action towards self.classic_(xxx) in the 'pre_classic' state
+    def classic_choose(self, index):
+        self.classic_chosen = [False for i in range(16)]
+        if 4 <= index <= 5: self.classic_mode = ("Human" if index == 4 else "AI")
+        if 6 <= index <= 11: self.classic_time = (-1 if index == 6 else int(-30 + 5 * index) if 7 <= index <= 10 else 30)
+        if 12 <= index <= 13: self.classic_undo = (True if index == 12 else False)
+        if self.classic_mode == "Human": self.classic_chosen[4] = True
+        else: self.classic_chosen[5] = True
+        if self.classic_time == -1: self.classic_chosen[6] = True
+        elif self.classic_time == 30: self.classic_chosen[11] = True
+        else: self.classic_chosen[int(self.classic_time / 5 + 6)] = True
+        if self.classic_undo == True: self.classic_chosen[12] = True
+        else: self.classic_chosen[13] = True
     
     def state_mainmenu(self):
         # Display title
@@ -138,6 +158,7 @@ class Game():
                         "Back to Menu", "Play Game"]
         button_dict = {}
         for i in range(len(button_texts)):
+            button_color = (white if self.classic_chosen[i] == False else prep_chosen_color)
             if 0 <= i <= 3:
                 buttonRect = pygame.Rect(self.board_start[0], self.board_height * (0.25 + 0.3 * i), self.screen_width / 3, self.screen_height / 10)
                 buttonText = preptextFont.render(button_texts[i], True, white)
@@ -154,19 +175,23 @@ class Game():
             buttonTextRect = buttonText.get_rect()
             buttonTextRect.center = buttonRect.center
             if 0 <= i <= 3: pygame.draw.rect(self.screen, black, buttonRect)
-            else: pygame.draw.rect(self.screen, white, buttonRect)
+            else: pygame.draw.rect(self.screen, button_color, buttonRect)
             self.screen.blit(buttonText, buttonTextRect)
             
         # Buttons functionality when clicked
         left, _, _ = pygame.mouse.get_pressed()
         mouse = pygame.mouse.get_pos()
         if left == 1:
-            pass
+            for i in range(4, 14, 1):
+                if button_dict[i].collidepoint(mouse):
+                    self.classic_choose(i)
                 
         pygame.display.flip()
     
     def state_pre_custom(self): #TODO
-        raise NotImplementedError
+        self.game_menu = "play"
+        time.sleep(0.2)
+        # TEMPORARY PLACEHOLDER TODO
 
     def state_play(self):
         # Initialize game with the required settings
