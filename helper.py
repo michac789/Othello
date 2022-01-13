@@ -1,5 +1,6 @@
 # Helper file associated with runner.py
 from pygame import font, init
+from os import path
 
 # Define all RGB colors for various components here
 black = (0, 0, 0)
@@ -17,7 +18,7 @@ prep_chosen_color = (255, 210, 10)
 
 # Define all fonts used here
 init()
-OPEN_SANS = "OpenSans-Regular.ttf"
+OPEN_SANS = path.join("assets", "OpenSans-Regular.ttf")
 smallFont = font.Font(OPEN_SANS, 20)
 hugeFont = font.Font(OPEN_SANS, 40)
 titleFont = font.Font(OPEN_SANS, 50)
