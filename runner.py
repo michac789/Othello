@@ -1,3 +1,4 @@
+from os import stat
 import pygame
 import sys
 import math
@@ -66,6 +67,9 @@ class Game():
         # Keep track whether bgm and soundfx is on or not, by default is on, can be turned off
         self.bgm_on = True
         self.soundfx_on = True
+        
+        # Various hover effects
+        self.hover_main = [False for i in range(3)]
     
     # Resize components relative to the overall screen width and height
     def resize(self):
@@ -137,9 +141,9 @@ class Game():
         # Play BGM, display title
         self.play_main_bgm()
         self.screen.fill(black)
-        title = titleFont.render("OTHELLO", True, white)
+        title = maintitleFont.render("OTHELLO", True, main_title_color)
         titleRect = title.get_rect()
-        titleRect.center = (self.screen_width / 2, 50)
+        titleRect.center = (self.screen_width / 2, self.screen_height * 0.2)
         self.screen.blit(title, titleRect)
         
         # Display buttons (classic mode, custom mode, puzzle mode)
@@ -147,21 +151,28 @@ class Game():
         button_dict = {}
         for i in range(3):
             buttonRect = pygame.Rect((self.screen_width / 4), ((6 + 2 * i) / 16) * self.screen_height, self.screen_width / 2, self.screen_height / 10)
+            if self.hover_main[i] == True:
+                buttonRect = pygame.Rect((self.screen_width / 4), ((6 + 2 * i) / 16) * self.screen_height, (self.screen_width / 2), (self.screen_height / 10) * 1.05)
             button_dict[i] = buttonRect
-            buttonText = buttonFont.render(button_texts[i], True, black)
+            buttonText = buttonFont.render(button_texts[i], True, main_button_text_color)
+            if self.hover_main[i] == True: buttonText = buttonFont.render(button_texts[i], True, main_button_text_hover_color)
             buttonTextRect = buttonText.get_rect()
             buttonTextRect.center = buttonRect.center
-            pygame.draw.rect(self.screen, white, buttonRect)
+            if self.hover_main[i] == True: pygame.draw.rect(self.screen, main_button_hover_color, buttonRect)
+            else: pygame.draw.rect(self.screen, main_button_color, buttonRect)
             self.screen.blit(buttonText, buttonTextRect)
         
-        # Change the game_menu to "play" if play button is left-clicked
+        # Change state when respective buttons are clicked, add hover effects
         states = ["pre_classic", "pre_custom", "pre_puzzle"]
+        mouse = pygame.mouse.get_pos()
         left, _, _ = pygame.mouse.get_pressed()
         if left == 1:
-            mouse = pygame.mouse.get_pos()
             for i in range(3):
                 if button_dict[i].collidepoint(mouse): self.game_menu = states[i]
                 time.sleep(0.1)
+        self.hover_main = [False for i in range(3)]
+        for i in range(3):
+            if button_dict[i].collidepoint(mouse): self.hover_main[i] = True
         
         pygame.display.flip()
         
@@ -379,7 +390,7 @@ class Game():
                                     if self.ot.turn == 1: self.time_start1 = pygame.time.get_ticks()
                                     elif self.ot.turn == 2: self.time_start2 = pygame.time.get_ticks()
                                     self.recent_move = (i, j)
-                if button_dict[8].collidepoint(mouse): # Undo last move button (TODO)
+                if button_dict[8].collidepoint(mouse): # Undo last move button
                     self.confirmation_action = "Undo"
                 if button_dict[9].collidepoint(mouse): # Reset board button (restart game with the same configuration)
                     self.confirmation_action = "Reset"
