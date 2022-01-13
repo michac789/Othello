@@ -1,5 +1,5 @@
 # Helper file associated with runner.py
-from pygame import font, init, mixer
+from pygame import font, init, mixer, image
 
 # This library is used to ensure that the assets can be loaded independent of user's operating system
 from os import path
@@ -55,10 +55,20 @@ confFont4 = font.Font(OPEN_SANS, 35)
 preptextFont = font.Font(OPEN_SANS, 25)
 
 # Define all background musics used here
-mixer.init()
 BGM_MENU = path.join("assets", "bgm", "menumusic.mp3")
 BGM_GAME = path.join("assets", "bgm", "gamemusic.mp3")
 
 
 
 # Define all sfx used here
+
+
+# Define all icons used here
+BGM_TRUE = path.join("assets", "icons", "bgm_true.jpg")
+BGM_FALSE = path.join("assets", "icons", "bgm_false.jpg")
+BGM_TRUE_HOVER = path.join("assets", "icons", "bgm_true_hover.jpg")
+BGM_FALSE_HOVER = path.join("assets", "icons", "bgm_false_hover.jpg")
+
+#SFX_ICON = path.join("assets", "icons", "sfx.png")
+#bgm_icon = image.load(BGM_ICON)
+

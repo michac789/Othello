@@ -1,4 +1,3 @@
-from os import stat
 import pygame
 import sys
 import math
@@ -175,6 +174,9 @@ class Game():
             buttonTextRect = buttonText.get_rect()
             buttonTextRect.center = buttonRect.center
             self.screen.blit(buttonText, buttonTextRect)
+            
+        #im = pygame.image.load(BGM_ICON)
+        #self.screen.blit(im, (0, 0))
         
         # Change state when respective buttons are clicked, add hover effects
         states = ["pre_classic", "pre_custom", "pre_puzzle"]
@@ -186,7 +188,7 @@ class Game():
                 time.sleep(0.1)
             if button_dict[7].collidepoint(mouse): self.bgm_on = (False if self.bgm_on == True else True)
         self.hover_main = [False for i in range(9)]
-        for i in range(7):
+        for i in range(9):
             if button_dict[i].collidepoint(mouse): self.hover_main[i] = True
         
         pygame.display.flip()
