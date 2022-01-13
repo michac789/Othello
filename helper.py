@@ -1,5 +1,7 @@
 # Helper file associated with runner.py
 from pygame import font, init, mixer
+
+# This library is used to ensure that the assets can be loaded independent of user's operating system
 from os import path
 
 # Define all RGB colors for various components here
@@ -8,10 +10,10 @@ main_button1_color = (217, 255, 179)
 main_button1_hover_color = (217, 255, 209)
 main_button1_text_color = (0, 51, 0)
 main_button1_text_hover_color = (255, 0, 255)
-main_button2_color = (217, 255, 179)
-main_button2_hover_color = (217, 255, 209)
-main_button2_text_color = (0, 51, 0)
-main_button2_text_hover_color = (255, 0, 255)
+main_button2_color = (255, 204, 153)
+main_button2_hover_color = (255, 226, 163)
+main_button2_text_color = (0, 0, 128)
+main_button2_text_hover_color = (185, 0, 102)
 
 
 black = (0, 0, 0)
@@ -28,16 +30,18 @@ conf_hover_color = (159, 200, 45)
 prep_chosen_color = (255, 210, 10)
 
 # Define all fonts used here
-OPEN_SANS = path.join("assets", "OpenSans-Regular.ttf")
-PACIFICO = path.join("assets", "Pacifico.ttf")
-BLACKJACK = path.join("assets", "blackjack.otf")
-LOBSTER = path.join("assets", "Lobster.otf")
-ARIZONIA = path.join("assets", "Arizonia-Regular.ttf")
+OPEN_SANS = path.join("assets", "fonts", "OpenSans-Regular.ttf")
+PACIFICO = path.join("assets", "fonts", "Pacifico.ttf")
+BLACKJACK = path.join("assets", "fonts", "blackjack.otf")
+LOBSTER = path.join("assets", "fonts", "Lobster.otf")
+ARIZONIA = path.join("assets", "fonts", "Arizonia-Regular.ttf")
 
 init()
 maintitleFont = font.Font(LOBSTER, 100)
 mainbuttonFont1 = font.Font(OPEN_SANS, 30)
+mainbuttonHoverFont1 = font.Font(OPEN_SANS, 32)
 mainbuttonFont2 = font.Font(BLACKJACK, 25)
+mainbuttonHoverFont2 = font.Font(BLACKJACK, 27)
 
 smallFont = font.Font(OPEN_SANS, 20)
 hugeFont = font.Font(OPEN_SANS, 40)
@@ -52,8 +56,8 @@ preptextFont = font.Font(OPEN_SANS, 25)
 
 # Define all background musics used here
 mixer.init()
-BGM_MENU = path.join("assets", "menumusic.mp3")
-BGM_GAME = path.join("assets", "gamemusic.mp3")
+BGM_MENU = path.join("assets", "bgm", "menumusic.mp3")
+BGM_GAME = path.join("assets", "bgm", "gamemusic.mp3")
 
 
 

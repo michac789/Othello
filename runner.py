@@ -153,17 +153,17 @@ class Game():
         for i in range(len(button_texts)):
             if 0 <= i <= 3:
                 buttonRect = pygame.Rect((self.screen_width / 4), ((6 + 2 * i) / 16) * self.screen_height, self.screen_width / 2, self.screen_height / 10)
-                if self.hover_main[i] == True: buttonRect = pygame.Rect((self.screen_width / 4), ((6 + 2 * i) / 16) * self.screen_height, (self.screen_width / 2), (self.screen_height / 10) * 1.05)
+                if self.hover_main[i] == True: buttonRect = pygame.Rect((self.screen_width / 4) - (self.screen_width / 2) * 0.02, ((6 + 2 * i) / 16) * self.screen_height, (self.screen_width / 2) * 1.04, (self.screen_height / 10) * 1.05)
                 buttonText = mainbuttonFont1.render(button_texts[i], True, main_button1_text_color)
-                if self.hover_main[i] == True: buttonText = mainbuttonFont1.render(button_texts[i], True, main_button1_text_hover_color)
+                if self.hover_main[i] == True: buttonText = mainbuttonHoverFont1.render(button_texts[i], True, main_button1_text_hover_color)
                 if i != 3:
                     if self.hover_main[i] == True: pygame.draw.rect(self.screen, main_button1_hover_color, buttonRect)
                     else: pygame.draw.rect(self.screen, main_button1_color, buttonRect)
             elif 4 <= i <= 6:
                 buttonRect = pygame.Rect(self.screen_width * (0.1 + 0.25 * (i - 4)), self.screen_height * 0.8, self.screen_width * 0.2, self.screen_height / 10)
-                if self.hover_main[i] == True: buttonRect = pygame.Rect(self.screen_width * (0.1 + 0.25 * (i - 4)), self.screen_height * 0.8, self.screen_width * 0.2, self.screen_height / 10)
+                if self.hover_main[i] == True: buttonRect = pygame.Rect((self.screen_width * (0.1 + 0.25 * (i - 4))) - (self.screen_width * 0.2) * 0.02, self.screen_height * 0.8, (self.screen_width * 0.2) * 1.04, (self.screen_height / 10) * 1.03)
                 buttonText = mainbuttonFont2.render(button_texts[i], True, main_button2_text_color)
-                if self.hover_main[i] == True: buttonText = mainbuttonFont2.render(button_texts[i], True, main_button2_text_hover_color)
+                if self.hover_main[i] == True: buttonText = mainbuttonHoverFont2.render(button_texts[i], True, main_button2_text_hover_color)
                 if self.hover_main[i] == True: pygame.draw.rect(self.screen, main_button2_hover_color, buttonRect)
                 else: pygame.draw.rect(self.screen, main_button2_color, buttonRect)
                 
@@ -174,8 +174,6 @@ class Game():
             button_dict[i] = buttonRect
             buttonTextRect = buttonText.get_rect()
             buttonTextRect.center = buttonRect.center
-
-
             self.screen.blit(buttonText, buttonTextRect)
         
         # Change state when respective buttons are clicked, add hover effects
