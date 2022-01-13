@@ -129,11 +129,15 @@ class Game():
             pygame.mixer.music.set_volume(0.1)
             pygame.mixer.music.play(loops = -1)
     
+    # Undo the last move, adjust all othello board configuration to the previous state
+    def undo_move(self):
+        raise NotImplementedError
+    
     def state_mainmenu(self):
         # Play BGM, display title
         self.play_main_bgm()
         self.screen.fill(black)
-        title = titleFont.render("Hello Othello", True, white)
+        title = titleFont.render("OTHELLO", True, white)
         titleRect = title.get_rect()
         titleRect.center = (self.screen_width / 2, 50)
         self.screen.blit(title, titleRect)
@@ -343,6 +347,8 @@ class Game():
             mouse = pygame.mouse.get_pos()
             if left == 1:
                 if yes_rect.collidepoint(mouse):
+                    if self.confirmation_action == "Undo":
+                        self.undo_move()
                     if self.confirmation_action == "Quit":
                         self.game_menu = "start"
                         self.game_state = "prep"
@@ -374,13 +380,13 @@ class Game():
                                     elif self.ot.turn == 2: self.time_start2 = pygame.time.get_ticks()
                                     self.recent_move = (i, j)
                 if button_dict[8].collidepoint(mouse): # Undo last move button (TODO)
-                    raise NotImplementedError
+                    self.confirmation_action = "Undo"
                 if button_dict[9].collidepoint(mouse): # Reset board button (restart game with the same configuration)
                     self.confirmation_action = "Reset"
                 if button_dict[10].collidepoint(mouse): # Quit button (back to main menu)
                     self.confirmation_action = "Quit"
         
-        pygame.display.flip()         
+        pygame.display.flip()
 
 
 def main():
@@ -392,9 +398,7 @@ if __name__ == "__main__":
 
 # TODO
 """
-- Add music
 - Add SFX
-- Add Timer Feature
 - Pre_custom UI
 - Fix UI, texts and colors
 - Add Undo Feature

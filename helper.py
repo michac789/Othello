@@ -17,11 +17,16 @@ conf_hover_color = (159, 200, 45)
 prep_chosen_color = (255, 210, 10)
 
 # Define all fonts used here
-init()
 OPEN_SANS = path.join("assets", "OpenSans-Regular.ttf")
+PACIFICO = path.join("assets", "Pacifico.ttf")
+BLACKJACK = path.join("assets", "blackjack.otf")
+LOBSTER = path.join("assets", "Lobster.otf")
+ARIZONIA = path.join("assets", "Arizonia-Regular.ttf")
+
+init()
 smallFont = font.Font(OPEN_SANS, 20)
 hugeFont = font.Font(OPEN_SANS, 40)
-titleFont = font.Font(OPEN_SANS, 50)
+titleFont = font.Font(LOBSTER, 100)
 buttonFont = font.Font(OPEN_SANS, 30)
 confFont1 =  font.Font(OPEN_SANS, 25)
 confFont2 =  font.Font(OPEN_SANS, 15)
