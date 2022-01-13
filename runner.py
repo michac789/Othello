@@ -147,24 +147,35 @@ class Game():
         titleRect.center = (self.screen_width / 2, self.screen_height * 0.2)
         self.screen.blit(title, titleRect)
         
-        # Display buttons (classic mode, custom mode, puzzle mode)
+        # Display buttons (classic mode, custom mode, puzzle mode), supporting buttons and toogle bgm / sfx / full screen buttons
         button_texts = ["Classic Mode", "Custom Mode", "Puzzle Mode", "", "How To Play", "Leaderboards", "About", "BGM", "SFX"]
         button_dict = {}
         for i in range(len(button_texts)):
             if 0 <= i <= 3:
                 buttonRect = pygame.Rect((self.screen_width / 4), ((6 + 2 * i) / 16) * self.screen_height, self.screen_width / 2, self.screen_height / 10)
                 if self.hover_main[i] == True: buttonRect = pygame.Rect((self.screen_width / 4), ((6 + 2 * i) / 16) * self.screen_height, (self.screen_width / 2), (self.screen_height / 10) * 1.05)
-                buttonText = buttonFont.render(button_texts[i], True, main_button_text_color)
-                if self.hover_main[i] == True: buttonText = buttonFont.render(button_texts[i], True, main_button_text_hover_color)
-            elif i == 7 or i == 8:
+                buttonText = mainbuttonFont1.render(button_texts[i], True, main_button1_text_color)
+                if self.hover_main[i] == True: buttonText = mainbuttonFont1.render(button_texts[i], True, main_button1_text_hover_color)
+                if i != 3:
+                    if self.hover_main[i] == True: pygame.draw.rect(self.screen, main_button1_hover_color, buttonRect)
+                    else: pygame.draw.rect(self.screen, main_button1_color, buttonRect)
+            elif 4 <= i <= 6:
+                buttonRect = pygame.Rect(self.screen_width * (0.1 + 0.25 * (i - 4)), self.screen_height * 0.8, self.screen_width * 0.2, self.screen_height / 10)
+                if self.hover_main[i] == True: buttonRect = pygame.Rect(self.screen_width * (0.1 + 0.25 * (i - 4)), self.screen_height * 0.8, self.screen_width * 0.2, self.screen_height / 10)
+                buttonText = mainbuttonFont2.render(button_texts[i], True, main_button2_text_color)
+                if self.hover_main[i] == True: buttonText = mainbuttonFont2.render(button_texts[i], True, main_button2_text_hover_color)
+                if self.hover_main[i] == True: pygame.draw.rect(self.screen, main_button2_hover_color, buttonRect)
+                else: pygame.draw.rect(self.screen, main_button2_color, buttonRect)
+                
+            if i == 7 or i == 8:
                 buttonRect = pygame.Rect((self.screen_width / 4), (self.screen_height * (-0.6 + i * 0.1)), self.screen_width / 4, self.screen_height / 20)
-                buttonText = buttonFont.render(button_texts[i], True, main_button_text_color)
+                buttonText = buttonFont.render(button_texts[i], True, main_button1_text_color)
+                
             button_dict[i] = buttonRect
             buttonTextRect = buttonText.get_rect()
             buttonTextRect.center = buttonRect.center
-            if 0 <= i <= 2 or i == 7 or i == 8:
-                if self.hover_main[i] == True: pygame.draw.rect(self.screen, main_button_hover_color, buttonRect)
-                else: pygame.draw.rect(self.screen, main_button_color, buttonRect)
+
+
             self.screen.blit(buttonText, buttonTextRect)
         
         # Change state when respective buttons are clicked, add hover effects
@@ -177,7 +188,7 @@ class Game():
                 time.sleep(0.1)
             if button_dict[7].collidepoint(mouse): self.bgm_on = (False if self.bgm_on == True else True)
         self.hover_main = [False for i in range(9)]
-        for i in range(3):
+        for i in range(7):
             if button_dict[i].collidepoint(mouse): self.hover_main[i] = True
         
         pygame.display.flip()

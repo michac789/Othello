@@ -4,10 +4,15 @@ from os import path
 
 # Define all RGB colors for various components here
 main_title_color = (0, 255, 255)
-main_button_color = (217, 255, 179)
-main_button_hover_color = (217, 255, 209)
-main_button_text_color = (0, 51, 0)
-main_button_text_hover_color = (255, 0, 255)
+main_button1_color = (217, 255, 179)
+main_button1_hover_color = (217, 255, 209)
+main_button1_text_color = (0, 51, 0)
+main_button1_text_hover_color = (255, 0, 255)
+main_button2_color = (217, 255, 179)
+main_button2_hover_color = (217, 255, 209)
+main_button2_text_color = (0, 51, 0)
+main_button2_text_hover_color = (255, 0, 255)
+
 
 black = (0, 0, 0)
 white = (255, 255, 255)
@@ -30,9 +35,13 @@ LOBSTER = path.join("assets", "Lobster.otf")
 ARIZONIA = path.join("assets", "Arizonia-Regular.ttf")
 
 init()
+maintitleFont = font.Font(LOBSTER, 100)
+mainbuttonFont1 = font.Font(OPEN_SANS, 30)
+mainbuttonFont2 = font.Font(BLACKJACK, 25)
+
 smallFont = font.Font(OPEN_SANS, 20)
 hugeFont = font.Font(OPEN_SANS, 40)
-maintitleFont = font.Font(LOBSTER, 100)
+
 titleFont = font.Font(ARIZONIA, 80)
 buttonFont = font.Font(OPEN_SANS, 30)
 confFont1 =  font.Font(OPEN_SANS, 25)
