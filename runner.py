@@ -76,7 +76,7 @@ class Game():
         self.board_start = (self.board_padding, self.board_padding)
         self.piece_radius = math.floor(self.tile_size / 2 - 5)
     
-    # This function is called for every frame in the game
+    # This function is called to loop through the game and render each frame while game is still running
     def run(self):
         while True:
             # Terminate application when the game is quit, resizable window feature
@@ -99,6 +99,7 @@ class Game():
             elif self.game_menu == "play":
                 self.state_play()
 
+    # Reset configuration made to self, called upon when restarting or quitting a game
     def set_config(self):
         self.recent_move = (-1, -1)
         self.stored_move = (-2, -2)
@@ -121,13 +122,16 @@ class Game():
         if self.classic_time > 0: self.timer_player1, self.timer_player2 = 60000 * self.classic_time, 60000 * self.classic_time
         else: self.timer_player1, self.timer_player2 = 0, 0
     
-    def state_mainmenu(self):
-        # If music is not playing, play main menu bgm
+    # Called upon to play main menu bgm and set its volume when not played yet, also called from several other game states
+    def play_main_bgm(self):
         if not pygame.mixer.music.get_busy():
             pygame.mixer.music.load(BGM_MENU)
+            pygame.mixer.music.set_volume(0.1)
             pygame.mixer.music.play(loops = -1)
-        
-        # Display title
+    
+    def state_mainmenu(self):
+        # Play BGM, display title
+        self.play_main_bgm()
         self.screen.fill(black)
         title = titleFont.render("Hello Othello", True, white)
         titleRect = title.get_rect()
@@ -165,6 +169,7 @@ class Game():
         titleRect.center = (self.screen_width / 2, 50)
         self.screen.blit(title, titleRect)
         self.classic_choose(-1)
+        self.play_main_bgm()
         
         # Display various buttons
         button_texts = ["Choose your opponent:",
@@ -227,6 +232,7 @@ class Game():
             self.game_state = "play"
             self.time_start1 = pygame.time.get_ticks()
             pygame.mixer.music.load(BGM_GAME)
+            pygame.mixer.music.set_volume(0.1)
             pygame.mixer.music.play(loops = -1)
         
         # Draw board and all the tiles
