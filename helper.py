@@ -1,5 +1,5 @@
 # Helper file associated with runner.py
-from pygame import font, init
+from pygame import font, init, mixer
 from os import path
 
 # Define all RGB colors for various components here
@@ -28,3 +28,12 @@ confFont2 =  font.Font(OPEN_SANS, 15)
 confFont3 = font.Font(OPEN_SANS, 30)
 confFont4 = font.Font(OPEN_SANS, 35)
 preptextFont = font.Font(OPEN_SANS, 25)
+
+# Define all background musics used here
+mixer.init()
+BGM_MENU = path.join("assets", "menumusic.mp3")
+BGM_GAME = path.join("assets", "gamemusic.mp3")
+
+
+
+# Define all sfx used here

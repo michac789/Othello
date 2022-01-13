@@ -21,6 +21,7 @@ class Game():
         self.screen_width = 800
         self.screen_height = 450
         pygame.init()
+        pygame.mixer.init()
         pygame.display.set_caption("Othello")
         self.screen = pygame.display.set_mode((800, 450), pygame.RESIZABLE)
         
@@ -61,6 +62,10 @@ class Game():
         self.timer_player2 = 0
         self.time_start1 = None
         self.time_start2 = None
+        
+        # Keep track whether bgm and soundfx is on or not, by default is on, can be turned off
+        self.bgm_on = True
+        self.soundfx_on = True
     
     # Resize components relative to the overall screen width and height
     def resize(self):
@@ -98,6 +103,7 @@ class Game():
         self.recent_move = (-1, -1)
         self.stored_move = (-2, -2)
         self.skip_index = -1
+        pygame.mixer.music.unload()
     
     # Handles all the choosing mode buttons and its action towards self.classic_(xxx) in the 'pre_classic' state
     def classic_choose(self, index):
@@ -116,6 +122,11 @@ class Game():
         else: self.timer_player1, self.timer_player2 = 0, 0
     
     def state_mainmenu(self):
+        # If music is not playing, play main menu bgm
+        if not pygame.mixer.music.get_busy():
+            pygame.mixer.music.load(BGM_MENU)
+            pygame.mixer.music.play(loops = -1)
+        
         # Display title
         self.screen.fill(black)
         title = titleFont.render("Hello Othello", True, white)
@@ -207,7 +218,7 @@ class Game():
         # TEMPORARY PLACEHOLDER TODO
 
     def state_play(self):
-        # Initialize game with the required settings
+        # Initialize game with the required settings; added bgm for gameplay
         if self.game_state == "prep":
             self.set_config()
             self.ot = Othello(self.dim_height, self.dim_width)
@@ -215,6 +226,8 @@ class Game():
             self.ot.turn = 1
             self.game_state = "play"
             self.time_start1 = pygame.time.get_ticks()
+            pygame.mixer.music.load(BGM_GAME)
+            pygame.mixer.music.play(loops = -1)
         
         # Draw board and all the tiles
         self.screen.fill(black)
