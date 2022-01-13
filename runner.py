@@ -56,9 +56,11 @@ class Game():
         self.classic_ai_black = False # AI goes later (second turn) as white by default, can be set to true so AI makes first turn
         self.classic_chosen = [False for i in range(16)]
         
-        # Keep track of time
-        self.timer_player1 = None
-        self.timer_player2 = None
+        # Keep track of time (time left & time since pygame was init for starting relative time)
+        self.timer_player1 = 0
+        self.timer_player2 = 0
+        self.time_start1 = None
+        self.time_start2 = None
     
     # Resize components relative to the overall screen width and height
     def resize(self):
@@ -110,7 +112,8 @@ class Game():
         else: self.classic_chosen[int(self.classic_time / 5 + 6)] = True
         if self.classic_undo == True: self.classic_chosen[12] = True
         else: self.classic_chosen[13] = True
-        if self.classic_time > 0: self.timer_player1, self.timer_player2 = 6000 * self.classic_time, 6000 * self.classic_time
+        if self.classic_time > 0: self.timer_player1, self.timer_player2 = 60000 * self.classic_time, 60000 * self.classic_time
+        else: self.timer_player1, self.timer_player2 = 0, 0
     
     def state_mainmenu(self):
         # Display title
@@ -139,6 +142,7 @@ class Game():
             mouse = pygame.mouse.get_pos()
             for i in range(3):
                 if button_dict[i].collidepoint(mouse): self.game_menu = states[i]
+                time.sleep(0.1)
         
         pygame.display.flip()
         
@@ -149,6 +153,7 @@ class Game():
         titleRect = title.get_rect()
         titleRect.center = (self.screen_width / 2, 50)
         self.screen.blit(title, titleRect)
+        self.classic_choose(-1)
         
         # Display various buttons
         button_texts = ["Choose your opponent:",
@@ -209,10 +214,7 @@ class Game():
             self.ot.set_initial_position(self.init_white, self.init_black)
             self.ot.turn = 1
             self.game_state = "play"
-            
-        if self.timer_player1 != None:
-            pass
-        
+            self.time_start1 = pygame.time.get_ticks()
         
         # Draw board and all the tiles
         self.screen.fill(black)
@@ -240,8 +242,16 @@ class Game():
             self.ot.skip_turn = 0
             self.skip_index = -1
         
-        time_left_1 = pygame.time.get_ticks()
-        print(time_left_1)
+        # Keep track of time if time limit is given; opponent wins if your time runs out and there are still moves possible to made
+        if self.classic_time != -1 and self.game_state != "end":
+            if self.ot.turn == 1:
+                self.timer_player1 = self.timer_player1 + (self.time_start1 - pygame.time.get_ticks())
+                self.time_start1 = pygame.time.get_ticks()
+            elif self.ot.turn == 2:
+                self.timer_player2 = self.timer_player2 + (self.time_start2 - pygame.time.get_ticks())
+                self.time_start2 = pygame.time.get_ticks()
+            if self.timer_player1 < 0: self.ot.force_win = 2
+            if self.timer_player2 < 0: self.ot.force_win = 1
         
         # Draw each pieces that are present in the board, including all tiles with possible moves, showing recent move made
         for i in range(self.dim_height):
@@ -260,19 +270,23 @@ class Game():
             self.game_state = "end"
         
         # Message to be displayed on screen
-        Time1, Time2 = 0, 0
+        time1, time2 = (self.timer_player1 if self.timer_player1 > 0 else 0), (self.timer_player2 if self.timer_player2 > 0 else 0)
+        time1, time2 = f"{(time1 // 60000):02d}:{((time1 // 1000) % 60):02d}:{((time1 // 10) % 100):02d}", f"{(time2 // 60000):02d}:{((time2 // 1000) % 60):02d}:{((time2 // 10) % 100):02d}"
         b1, b2, b3, b4, b5 = f"{self.ot.get_color(self.ot.turn)}'s move (Turn: {self.ot.move_no + 1})", "No winner yet.", "Undo", "Reset", "Quit"
         if self.game_state == "end":
-            b1 = f"No more moves! ({self.ot.move_no} turns)"
+            ms = ("No more moves!" if self.ot.force_win == -1 else "Time is up!")
+            b1 = f"{ms} ({self.ot.move_no} turns)"
             b2 = f"{self.ot.get_color(self.ot.check_victory())} wins!"
-        button_texts = [f"{Time1}", f"{Time2}", "Black", "White", f"{self.ot.black_tiles}", f"{self.ot.white_tiles}", b1, b2, b3, b4, b5]
+        button_texts = [f"{time1}", f"{time2}", "Black", "White", f"{self.ot.black_tiles}", f"{self.ot.white_tiles}", b1, b2, b3, b4, b5]
 
         # Display various user interfaces (scoreboards, messages, buttons)
         scoreRect = pygame.Rect((self.screen_width * 0.55), (self.screen_height * 0.1), (self.screen_width * 0.4), (self.screen_height * 0.3))
         pygame.draw.rect(self.screen, white, scoreRect)
         button_dict = {}
         for i in range(len(button_texts)):
-            if i == 2 or i == 3:
+            if (i == 0 or i == 1) and self.classic_time != -1:
+                buttonRect = pygame.Rect((self.screen_width * (0.58 + i * 0.18)), (self.screen_height * 0.05), self.screen_width / 6, self.screen_height / 15)
+            elif i == 2 or i == 3:
                 buttonRect = pygame.Rect((self.screen_width * (0.58 + (i - 2) * 0.18)), (self.screen_height * 0.3), self.screen_width / 6, self.screen_height / 15)
             elif i == 4 or i == 5:
                 buttonRect = pygame.Rect((self.screen_width * (0.58 + (i - 4) * 0.18)), (self.screen_height * 0.12), self.screen_width / 6, self.screen_height / 5)
@@ -317,6 +331,7 @@ class Game():
                     if self.confirmation_action == "Reset":
                         self.game_state = "prep"
                         self.set_config()
+                        self.classic_choose(-1)
                     self.confirmation_action = ""
                     time.sleep(0.2)
                 if no_rect.collidepoint(mouse):
@@ -330,13 +345,16 @@ class Game():
             left, _, _ = pygame.mouse.get_pressed()
             mouse = pygame.mouse.get_pos()
             if left == 1:
-                for i in range(self.dim_height):
-                    for j in range(self.dim_width):
-                        if tiles[i][j].collidepoint(mouse):
-                            if (i, j) in moves:
-                                self.ot.make_move((i, j))
-                                self.recent_move = (i, j)
-                if button_dict[8].collidepoint(mouse):
+                if self.game_state == "play":
+                    for i in range(self.dim_height):
+                        for j in range(self.dim_width):
+                            if tiles[i][j].collidepoint(mouse):
+                                if (i, j) in moves:
+                                    self.ot.make_move((i, j))
+                                    if self.ot.turn == 1: self.time_start1 = pygame.time.get_ticks()
+                                    elif self.ot.turn == 2: self.time_start2 = pygame.time.get_ticks()
+                                    self.recent_move = (i, j)
+                if button_dict[8].collidepoint(mouse): # Undo last move button (TODO)
                     raise NotImplementedError
                 if button_dict[9].collidepoint(mouse): # Reset board button (restart game with the same configuration)
                     self.confirmation_action = "Reset"
