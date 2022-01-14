@@ -134,7 +134,9 @@ class Othello():
     
     # Undo last move made, revert all self properties to previous state, returns False if no more undo possible, otherwise True
     def undo_move(self):
-        if self.move_no != 0:
+        # Only works for 2nd move and so on, for 1st move might not work in a very special customized case;
+        # Undo first move = reset board; this is handled from runner.py and not here
+        if self.move_no != 0 and self.move_no != 1:
             self.board = self.moves_made[self.move_no - 1][0]
             self.recent_move, self.stored_move,  = self.moves_made[self.move_no - 1][1][0], self.moves_made[self.move_no - 1][1][1], 
             self.skip_index, self.skip_turn = self.moves_made[self.move_no - 1][1][2], self.moves_made[self.move_no - 1][1][3]

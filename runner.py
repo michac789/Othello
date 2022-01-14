@@ -373,52 +373,6 @@ class Game():
             buttonTextRect.center = buttonRect.center
             pygame.draw.rect(self.screen, color_x, buttonRect)
             self.screen.blit(buttonText, buttonTextRect)
-            
-        # Display confirmation screen and yes/no buttons, proceed with action when 'yes' is clicked, back to game when 'no' is clicked
-        if self.confirmation_action != "":
-            confRectborder = pygame.Rect((self.virtual_width / 4), (self.virtual_height / 4), (self.virtual_width / 2), (self.virtual_height / 2))
-            confRect = pygame.Rect((self.virtual_width / 4 + 3), (self.virtual_height / 4 + 3), (self.virtual_width / 2 - 6), (self.virtual_height / 2 - 6))
-            confText1 = confFont1.render(f"Confirm {self.confirmation_action}?", True, black)
-            confText2 = confFont2.render("Warning! This cannot be undone!", True, black)
-            confTextRect1 = confText1.get_rect(center = (self.virtual_width / 2, self.virtual_height * 0.35))
-            confTextRect2 = confText2.get_rect(center = (self.virtual_width / 2, self.virtual_height * 0.45))
-            pygame.draw.rect(self.screen, conf_screen_border_color, confRectborder)
-            pygame.draw.rect(self.screen, conf_screen_color, confRect)
-            self.screen.blit(confText1, confTextRect1)
-            self.screen.blit(confText2, confTextRect2)
-            yes, no = confFont3.render("Yes", True, black), confFont3.render("No", True, black)
-            if self.hover_yes: yes = confFont4.render("Yes", True, conf_hover_color)
-            if self.hover_no: no = confFont4.render("No", True, conf_hover_color)
-            yes_rect = yes.get_rect(center = (self.virtual_width * 0.65, self.virtual_height * 0.55)) #TEMP TODO
-            no_rect = no.get_rect(center = (self.virtual_width * 0.55, self.virtual_height * 0.55))
-            self.screen.blit(yes, yes_rect)
-            self.screen.blit(no, no_rect)
-            left, _, _ = pygame.mouse.get_pressed()
-            mouse = pygame.mouse.get_pos()
-            if left == 1:
-                if yes_rect.collidepoint(mouse):
-                    if self.confirmation_action == "Undo":
-                        if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_UNDO_GAME))
-                        self.ot.undo_move()
-                        time.sleep(0.5)
-                    if self.confirmation_action == "Quit":
-                        if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_QUIT_GAME))
-                        self.game_menu = "start"
-                        self.game_state = "prep"
-                        self.set_config()
-                    if self.confirmation_action == "Reset":
-                        if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_RESET_GAME))
-                        self.game_state = "prep"
-                        self.set_config()
-                        self.classic_choose(-1)
-                    self.confirmation_action = ""
-                    time.sleep(0.2)
-                if no_rect.collidepoint(mouse):
-                    if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
-                    self.confirmation_action = ""
-            self.hover_yes, self.hover_no = False, False
-            if yes_rect.collidepoint(mouse): self.hover_yes = True
-            if no_rect.collidepoint(mouse): self.hover_no = True
         
         # Update changes when a valid tile is clicked, or when a button is clicked
         if self.confirmation_action == "":
@@ -443,6 +397,53 @@ class Game():
                 if button_dict[8].collidepoint(mouse): self.confirmation_action = "Undo" # Undo last move button
                 if button_dict[9].collidepoint(mouse): self.confirmation_action = "Reset" # Reset board button (restart game with the same configuration)
                 if button_dict[10].collidepoint(mouse): self.confirmation_action = "Quit" # Quit button (back to main menu)
+                
+        # Display confirmation screen and yes/no buttons, proceed with action when 'yes' is clicked, back to game when 'no' is clicked
+        if self.confirmation_action != "":
+            confRectborder = pygame.Rect((self.virtual_width / 4), (self.virtual_height / 4), (self.virtual_width / 2), (self.virtual_height / 2))
+            confRect = pygame.Rect((self.virtual_width / 4 + 3), (self.virtual_height / 4 + 3), (self.virtual_width / 2 - 6), (self.virtual_height / 2 - 6))
+            confText1 = confFont1.render(f"Confirm {self.confirmation_action}?", True, black)
+            confText2 = confFont2.render("Warning! This cannot be undone!", True, black)
+            confTextRect1 = confText1.get_rect(center = (self.virtual_width / 2, self.virtual_height * 0.35))
+            confTextRect2 = confText2.get_rect(center = (self.virtual_width / 2, self.virtual_height * 0.45))
+            pygame.draw.rect(self.screen, conf_screen_border_color, confRectborder)
+            pygame.draw.rect(self.screen, conf_screen_color, confRect)
+            self.screen.blit(confText1, confTextRect1)
+            self.screen.blit(confText2, confTextRect2)
+            yes, no = confFont3.render("Yes", True, black), confFont3.render("No", True, black)
+            if self.hover_yes: yes = confFont4.render("Yes", True, conf_hover_color)
+            if self.hover_no: no = confFont4.render("No", True, conf_hover_color)
+            yes_rect = yes.get_rect(center = (self.virtual_width * 0.45, self.virtual_height * 0.55))
+            no_rect = no.get_rect(center = (self.virtual_width * 0.55, self.virtual_height * 0.55))
+            self.screen.blit(yes, yes_rect)
+            self.screen.blit(no, no_rect)
+            left, _, _ = pygame.mouse.get_pressed()
+            mouse = pygame.mouse.get_pos()
+            if left == 1:
+                if yes_rect.collidepoint(mouse):
+                    if self.confirmation_action == "Undo":
+                        if self.ot.move_no == 1: self.confirmation_action = "Reset"
+                        if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_UNDO_GAME))
+                        self.ot.undo_move()
+                        time.sleep(0.2)
+                    if self.confirmation_action == "Quit":
+                        if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_QUIT_GAME))
+                        self.game_menu = "start"
+                        self.game_state = "prep"
+                        self.set_config()
+                    if self.confirmation_action == "Reset":
+                        if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_RESET_GAME))
+                        self.game_state = "prep"
+                        self.set_config()
+                        self.classic_choose(-1)
+                    self.confirmation_action = ""
+                    time.sleep(0.2)
+                if no_rect.collidepoint(mouse):
+                    if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
+                    self.confirmation_action = ""
+            self.hover_yes, self.hover_no = False, False
+            if yes_rect.collidepoint(mouse): self.hover_yes = True
+            if no_rect.collidepoint(mouse): self.hover_no = True
 
 def main():
     game = Game()
