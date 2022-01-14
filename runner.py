@@ -74,6 +74,7 @@ class Game():
         
         # Various hover effects
         self.hover_main = [False for i in range(9)]
+        self.hover_pre_classic = [False for i in range(16)]
     
     # Resize components relative to the overall screen width and height; maintaining 16:9 aspect ratio
     def resize(self):
@@ -109,6 +110,7 @@ class Game():
                 raise NotImplementedError
             elif self.game_menu == "play":
                 self.state_play()
+            pygame.display.flip()
 
     # Reset configuration made to self, called upon when restarting or quitting a game
     def set_config(self):
@@ -215,8 +217,6 @@ class Game():
         for i in range(9):
             if button_dict[i].collidepoint(mouse): self.hover_main[i] = True
         
-        pygame.display.flip()
-        
     def state_pre_classic(self):
         # Display game mode as main title
         self.screen.fill(black)
@@ -239,18 +239,18 @@ class Game():
                 buttonText = preptextFont.render(button_texts[i], True, (prep_text_color1 if i == 0 else prep_text_color2))
             if 4 <= i <= 5:
                 buttonRect = pygame.Rect(self.virtual_width * (0.4 + 0.3 * (i - 4)), self.virtual_height * 0.25, self.virtual_width * 0.27, self.virtual_height / 5)
-                buttonText = prepoptionFont.render(button_texts[i], True, prep_option_color1)
+                buttonText = prepoptionFont.render(button_texts[i], True, (prep_option_color1 if self.hover_pre_classic[i] == False else prep_button_hover_color1))
             if 6 <= i <= 13:
                 buttonRect = pygame.Rect(self.virtual_width * (0.4 + 0.2 * ((i - 6) % 3)), self.virtual_height * (0.5 + 0.12 * math.floor((i - 6) / 3)), self.virtual_width * 0.15, self.virtual_height / 12)
-                buttonText = prepoptionFont.render(button_texts[i], True, prep_option_color2)
+                buttonText = prepoptionFont.render(button_texts[i], True, (prep_option_color2 if self.hover_pre_classic[i] == False else prep_button_hover_color1))
             if 14 <= i <= 15:
                 buttonRect = pygame.Rect(self.virtual_width * (0.1 + 0.4 * (i - 14)), self.virtual_height * 0.88, self.virtual_width * 0.3, self.virtual_height / 10)
-                buttonText = prepgoFont.render(button_texts[i], True, prep_option_color3)
+                buttonText = prepgoFont.render(button_texts[i], True, (prep_option_color3 if self.hover_pre_classic[i] == False else prep_button_hover_color2))
             button_dict[i] = buttonRect
             buttonTextRect = buttonText.get_rect()
             buttonTextRect.center = buttonRect.center
             if 0 <= i <= 3: pygame.draw.rect(self.screen, black, buttonRect)
-            elif i == 14 or i == 15: pygame.draw.rect(self.screen, prep_button_color2, buttonRect)
+            elif i == 14 or i == 15: pygame.draw.rect(self.screen, (prep_button_color2 if self.hover_pre_classic[i] == False else prep_rect_hover_color), buttonRect)
             else: pygame.draw.rect(self.screen, (prep_button_color1 if self.classic_chosen[i] == False else prep_chosen_color), buttonRect)
             self.screen.blit(buttonText, buttonTextRect)
         self.display_icon()
@@ -272,8 +272,9 @@ class Game():
                 self.dim_height, self.dim_width = 8, 8
                 self.game_menu = "play"
                 time.sleep(0.2)
-                
-        pygame.display.flip()
+        for i in range(4, 16, 1):
+            self.hover_pre_classic[i] = False
+            if button_dict[i].collidepoint(mouse): self.hover_pre_classic[i] = True
     
     def state_pre_custom(self): #TODO        
         self.init_white = [(0, 0), (0, 1), (0, 2), (0, 3)]
@@ -452,9 +453,6 @@ class Game():
                 if button_dict[8].collidepoint(mouse): self.confirmation_action = "Undo" # Undo last move button
                 if button_dict[9].collidepoint(mouse): self.confirmation_action = "Reset" # Reset board button (restart game with the same configuration)
                 if button_dict[10].collidepoint(mouse): self.confirmation_action = "Quit" # Quit button (back to main menu)
-        
-        pygame.display.flip()
-
 
 def main():
     game = Game()
