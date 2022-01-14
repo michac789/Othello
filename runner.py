@@ -43,11 +43,6 @@ class Game():
         self.game_menu = "start"
         self.game_state = "prep"
         
-        # Keep track of recent move, tracker used to end game when no 2 consecutive moves possible
-        self.recent_move = (-1, -1)
-        self.stored_move = (-2, -2)
-        self.skip_index = -1
-        
         # Confirmation window displayer
         self.confirmation_action = ""
         self.hover_yes = False
@@ -115,9 +110,6 @@ class Game():
 
     # Reset configuration made to self, called upon when restarting or quitting a game
     def set_config(self):
-        self.recent_move = (-1, -1)
-        self.stored_move = (-2, -2)
-        self.skip_index = -1
         pygame.mixer.music.unload()
     
     # Handles all the choosing mode buttons and its action towards self.classic_(xxx) in the 'pre_classic' state
@@ -143,8 +135,8 @@ class Game():
             pygame.mixer.music.play(loops = 0, start = 1.5)
         pygame.mixer.music.set_volume((0.2 if self.bgm_on == True else 0))
     
+    # Draw icons on bottom right of the screen
     def display_icon(self):
-        # Draw icons on bottom right of the screen
         img_name = [(BGM_TRUE_HOVER if self.bgm_on == True and self.bgm_hover == True else BGM_TRUE if self.bgm_on == True else BGM_FALSE_HOVER if self.bgm_hover == True else BGM_FALSE),
                  (SFX_TRUE_HOVER if self.sfx_on == True and self.sfx_hover == True else SFX_TRUE if self.sfx_on == True else SFX_FALSE_HOVER if self.sfx_hover == True else SFX_FALSE)]
         button_dict = {}
@@ -311,17 +303,7 @@ class Game():
         
         # Continue to next turn if there are no moves available; end game if no moves in 2 consecutive turns
         moves = self.ot.get_possible_moves()
-        if len(moves) == 0:
-            if self.skip_index != self.ot.turn and self.ot.skip_turn == 1:
-                self.ot.skip_turn = 2
-            if self.recent_move != self.stored_move:
-                self.ot.skip_turn = 1
-                self.skip_index = self.ot.turn
-                self.ot.turn = self.ot.turn % 2 + 1
-            self.stored_move = self.recent_move
-        else:
-            self.ot.skip_turn = 0
-            self.skip_index = -1
+        self.ot.check_no_move(moves)
         
         # Keep track of time if time limit is given; opponent wins if your time runs out and there are still moves possible to made
         if self.classic_time != -1 and self.game_state != "end":
@@ -343,7 +325,7 @@ class Game():
                     circ = pygame.draw.circle(self.screen, (white if self.ot.board[i][j] == 2 else black), coordinate, self.piece_radius)
                 if (i, j) in moves:
                     circ = pygame.draw.circle(self.screen, moves_color, coordinate, self.piece_radius, int(self.piece_radius / 2))
-                if self.recent_move == (i, j):
+                if self.ot.recent_move == (i, j):
                     circ = pygame.draw.circle(self.screen, recent_move_color, coordinate, self.piece_radius / 3)
         
         # Check if victory
@@ -407,7 +389,7 @@ class Game():
             yes, no = confFont3.render("Yes", True, black), confFont3.render("No", True, black)
             if self.hover_yes: yes = confFont4.render("Yes", True, conf_hover_color)
             if self.hover_no: no = confFont4.render("No", True, conf_hover_color)
-            yes_rect = yes.get_rect(center = (self.virtual_width * 0.45, self.virtual_height * 0.55))
+            yes_rect = yes.get_rect(center = (self.virtual_width * 0.65, self.virtual_height * 0.55)) #TEMP TODO
             no_rect = no.get_rect(center = (self.virtual_width * 0.55, self.virtual_height * 0.55))
             self.screen.blit(yes, yes_rect)
             self.screen.blit(no, no_rect)
@@ -418,6 +400,7 @@ class Game():
                     if self.confirmation_action == "Undo":
                         if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_UNDO_GAME))
                         self.ot.undo_move()
+                        time.sleep(0.5)
                     if self.confirmation_action == "Quit":
                         if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_QUIT_GAME))
                         self.game_menu = "start"
@@ -454,7 +437,6 @@ class Game():
                                     elif self.ot.turn == 2:
                                         self.time_start2 = pygame.time.get_ticks()
                                         if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_BLACK_MOVE))
-                                    self.recent_move = (i, j)
                                 elif self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_BUTTON_INVALID))
                 if button_dict[8].collidepoint(mouse) or button_dict[9].collidepoint(mouse) or button_dict[10].collidepoint(mouse):
                     if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
