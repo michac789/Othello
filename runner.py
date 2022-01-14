@@ -243,7 +243,7 @@ class Game():
                 buttonRect = pygame.Rect(self.virtual_width * (0.4 + 0.2 * ((i - 6) % 3)), self.virtual_height * (0.5 + 0.12 * math.floor((i - 6) / 3)), self.virtual_width * 0.15, self.virtual_height / 12)
                 buttonText = preptextFont.render(button_texts[i], True, black)
             if 14 <= i <= 15:
-                buttonRect = pygame.Rect(self.virtual_width * (0.1 + 0.5 * (i - 14)), self.virtual_height * 0.88, self.virtual_width * 0.3, self.virtual_height / 10)
+                buttonRect = pygame.Rect(self.virtual_width * (0.1 + 0.4 * (i - 14)), self.virtual_height * 0.88, self.virtual_width * 0.3, self.virtual_height / 10)
                 buttonText = preptextFont.render(button_texts[i], True, black)
             button_dict[i] = buttonRect
             buttonTextRect = buttonText.get_rect()
@@ -287,8 +287,8 @@ class Game():
             self.game_state = "play"
             self.time_start1 = pygame.time.get_ticks()
             pygame.mixer.music.load(BGM_GAME)
-            pygame.mixer.music.set_volume(0.1)
             pygame.mixer.music.play(loops = -1)
+        pygame.mixer.music.set_volume((0.1 if self.bgm_on == True else 0))
         
         # Draw board and all the tiles
         self.screen.fill(black)
@@ -368,7 +368,7 @@ class Game():
             elif i == 6 or i == 7:
                 buttonRect = pygame.Rect((self.virtual_width * 0.55), (self.virtual_height * (0.45 + (i - 6) / 6)), self.virtual_width * 0.4, self.virtual_height / 8)
             else:
-                buttonRect = pygame.Rect((self.virtual_width * (0.55 + (i - 8) * 0.13)), (self.virtual_height * 0.79), self.virtual_width * 0.12, self.virtual_height / 8)
+                buttonRect = pygame.Rect((self.virtual_width * (0.55 + (i - 8) * 0.12)), (self.virtual_height * 0.79), self.virtual_width * 0.1, self.virtual_height / 8)
             button_dict[i] = buttonRect
             buttonText = smallFont.render(button_texts[i], True, black)
             buttonTextRect = buttonText.get_rect()
