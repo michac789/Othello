@@ -143,10 +143,6 @@ class Game():
             pygame.mixer.music.play(loops = 0, start = 1.5)
         pygame.mixer.music.set_volume((0.2 if self.bgm_on == True else 0))
     
-    # Undo the last move, adjust all othello board configuration to the previous state
-    def undo_move(self):
-        raise NotImplementedError
-    
     def display_icon(self):
         # Draw icons on bottom right of the screen
         img_name = [(BGM_TRUE_HOVER if self.bgm_on == True and self.bgm_hover == True else BGM_TRUE if self.bgm_on == True else BGM_FALSE_HOVER if self.bgm_hover == True else BGM_FALSE),
@@ -298,6 +294,8 @@ class Game():
             pygame.mixer.music.play(loops = -1)
         pygame.mixer.music.set_volume((0.2 if self.bgm_on == True else 0))
         
+        #print(self.ot.moves_made)
+        
         # Draw board and all the tiles
         self.screen.fill(black)
         tiles = []
@@ -419,8 +417,7 @@ class Game():
                 if yes_rect.collidepoint(mouse):
                     if self.confirmation_action == "Undo":
                         if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_UNDO_GAME))
-                        time.sleep(5) #TEMP #TODO
-                        self.undo_move()
+                        self.ot.undo_move()
                     if self.confirmation_action == "Quit":
                         if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_QUIT_GAME))
                         self.game_menu = "start"

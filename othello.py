@@ -1,3 +1,4 @@
+import copy
 import sys
 import operator
 import random
@@ -18,7 +19,10 @@ class Othello():
         self.skip_turn = 0
         self.move_no = 0
         self.surrounding_tiles = [(i, j) for i in range(-1, 2, 1) for j in range(-1, 2, 1) if i != 0 or j != 0]
-        self.force_win = -1
+        # Used when time runs out in runner.py file to force a certain player to win
+        self.force_win = -1 
+        # Dictionary mapping move[i] to be made with tuple (current board state, self.skip_turn, move made) for tracking purpose & undo functionality
+        self.moves_made = {}
         
         self.tiles_corner = [(0, 0), (0, self.width - 1), (self.height - 1, 0), (self.height - 1, self.width - 1)]
         self.tiles_near_corner = [(0, 1), (1, 0), (1, 1), (0, self.width - 2), (1, self.width - 2), (1, self.width - 1), (self.height - 2, 0), (self.height - 1, 1), (self.height - 2, 1), (self.height - 2, self.width - 1), (self.height - 1, self.width - 2), (self.height - 2, self.width - 2)]
@@ -79,6 +83,7 @@ class Othello():
     
     # Updates the board with the current move, assuming that the 'move' parameter should already be valid
     def make_move(self, move):
+        self.moves_made[self.move_no] = (copy.deepcopy(self.board), self.skip_turn, move)
         for t in self.surrounding_tiles:
             if self.is_valid_tile((move[0] + t[0], move[1] + t[1])):
                 if self.board[move[0] + t[0]][move[1] + t[1]] == self.turn % 2 + 1:
@@ -101,8 +106,20 @@ class Othello():
     def check_victory(self):
         if self.force_win != -1: return (self.force_win)
         if self.black_tiles + self.white_tiles == self.height * self.width or self.skip_turn == 2:
+            self.moves_made[self.move_no] = (copy.deepcopy(self.board), self.skip_turn, None)
             return (2 if self.white_tiles > self.black_tiles else 1 if self.white_tiles < self.black_tiles else 3)
         return 0
+    
+    # Undo last move made, revert all self properties to previous state, returns False if no more undo possible, otherwise True
+    def undo_move(self):
+        if self.move_no != 0:
+            self.board = self.moves_made[self.move_no - 1][0]
+            self.skip_turn = self.moves_made[self.move_no - 1][1]
+            self.move_no -= 1
+            self.turn = self.turn % 2 + 1
+            self.update_piece_count()
+            return True
+        return False
     
     # Returns True and create computer move where possible, otherwise returns False
     def make_computer_move(self, level):
