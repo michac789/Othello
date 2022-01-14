@@ -1,3 +1,4 @@
+from turtle import color
 import pygame
 import sys
 import math
@@ -360,28 +361,37 @@ class Game():
             ms = ("No more moves!" if self.ot.force_win == -1 else "Time is up!")
             b1 = f"{ms} ({self.ot.move_no} turns)"
             b2 = f"{self.ot.get_color(self.ot.check_victory())} wins!"
-        button_texts = [f"{time1}", f"{time2}", "Black", "White", f"{self.ot.black_tiles}", f"{self.ot.white_tiles}", b1, b2, b3, b4, b5]
+        button_texts = [f"{time1}", f"{time2}", f"{self.ot.black_tiles}", f"{self.ot.white_tiles}", "Black", "White", b1, b2, b3, b4, b5]
 
         # Display various user interfaces (scoreboards, messages, buttons)
-        scoreRect = pygame.Rect((self.virtual_width * 0.55), (self.virtual_height * 0.1), (self.virtual_width * 0.4), (self.virtual_height * 0.3))
-        pygame.draw.rect(self.screen, white, scoreRect)
+        scoreRect = pygame.Rect((self.virtual_width * 0.55), (self.virtual_height * 0.05), (self.virtual_width * 0.4), (self.virtual_height * 0.37))
+        pygame.draw.rect(self.screen, play_scoreboard_color, scoreRect)
         button_dict = {}
         for i in range(len(button_texts)):
             if (i == 0 or i == 1) and self.classic_time != -1:
-                buttonRect = pygame.Rect((self.virtual_width * (0.58 + i * 0.18)), (self.virtual_height * 0.05), self.virtual_width / 6, self.virtual_height / 15)
+                buttonRect = pygame.Rect((self.virtual_width * (0.58 + i * 0.18)), (self.virtual_height * 0.07), self.virtual_width / 6, self.virtual_height / 15)
+                buttonText = playtimerFont.render(button_texts[i], True, play_timer_color)
+                color_x = play_score_color
             elif i == 2 or i == 3:
-                buttonRect = pygame.Rect((self.virtual_width * (0.58 + (i - 2) * 0.18)), (self.virtual_height * 0.3), self.virtual_width / 6, self.virtual_height / 15)
+                buttonRect = pygame.Rect((self.virtual_width * (0.58 + (i - 2) * 0.18)), (self.virtual_height * 0.16), self.virtual_width / 6, self.virtual_height / 5)
+                buttonText = playscoreFont.render(button_texts[i], True, play_sb_text_color)
+                color_x = play_score_color
             elif i == 4 or i == 5:
-                buttonRect = pygame.Rect((self.virtual_width * (0.58 + (i - 4) * 0.18)), (self.virtual_height * 0.12), self.virtual_width / 6, self.virtual_height / 5)
+                buttonRect = pygame.Rect((self.virtual_width * (0.58 + (i - 4) * 0.18)), (self.virtual_height * 0.32), self.virtual_width / 6, self.virtual_height / 15)
+                buttonText = playcolorFont.render(button_texts[i], True, play_sb_text_color)
+                color_x = play_score_color
             elif i == 6 or i == 7:
-                buttonRect = pygame.Rect((self.virtual_width * 0.55), (self.virtual_height * (0.45 + (i - 6) / 6)), self.virtual_width * 0.4, self.virtual_height / 8)
+                buttonRect = pygame.Rect((self.virtual_width * 0.55), (self.virtual_height * (0.45 + (i - 6) / 6)), self.virtual_width * 0.35, self.virtual_height / 8)
+                buttonText = playtextFont.render(button_texts[i], True, play_rect_text_color)
+                color_x = play_rect_displayer_color
             else:
                 buttonRect = pygame.Rect((self.virtual_width * (0.55 + (i - 8) * 0.12)), (self.virtual_height * 0.79), self.virtual_width * 0.1, self.virtual_height / 8)
+                buttonText = playutilFont.render(button_texts[i], True, play_utility_text_color)
+                color_x = play_utility_button_color
             button_dict[i] = buttonRect
-            buttonText = smallFont.render(button_texts[i], True, black)
             buttonTextRect = buttonText.get_rect()
             buttonTextRect.center = buttonRect.center
-            pygame.draw.rect(self.screen, score_color, buttonRect)
+            pygame.draw.rect(self.screen, color_x, buttonRect)
             self.screen.blit(buttonText, buttonTextRect)
             
         # Display confirmation screen and yes/no buttons, proceed with action when 'yes' is clicked, back to game when 'no' is clicked
@@ -409,7 +419,7 @@ class Game():
                 if yes_rect.collidepoint(mouse):
                     if self.confirmation_action == "Undo":
                         if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_UNDO_GAME))
-                        time.sleep(5) #TEMP
+                        time.sleep(5) #TEMP #TODO
                         self.undo_move()
                     if self.confirmation_action == "Quit":
                         if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_QUIT_GAME))
@@ -448,6 +458,7 @@ class Game():
                                         self.time_start2 = pygame.time.get_ticks()
                                         if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_BLACK_MOVE))
                                     self.recent_move = (i, j)
+                                elif self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_BUTTON_INVALID))
                 if button_dict[8].collidepoint(mouse) or button_dict[9].collidepoint(mouse) or button_dict[10].collidepoint(mouse):
                     if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
                 if button_dict[8].collidepoint(mouse): self.confirmation_action = "Undo" # Undo last move button
