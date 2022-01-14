@@ -137,9 +137,8 @@ class Game():
     def play_main_bgm(self):
         if not pygame.mixer.music.get_busy():
             pygame.mixer.music.load(BGM_MENU)
-            pygame.mixer.music.set_volume((0.1 if self.bgm_on == True else 0))
             pygame.mixer.music.play(loops = 0, start = 1.5)
-        pygame.mixer.music.set_volume((0.1 if self.bgm_on == True else 0))
+        pygame.mixer.music.set_volume((0.2 if self.bgm_on == True else 0))
     
     # Undo the last move, adjust all othello board configuration to the previous state
     def undo_move(self):
@@ -218,7 +217,7 @@ class Game():
     def state_pre_classic(self):
         # Display game mode as main title
         self.screen.fill(black)
-        title = titleFont.render("Classic Mode", True, white)
+        title = titleFont.render("Classic Mode", True, mode_title)
         titleRect = title.get_rect()
         titleRect.center = (self.virtual_width / 2, 50)
         self.screen.blit(title, titleRect)
@@ -228,31 +227,31 @@ class Game():
         # Display various buttons
         button_texts = ["Choose your opponent:",
                         "Choose time constraint:", "Allow undo move:", "",
-                        "Human VS Human", "Human VS AI", "No Limit", "5 Min", "10 Min", "15 Mins", "20 Mins", "30 Mins", "Yes", "No",
+                        "Human VS Human", "Human VS AI", "No Limit", "5 Mins", "10 Mins", "15 Mins", "20 Mins", "30 Mins", "Yes", "No",
                         "Back to Menu", "Play Game"]
         button_dict = {}
         for i in range(len(button_texts)):
-            button_color = (white if self.classic_chosen[i] == False else prep_chosen_color)
             if 0 <= i <= 3:
                 buttonRect = pygame.Rect(self.board_start[0], self.board_height * (0.25 + 0.3 * i), self.virtual_width / 3, self.virtual_height / 10)
-                buttonText = preptextFont.render(button_texts[i], True, white)
+                buttonText = preptextFont.render(button_texts[i], True, (prep_text_color1 if i == 0 else prep_text_color2))
             if 4 <= i <= 5:
                 buttonRect = pygame.Rect(self.virtual_width * (0.4 + 0.3 * (i - 4)), self.virtual_height * 0.25, self.virtual_width * 0.27, self.virtual_height / 5)
-                buttonText = preptextFont.render(button_texts[i], True, black)
+                buttonText = prepoptionFont.render(button_texts[i], True, prep_option_color1)
             if 6 <= i <= 13:
                 buttonRect = pygame.Rect(self.virtual_width * (0.4 + 0.2 * ((i - 6) % 3)), self.virtual_height * (0.5 + 0.12 * math.floor((i - 6) / 3)), self.virtual_width * 0.15, self.virtual_height / 12)
-                buttonText = preptextFont.render(button_texts[i], True, black)
+                buttonText = prepoptionFont.render(button_texts[i], True, prep_option_color2)
             if 14 <= i <= 15:
                 buttonRect = pygame.Rect(self.virtual_width * (0.1 + 0.4 * (i - 14)), self.virtual_height * 0.88, self.virtual_width * 0.3, self.virtual_height / 10)
-                buttonText = preptextFont.render(button_texts[i], True, black)
+                buttonText = prepgoFont.render(button_texts[i], True, prep_option_color3)
             button_dict[i] = buttonRect
             buttonTextRect = buttonText.get_rect()
             buttonTextRect.center = buttonRect.center
             if 0 <= i <= 3: pygame.draw.rect(self.screen, black, buttonRect)
-            else: pygame.draw.rect(self.screen, button_color, buttonRect)
+            elif i == 14 or i == 15: pygame.draw.rect(self.screen, prep_button_color2, buttonRect)
+            else: pygame.draw.rect(self.screen, (prep_button_color1 if self.classic_chosen[i] == False else prep_chosen_color), buttonRect)
             self.screen.blit(buttonText, buttonTextRect)
         self.display_icon()
-            
+
         # Buttons functionality when clicked
         left, _, _ = pygame.mouse.get_pressed()
         mouse = pygame.mouse.get_pos()
@@ -288,7 +287,7 @@ class Game():
             self.time_start1 = pygame.time.get_ticks()
             pygame.mixer.music.load(BGM_GAME)
             pygame.mixer.music.play(loops = -1)
-        pygame.mixer.music.set_volume((0.1 if self.bgm_on == True else 0))
+        pygame.mixer.music.set_volume((0.2 if self.bgm_on == True else 0))
         
         # Draw board and all the tiles
         self.screen.fill(black)
@@ -407,6 +406,7 @@ class Game():
                         self.set_config()
                     if self.confirmation_action == "Reset":
                         self.game_state = "prep"
+                        if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_RESET_GAME))
                         self.set_config()
                         self.classic_choose(-1)
                     self.confirmation_action = ""
@@ -428,8 +428,12 @@ class Game():
                             if tiles[i][j].collidepoint(mouse):
                                 if (i, j) in moves:
                                     self.ot.make_move((i, j))
-                                    if self.ot.turn == 1: self.time_start1 = pygame.time.get_ticks()
-                                    elif self.ot.turn == 2: self.time_start2 = pygame.time.get_ticks()
+                                    if self.ot.turn == 1:
+                                        self.time_start1 = pygame.time.get_ticks()
+                                        if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_WHITE_MOVE))
+                                    elif self.ot.turn == 2:
+                                        self.time_start2 = pygame.time.get_ticks()
+                                        if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_BLACK_MOVE))
                                     self.recent_move = (i, j)
                 if button_dict[8].collidepoint(mouse): # Undo last move button
                     self.confirmation_action = "Undo"

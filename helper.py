@@ -1,7 +1,7 @@
 # Helper file associated with runner.py
 from pygame import font, init, mixer, image
 
-# This library is used to ensure that the assets can be loaded independent of user's operating system
+# This library is used to ensure that the assets can be loaded independently of user's operating system
 from os import path
 
 # Define all RGB colors for various components here
@@ -14,7 +14,15 @@ main_button2_color = (255, 204, 153)
 main_button2_hover_color = (255, 226, 163)
 main_button2_text_color = (0, 0, 128)
 main_button2_text_hover_color = (185, 0, 102)
-
+mode_title = (255, 153, 255)
+prep_text_color1 = (204, 255, 255)
+prep_text_color2 = (255, 224, 224)
+prep_option_color1 = (0, 51, 0)
+prep_option_color2 = (0, 0, 153)
+prep_option_color3 = (128, 0, 0)
+prep_button_color1 = (240, 250, 255)
+prep_button_color2 = (200, 225, 245)
+prep_chosen_color = (255, 210, 10)
 
 black = (0, 0, 0)
 white = (255, 255, 255)
@@ -27,7 +35,6 @@ recent_move_color = (255, 0, 0)
 conf_screen_border_color = (30, 45, 240)
 conf_screen_color = (75, 145, 200)
 conf_hover_color = (159, 200, 45)
-prep_chosen_color = (255, 210, 10)
 
 # Define all fonts used here
 OPEN_SANS = path.join("assets", "fonts", "OpenSans-Regular.ttf")
@@ -42,26 +49,32 @@ mainbuttonFont1 = font.Font(OPEN_SANS, 30)
 mainbuttonHoverFont1 = font.Font(OPEN_SANS, 32)
 mainbuttonFont2 = font.Font(BLACKJACK, 25)
 mainbuttonHoverFont2 = font.Font(BLACKJACK, 27)
+titleFont = font.Font(ARIZONIA, 80)
+preptextFont = font.Font(OPEN_SANS, 25)
+prepoptionFont = font.Font(PACIFICO, 25)
+prepgoFont = font.Font(LOBSTER, 30)
+
+
 
 smallFont = font.Font(OPEN_SANS, 20)
 hugeFont = font.Font(OPEN_SANS, 40)
 
-titleFont = font.Font(ARIZONIA, 80)
+
 buttonFont = font.Font(OPEN_SANS, 30)
 confFont1 =  font.Font(OPEN_SANS, 25)
 confFont2 =  font.Font(OPEN_SANS, 15)
 confFont3 = font.Font(OPEN_SANS, 30)
 confFont4 = font.Font(OPEN_SANS, 35)
-preptextFont = font.Font(OPEN_SANS, 25)
+
 
 # Define all background musics used here
 BGM_MENU = path.join("assets", "bgm", "menumusic.mp3")
 BGM_GAME = path.join("assets", "bgm", "gamemusic.mp3")
 
-
-
 # Define all sfx used here
-
+SFX_BLACK_MOVE = path.join("assets", "sfx", "black_move.wav")
+SFX_WHITE_MOVE = path.join("assets", "sfx", "white_move.wav")
+SFX_RESET_GAME = path.join("assets", "sfx", "reset_game.wav")
 
 # Define all icons used here
 BGM_TRUE = path.join("assets", "icons", "bgm_true.jpg")
