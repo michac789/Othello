@@ -34,7 +34,7 @@ class Game():
         self.tile_size = int(min(self.board_width / self.dim_width, self.board_height / self.dim_height))
         self.board_start = (self.board_padding, self.board_padding)
         self.piece_radius = math.floor(self.tile_size / 2 - 5)
-        #self.icon_side = self.virtual_height / 9
+        self.icon_sides = math.floor(self.virtual_height / 9)
         
         # Keep track of game menus and states (state machine updator)
         # Menu: start, play, pre_classic, pre_custom, pre_puzzle, tutorial, leaderboard
@@ -68,7 +68,9 @@ class Game():
         
         # Keep track whether bgm and soundfx is on or not, by default is on, can be turned off
         self.bgm_on = True
-        self.soundfx_on = True
+        self.sfx_on = True
+        self.bgm_hover = False
+        self.sfx_hover = False
         
         # Various hover effects
         self.hover_main = [False for i in range(9)]
@@ -83,6 +85,7 @@ class Game():
         self.tile_size = int(min(self.board_width / self.dim_width, self.board_height / self.dim_height))
         self.board_start = (self.board_padding, self.board_padding)
         self.piece_radius = math.floor(self.tile_size / 2 - 5)
+        self.icon_sides = math.floor(self.virtual_height / 9)
     
     # This function is called to loop through the game and render each frame while game is still running
     def run(self):
@@ -142,6 +145,28 @@ class Game():
     def undo_move(self):
         raise NotImplementedError
     
+    def display_icon(self):
+        # Draw icons on bottom right of the screen
+        img_name = [(BGM_TRUE_HOVER if self.bgm_on == True and self.bgm_hover == True else BGM_TRUE if self.bgm_on == True else BGM_FALSE_HOVER if self.bgm_hover == True else BGM_FALSE),
+                 (BGM_TRUE if self.bgm_on == True else BGM_FALSE)]
+        button_dict = {}
+        for i in range(2):
+            image = pygame.transform.scale(img_name[i], (self.icon_sides, self.icon_sides))
+            buttonRect = pygame.Rect(self.virtual_width * 0.92, self.virtual_height * (0.85 - 0.1 * i), self.icon_sides, self.icon_sides)
+            buttonTextRect = image.get_rect()
+            buttonTextRect.center = buttonRect.center
+            self.screen.blit(image, buttonTextRect)
+            button_dict[i] = buttonRect
+            
+        # Implement clicking functionality and hover effect
+        mouse = pygame.mouse.get_pos()
+        left, _, _ = pygame.mouse.get_pressed()
+        if left == 1:
+            if button_dict[0].collidepoint(mouse): self.bgm_on = (False if self.bgm_on == True else True)
+            if button_dict[1].collidepoint(mouse): raise NotImplementedError
+            time.sleep(0.2)
+        self.bgm_hover = (True if button_dict[0].collidepoint(mouse) else False)
+    
     def state_mainmenu(self):
         # Play BGM, display title
         self.play_main_bgm()
@@ -170,17 +195,11 @@ class Game():
                 if self.hover_main[i] == True: buttonText = mainbuttonHoverFont2.render(button_texts[i], True, main_button2_text_hover_color)
                 if self.hover_main[i] == True: pygame.draw.rect(self.screen, main_button2_hover_color, buttonRect)
                 else: pygame.draw.rect(self.screen, main_button2_color, buttonRect)
-            # elif i == 7 or i == 8:
-            #     buttonText = pygame.transform.scale(pygame.image.load(BGM_TRUE), (50, 50))
-            #     buttonRect = pygame.Rect((self.virtual_width / 4), (self.virtual_height * (-0.6 + i * 0.1)), 50, 50)
-                
             button_dict[i] = buttonRect
             buttonTextRect = buttonText.get_rect()
             buttonTextRect.center = buttonRect.center
             self.screen.blit(buttonText, buttonTextRect)
-            
-        #im = pygame.image.load(BGM_ICON)
-        #self.screen.blit(im, (0, 0))
+        self.display_icon()
         
         # Change state when respective buttons are clicked, add hover effects
         states = ["pre_classic", "pre_custom", "pre_puzzle"]
@@ -190,7 +209,6 @@ class Game():
             for i in range(3):
                 if button_dict[i].collidepoint(mouse): self.game_menu = states[i]
                 time.sleep(0.1)
-            if button_dict[7].collidepoint(mouse): self.bgm_on = (False if self.bgm_on == True else True)
         self.hover_main = [False for i in range(9)]
         for i in range(9):
             if button_dict[i].collidepoint(mouse): self.hover_main[i] = True
@@ -233,6 +251,7 @@ class Game():
             if 0 <= i <= 3: pygame.draw.rect(self.screen, black, buttonRect)
             else: pygame.draw.rect(self.screen, button_color, buttonRect)
             self.screen.blit(buttonText, buttonTextRect)
+        self.display_icon()
             
         # Buttons functionality when clicked
         left, _, _ = pygame.mouse.get_pressed()
@@ -282,6 +301,7 @@ class Game():
                 pygame.draw.rect(self.screen, board_color, rect, 3)
                 row_tiles.append(rect)
             tiles.append(row_tiles)
+        self.display_icon()
         
         # Continue to next turn if there are no moves available; end game if no moves in 2 consecutive turns
         moves = self.ot.get_possible_moves()
