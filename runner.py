@@ -147,7 +147,7 @@ class Game():
     def display_icon(self):
         # Draw icons on bottom right of the screen
         img_name = [(BGM_TRUE_HOVER if self.bgm_on == True and self.bgm_hover == True else BGM_TRUE if self.bgm_on == True else BGM_FALSE_HOVER if self.bgm_hover == True else BGM_FALSE),
-                 (BGM_TRUE if self.bgm_on == True else BGM_FALSE)]
+                 (SFX_TRUE_HOVER if self.sfx_on == True and self.sfx_hover == True else SFX_TRUE if self.sfx_on == True else SFX_FALSE_HOVER if self.sfx_hover == True else SFX_FALSE)]
         button_dict = {}
         for i in range(2):
             image = pygame.transform.scale(img_name[i], (self.icon_sides, self.icon_sides))
@@ -156,15 +156,16 @@ class Game():
             buttonTextRect.center = buttonRect.center
             self.screen.blit(image, buttonTextRect)
             button_dict[i] = buttonRect
-            
+        
         # Implement clicking functionality and hover effect
         mouse = pygame.mouse.get_pos()
         left, _, _ = pygame.mouse.get_pressed()
         if left == 1:
             if button_dict[0].collidepoint(mouse): self.bgm_on = (False if self.bgm_on == True else True)
-            if button_dict[1].collidepoint(mouse): raise NotImplementedError
+            if button_dict[1].collidepoint(mouse): self.sfx_on = (False if self.sfx_on == True else True)
             time.sleep(0.2)
         self.bgm_hover = (True if button_dict[0].collidepoint(mouse) else False)
+        self.sfx_hover = (True if button_dict[1].collidepoint(mouse) else False)
     
     def state_mainmenu(self):
         # Play BGM, display title
@@ -464,11 +465,20 @@ if __name__ == "__main__":
 
 # TODO
 """
-- Add SFX
+1. Improve UI in pre_classic state (hover effects) and play state
+2. Add undo feature
+3. Create pre_custom feature user interface
+4. Add AI level 1 and basic against AI gameplay
+5. 'How to play' pages and pics, UI
+6. AI minimax algorithm??
+7. Puzzle mode??
+
 - Pre_custom UI
 - Fix UI, texts and colors
 - Add Undo Feature
 - AI simple level 1 (random moves)
 - Custom othello sizes and vs ai mode
 - etc.. (coming soon)
+BUGS:
+Handles self.timer when choosing timer!!!
 """

@@ -79,17 +79,25 @@ SFX_UNDO_GAME = path.join("assets", "sfx", "undo_game.wav")
 SFX_QUIT_GAME = path.join("assets", "sfx", "quit_game.wav")
 SFX_WIN_GAME = path.join("assets", "sfx", "win_game.wav")
 SFX_BUTTON_CLICK = path.join("assets", "sfx", "button_click.wav")
+SFX_BUTTON_INVALID = path.join("assets", "sfx", "button_invalid.wav")
 
-# Define all icons used here
+# Define all icons (images) used here
 BGM_TRUE = path.join("assets", "icons", "bgm_true.jpg")
 BGM_FALSE = path.join("assets", "icons", "bgm_false.jpg")
 BGM_TRUE_HOVER = path.join("assets", "icons", "bgm_true_hover.jpg")
 BGM_FALSE_HOVER = path.join("assets", "icons", "bgm_false_hover.jpg")
+SFX_TRUE = path.join("assets", "icons", "sfx_true.jpg")
+SFX_FALSE = path.join("assets", "icons", "sfx_false.jpg")
+SFX_TRUE_HOVER = path.join("assets", "icons", "sfx_true_hover.jpg")
+SFX_FALSE_HOVER = path.join("assets", "icons", "sfx_false_hover.jpg")
 BGM_TRUE = image.load(BGM_TRUE)
 BGM_FALSE = image.load(BGM_FALSE)
 BGM_TRUE_HOVER = image.load(BGM_TRUE_HOVER)
 BGM_FALSE_HOVER = image.load(BGM_FALSE_HOVER)
+SFX_TRUE = image.load(SFX_TRUE)
+SFX_FALSE = image.load(SFX_FALSE)
+SFX_TRUE_HOVER = image.load(SFX_TRUE_HOVER)
+SFX_FALSE_HOVER = image.load(SFX_FALSE_HOVER)
 
-#SFX_ICON = path.join("assets", "icons", "sfx.png")
-#bgm_icon = image.load(BGM_ICON)
-
+# Define images in 'how to play' section
+#TODO
