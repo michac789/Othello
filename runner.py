@@ -206,7 +206,9 @@ class Game():
         left, _, _ = pygame.mouse.get_pressed()
         if left == 1:
             for i in range(3):
-                if button_dict[i].collidepoint(mouse): self.game_menu = states[i]
+                if button_dict[i].collidepoint(mouse):
+                    self.game_menu = states[i]
+                    if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
                 time.sleep(0.1)
         self.hover_main = [False for i in range(9)]
         for i in range(9):
@@ -258,9 +260,13 @@ class Game():
         if left == 1:
             for i in range(4, 14, 1):
                 if button_dict[i].collidepoint(mouse):
+                    if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
                     self.classic_choose(i)
-            if button_dict[14].collidepoint(mouse): self.game_menu = "start"
+            if button_dict[14].collidepoint(mouse):
+                if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
+                self.game_menu = "start"
             if button_dict[15].collidepoint(mouse):
+                if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
                 self.init_white, self.init_black = [(3, 3), (4, 4)], [(3, 4), (4, 3)]
                 self.dim_height, self.dim_width = 8, 8
                 self.game_menu = "play"
@@ -340,7 +346,8 @@ class Game():
                     circ = pygame.draw.circle(self.screen, recent_move_color, coordinate, self.piece_radius / 3)
         
         # Check if victory
-        if self.ot.check_victory() != 0:
+        if self.ot.check_victory() != 0 and self.game_state != "end":
+            if self.sfx_on: pygame.mixer.Channel(2).play(pygame.mixer.Sound(SFX_WIN_GAME))
             self.game_state = "end"
         
         # Message to be displayed on screen
@@ -399,19 +406,23 @@ class Game():
             if left == 1:
                 if yes_rect.collidepoint(mouse):
                     if self.confirmation_action == "Undo":
+                        if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_UNDO_GAME))
+                        time.sleep(5) #TEMP
                         self.undo_move()
                     if self.confirmation_action == "Quit":
+                        if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_QUIT_GAME))
                         self.game_menu = "start"
                         self.game_state = "prep"
                         self.set_config()
                     if self.confirmation_action == "Reset":
-                        self.game_state = "prep"
                         if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_RESET_GAME))
+                        self.game_state = "prep"
                         self.set_config()
                         self.classic_choose(-1)
                     self.confirmation_action = ""
                     time.sleep(0.2)
                 if no_rect.collidepoint(mouse):
+                    if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
                     self.confirmation_action = ""
             self.hover_yes, self.hover_no = False, False
             if yes_rect.collidepoint(mouse): self.hover_yes = True
@@ -435,12 +446,11 @@ class Game():
                                         self.time_start2 = pygame.time.get_ticks()
                                         if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_BLACK_MOVE))
                                     self.recent_move = (i, j)
-                if button_dict[8].collidepoint(mouse): # Undo last move button
-                    self.confirmation_action = "Undo"
-                if button_dict[9].collidepoint(mouse): # Reset board button (restart game with the same configuration)
-                    self.confirmation_action = "Reset"
-                if button_dict[10].collidepoint(mouse): # Quit button (back to main menu)
-                    self.confirmation_action = "Quit"
+                if button_dict[8].collidepoint(mouse) or button_dict[9].collidepoint(mouse) or button_dict[10].collidepoint(mouse):
+                    if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
+                if button_dict[8].collidepoint(mouse): self.confirmation_action = "Undo" # Undo last move button
+                if button_dict[9].collidepoint(mouse): self.confirmation_action = "Reset" # Reset board button (restart game with the same configuration)
+                if button_dict[10].collidepoint(mouse): self.confirmation_action = "Quit" # Quit button (back to main menu)
         
         pygame.display.flip()
 

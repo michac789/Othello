@@ -75,6 +75,10 @@ BGM_GAME = path.join("assets", "bgm", "gamemusic.mp3")
 SFX_BLACK_MOVE = path.join("assets", "sfx", "black_move.wav")
 SFX_WHITE_MOVE = path.join("assets", "sfx", "white_move.wav")
 SFX_RESET_GAME = path.join("assets", "sfx", "reset_game.wav")
+SFX_UNDO_GAME = path.join("assets", "sfx", "undo_game.wav")
+SFX_QUIT_GAME = path.join("assets", "sfx", "quit_game.wav")
+SFX_WIN_GAME = path.join("assets", "sfx", "win_game.wav")
+SFX_BUTTON_CLICK = path.join("assets", "sfx", "button_click.wav")
 
 # Define all icons used here
 BGM_TRUE = path.join("assets", "icons", "bgm_true.jpg")
