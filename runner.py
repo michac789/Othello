@@ -26,12 +26,15 @@ class Game():
         self.screen = pygame.display.set_mode((800, 450), pygame.RESIZABLE)
         
         # Compute various component sizes relative to screen_width and screen_height
-        self.board_padding = self.screen_height / 15
-        self.board_width = ((9 / 16) * self.screen_width) - (2 * self.board_padding)
-        self.board_height = self.screen_height - (2 * self.board_padding)
+        self.virtual_height = min((9 / 16) * self.screen_width, self.screen_height)
+        self.virtual_width = (16 / 9) * self.virtual_height
+        self.board_padding = self.virtual_height / 15
+        self.board_width = ((9 / 16) * self.virtual_width) - (2 * self.board_padding)
+        self.board_height = self.virtual_height - (2 * self.board_padding)
         self.tile_size = int(min(self.board_width / self.dim_width, self.board_height / self.dim_height))
         self.board_start = (self.board_padding, self.board_padding)
         self.piece_radius = math.floor(self.tile_size / 2 - 5)
+        #self.icon_side = self.virtual_height / 9
         
         # Keep track of game menus and states (state machine updator)
         # Menu: start, play, pre_classic, pre_custom, pre_puzzle, tutorial, leaderboard
@@ -70,11 +73,13 @@ class Game():
         # Various hover effects
         self.hover_main = [False for i in range(9)]
     
-    # Resize components relative to the overall screen width and height
+    # Resize components relative to the overall screen width and height; maintaining 16:9 aspect ratio
     def resize(self):
-        self.board_padding = self.screen_height / 15
-        self.board_width = ((9 / 16) * self.screen_width) - (2 * self.board_padding)
-        self.board_height = self.screen_height - (2 * self.board_padding)
+        self.virtual_height = min((9 / 16) * self.screen_width, self.screen_height)
+        self.virtual_width = (16 / 9) * self.virtual_height
+        self.board_padding = self.virtual_height / 15
+        self.board_width = ((9 / 16) * self.virtual_width) - (2 * self.board_padding)
+        self.board_height = self.virtual_height - (2 * self.board_padding)
         self.tile_size = int(min(self.board_width / self.dim_width, self.board_height / self.dim_height))
         self.board_start = (self.board_padding, self.board_padding)
         self.piece_radius = math.floor(self.tile_size / 2 - 5)
@@ -130,7 +135,7 @@ class Game():
         if not pygame.mixer.music.get_busy():
             pygame.mixer.music.load(BGM_MENU)
             pygame.mixer.music.set_volume((0.1 if self.bgm_on == True else 0))
-            pygame.mixer.music.play(loops = -1)
+            pygame.mixer.music.play(loops = 0, start = 1.5)
         pygame.mixer.music.set_volume((0.1 if self.bgm_on == True else 0))
     
     # Undo the last move, adjust all othello board configuration to the previous state
@@ -143,7 +148,7 @@ class Game():
         self.screen.fill(black)
         title = maintitleFont.render("OTHELLO", True, main_title_color)
         titleRect = title.get_rect()
-        titleRect.center = (self.screen_width / 2, self.screen_height * 0.2)
+        titleRect.center = (self.virtual_width / 2, self.virtual_height * 0.2)
         self.screen.blit(title, titleRect)
         
         # Display buttons (classic mode, custom mode, puzzle mode), supporting buttons and toogle bgm / sfx / full screen buttons
@@ -151,24 +156,23 @@ class Game():
         button_dict = {}
         for i in range(len(button_texts)):
             if 0 <= i <= 3:
-                buttonRect = pygame.Rect((self.screen_width / 4), ((6 + 2 * i) / 16) * self.screen_height, self.screen_width / 2, self.screen_height / 10)
-                if self.hover_main[i] == True: buttonRect = pygame.Rect((self.screen_width / 4) - (self.screen_width / 2) * 0.02, ((6 + 2 * i) / 16) * self.screen_height, (self.screen_width / 2) * 1.04, (self.screen_height / 10) * 1.05)
+                buttonRect = pygame.Rect((self.virtual_width / 4), ((6 + 2 * i) / 16) * self.virtual_height, self.virtual_width / 2, self.virtual_height / 10)
+                if self.hover_main[i] == True: buttonRect = pygame.Rect((self.virtual_width / 4) - (self.virtual_width / 2) * 0.02, ((6 + 2 * i) / 16) * self.virtual_height, (self.virtual_width / 2) * 1.04, (self.virtual_height / 10) * 1.05)
                 buttonText = mainbuttonFont1.render(button_texts[i], True, main_button1_text_color)
                 if self.hover_main[i] == True: buttonText = mainbuttonHoverFont1.render(button_texts[i], True, main_button1_text_hover_color)
                 if i != 3:
                     if self.hover_main[i] == True: pygame.draw.rect(self.screen, main_button1_hover_color, buttonRect)
                     else: pygame.draw.rect(self.screen, main_button1_color, buttonRect)
             elif 4 <= i <= 6:
-                buttonRect = pygame.Rect(self.screen_width * (0.1 + 0.25 * (i - 4)), self.screen_height * 0.8, self.screen_width * 0.2, self.screen_height / 10)
-                if self.hover_main[i] == True: buttonRect = pygame.Rect((self.screen_width * (0.1 + 0.25 * (i - 4))) - (self.screen_width * 0.2) * 0.02, self.screen_height * 0.8, (self.screen_width * 0.2) * 1.04, (self.screen_height / 10) * 1.03)
+                buttonRect = pygame.Rect(self.virtual_width * (0.1 + 0.25 * (i - 4)), self.virtual_height * 0.8, self.virtual_width * 0.2, self.virtual_height / 10)
+                if self.hover_main[i] == True: buttonRect = pygame.Rect((self.virtual_width * (0.1 + 0.25 * (i - 4))) - (self.virtual_width * 0.2) * 0.02, self.virtual_height * 0.8, (self.virtual_width * 0.2) * 1.04, (self.virtual_height / 10) * 1.03)
                 buttonText = mainbuttonFont2.render(button_texts[i], True, main_button2_text_color)
                 if self.hover_main[i] == True: buttonText = mainbuttonHoverFont2.render(button_texts[i], True, main_button2_text_hover_color)
                 if self.hover_main[i] == True: pygame.draw.rect(self.screen, main_button2_hover_color, buttonRect)
                 else: pygame.draw.rect(self.screen, main_button2_color, buttonRect)
-                
-            if i == 7 or i == 8:
-                buttonRect = pygame.Rect((self.screen_width / 4), (self.screen_height * (-0.6 + i * 0.1)), self.screen_width / 4, self.screen_height / 20)
-                buttonText = buttonFont.render(button_texts[i], True, main_button1_text_color)
+            # elif i == 7 or i == 8:
+            #     buttonText = pygame.transform.scale(pygame.image.load(BGM_TRUE), (50, 50))
+            #     buttonRect = pygame.Rect((self.virtual_width / 4), (self.virtual_height * (-0.6 + i * 0.1)), 50, 50)
                 
             button_dict[i] = buttonRect
             buttonTextRect = buttonText.get_rect()
@@ -198,7 +202,7 @@ class Game():
         self.screen.fill(black)
         title = titleFont.render("Classic Mode", True, white)
         titleRect = title.get_rect()
-        titleRect.center = (self.screen_width / 2, 50)
+        titleRect.center = (self.virtual_width / 2, 50)
         self.screen.blit(title, titleRect)
         self.classic_choose(-1)
         self.play_main_bgm()
@@ -212,16 +216,16 @@ class Game():
         for i in range(len(button_texts)):
             button_color = (white if self.classic_chosen[i] == False else prep_chosen_color)
             if 0 <= i <= 3:
-                buttonRect = pygame.Rect(self.board_start[0], self.board_height * (0.25 + 0.3 * i), self.screen_width / 3, self.screen_height / 10)
+                buttonRect = pygame.Rect(self.board_start[0], self.board_height * (0.25 + 0.3 * i), self.virtual_width / 3, self.virtual_height / 10)
                 buttonText = preptextFont.render(button_texts[i], True, white)
             if 4 <= i <= 5:
-                buttonRect = pygame.Rect(self.screen_width * (0.4 + 0.3 * (i - 4)), self.screen_height * 0.25, self.screen_width * 0.27, self.screen_height / 5)
+                buttonRect = pygame.Rect(self.virtual_width * (0.4 + 0.3 * (i - 4)), self.virtual_height * 0.25, self.virtual_width * 0.27, self.virtual_height / 5)
                 buttonText = preptextFont.render(button_texts[i], True, black)
             if 6 <= i <= 13:
-                buttonRect = pygame.Rect(self.screen_width * (0.4 + 0.2 * ((i - 6) % 3)), self.screen_height * (0.5 + 0.12 * math.floor((i - 6) / 3)), self.screen_width * 0.15, self.screen_height / 12)
+                buttonRect = pygame.Rect(self.virtual_width * (0.4 + 0.2 * ((i - 6) % 3)), self.virtual_height * (0.5 + 0.12 * math.floor((i - 6) / 3)), self.virtual_width * 0.15, self.virtual_height / 12)
                 buttonText = preptextFont.render(button_texts[i], True, black)
             if 14 <= i <= 15:
-                buttonRect = pygame.Rect(self.screen_width * (0.1 + 0.5 * (i - 14)), self.screen_height * 0.88, self.screen_width * 0.3, self.screen_height / 10)
+                buttonRect = pygame.Rect(self.virtual_width * (0.1 + 0.5 * (i - 14)), self.virtual_height * 0.88, self.virtual_width * 0.3, self.virtual_height / 10)
                 buttonText = preptextFont.render(button_texts[i], True, black)
             button_dict[i] = buttonRect
             buttonTextRect = buttonText.get_rect()
@@ -331,20 +335,20 @@ class Game():
         button_texts = [f"{time1}", f"{time2}", "Black", "White", f"{self.ot.black_tiles}", f"{self.ot.white_tiles}", b1, b2, b3, b4, b5]
 
         # Display various user interfaces (scoreboards, messages, buttons)
-        scoreRect = pygame.Rect((self.screen_width * 0.55), (self.screen_height * 0.1), (self.screen_width * 0.4), (self.screen_height * 0.3))
+        scoreRect = pygame.Rect((self.virtual_width * 0.55), (self.virtual_height * 0.1), (self.virtual_width * 0.4), (self.virtual_height * 0.3))
         pygame.draw.rect(self.screen, white, scoreRect)
         button_dict = {}
         for i in range(len(button_texts)):
             if (i == 0 or i == 1) and self.classic_time != -1:
-                buttonRect = pygame.Rect((self.screen_width * (0.58 + i * 0.18)), (self.screen_height * 0.05), self.screen_width / 6, self.screen_height / 15)
+                buttonRect = pygame.Rect((self.virtual_width * (0.58 + i * 0.18)), (self.virtual_height * 0.05), self.virtual_width / 6, self.virtual_height / 15)
             elif i == 2 or i == 3:
-                buttonRect = pygame.Rect((self.screen_width * (0.58 + (i - 2) * 0.18)), (self.screen_height * 0.3), self.screen_width / 6, self.screen_height / 15)
+                buttonRect = pygame.Rect((self.virtual_width * (0.58 + (i - 2) * 0.18)), (self.virtual_height * 0.3), self.virtual_width / 6, self.virtual_height / 15)
             elif i == 4 or i == 5:
-                buttonRect = pygame.Rect((self.screen_width * (0.58 + (i - 4) * 0.18)), (self.screen_height * 0.12), self.screen_width / 6, self.screen_height / 5)
+                buttonRect = pygame.Rect((self.virtual_width * (0.58 + (i - 4) * 0.18)), (self.virtual_height * 0.12), self.virtual_width / 6, self.virtual_height / 5)
             elif i == 6 or i == 7:
-                buttonRect = pygame.Rect((self.screen_width * 0.55), (self.screen_height * (0.45 + (i - 6) / 6)), self.screen_width * 0.4, self.screen_height / 8)
+                buttonRect = pygame.Rect((self.virtual_width * 0.55), (self.virtual_height * (0.45 + (i - 6) / 6)), self.virtual_width * 0.4, self.virtual_height / 8)
             else:
-                buttonRect = pygame.Rect((self.screen_width * (0.55 + (i - 8) * 0.13)), (self.screen_height * 0.79), self.screen_width * 0.12, self.screen_height / 8)
+                buttonRect = pygame.Rect((self.virtual_width * (0.55 + (i - 8) * 0.13)), (self.virtual_height * 0.79), self.virtual_width * 0.12, self.virtual_height / 8)
             button_dict[i] = buttonRect
             buttonText = smallFont.render(button_texts[i], True, black)
             buttonTextRect = buttonText.get_rect()
@@ -354,12 +358,12 @@ class Game():
             
         # Display confirmation screen and yes/no buttons, proceed with action when 'yes' is clicked, back to game when 'no' is clicked
         if self.confirmation_action != "":
-            confRectborder = pygame.Rect((self.screen_width / 4), (self.screen_height / 4), (self.screen_width / 2), (self.screen_height / 2))
-            confRect = pygame.Rect((self.screen_width / 4 + 3), (self.screen_height / 4 + 3), (self.screen_width / 2 - 6), (self.screen_height / 2 - 6))
+            confRectborder = pygame.Rect((self.virtual_width / 4), (self.virtual_height / 4), (self.virtual_width / 2), (self.virtual_height / 2))
+            confRect = pygame.Rect((self.virtual_width / 4 + 3), (self.virtual_height / 4 + 3), (self.virtual_width / 2 - 6), (self.virtual_height / 2 - 6))
             confText1 = confFont1.render(f"Confirm {self.confirmation_action}?", True, black)
             confText2 = confFont2.render("Warning! This cannot be undone!", True, black)
-            confTextRect1 = confText1.get_rect(center = (self.screen_width / 2, self.screen_height * 0.35))
-            confTextRect2 = confText2.get_rect(center = (self.screen_width / 2, self.screen_height * 0.45))
+            confTextRect1 = confText1.get_rect(center = (self.virtual_width / 2, self.virtual_height * 0.35))
+            confTextRect2 = confText2.get_rect(center = (self.virtual_width / 2, self.virtual_height * 0.45))
             pygame.draw.rect(self.screen, conf_screen_border_color, confRectborder)
             pygame.draw.rect(self.screen, conf_screen_color, confRect)
             self.screen.blit(confText1, confTextRect1)
@@ -367,8 +371,8 @@ class Game():
             yes, no = confFont3.render("Yes", True, black), confFont3.render("No", True, black)
             if self.hover_yes: yes = confFont4.render("Yes", True, conf_hover_color)
             if self.hover_no: no = confFont4.render("No", True, conf_hover_color)
-            yes_rect = yes.get_rect(center = (self.screen_width * 0.45, self.screen_height * 0.55))
-            no_rect = no.get_rect(center = (self.screen_width * 0.55, self.screen_height * 0.55))
+            yes_rect = yes.get_rect(center = (self.virtual_width * 0.45, self.virtual_height * 0.55))
+            no_rect = no.get_rect(center = (self.virtual_width * 0.55, self.virtual_height * 0.55))
             self.screen.blit(yes, yes_rect)
             self.screen.blit(no, no_rect)
             left, _, _ = pygame.mouse.get_pressed()

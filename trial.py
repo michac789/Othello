@@ -1,6 +1,8 @@
 number = 1
 print(f"{number:02d}")
 
+print(min(12, 3))
+
 '''
 <a href='https://pngtree.com/so/High'>High png from pngtree.com/</a>
 <a href='https://pngtree.com/so/Music'>Music png from pngtree.com/</a>
