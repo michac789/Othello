@@ -72,6 +72,25 @@ class Game():
         self.hover_main = [False for i in range(9)]
         self.hover_pre_classic = [False for i in range(16)]
         self.hover_play_util = [False for i in range(11)]
+        
+        # Define all fonts used here
+        self.maintitleFont = font.Font(LOBSTER, 100)
+        self.mainbuttonFont1 = font.Font(OPEN_SANS, 30)
+        self.mainbuttonHoverFont1 = font.Font(OPEN_SANS, 32)
+        self.mainbuttonFont2 = font.Font(BLACKJACK, 25)
+        self.mainbuttonHoverFont2 = font.Font(BLACKJACK, 27)
+        self.titleFont = font.Font(ARIZONIA, 80)
+        self.preptextFont = font.Font(OPEN_SANS, 25)
+        self.prepoptionFont = font.Font(PACIFICO, 25)
+        self.prepgoFont = font.Font(LOBSTER, 30)
+        self.playtimerFont = font.Font(OPEN_SANS, 20)
+        self.playscoreFont = font.Font(BLACKJACK, 60)
+        self.playtextFont = font.Font(BLACKJACK, 25)
+        self.playutilFont = font.Font(OPEN_SANS, 25)
+        self.confFont1 =  font.Font(PACIFICO, 35)
+        self.confFont2 =  font.Font(OPEN_SANS, 20)
+        self.confFont3 = font.Font(OPEN_SANS, 40)
+        self.confFont4 = font.Font(OPEN_SANS, 45)
     
     # Resize components relative to the overall screen width and height; maintaining 16:9 aspect ratio
     def resize(self):
@@ -84,6 +103,23 @@ class Game():
         self.board_start = (self.board_padding, self.board_padding)
         self.piece_radius = math.floor(self.tile_size / 2 - 5)
         self.icon_sides = math.floor(self.virtual_height / 9)
+        self.maintitleFont = font.Font(LOBSTER, int(self.virtual_height * (2 / 9)))
+        self.mainbuttonFont1 = font.Font(OPEN_SANS, int(self.virtual_height * (1 / 15)))
+        self.mainbuttonHoverFont1 = font.Font(OPEN_SANS, int(self.virtual_height * (16 / 225)))
+        self.mainbuttonFont2 = font.Font(BLACKJACK, int(self.virtual_height * (1 / 18)))
+        self.mainbuttonHoverFont2 = font.Font(BLACKJACK, int(self.virtual_height * (3 / 50)))
+        self.titleFont = font.Font(ARIZONIA, int(self.virtual_height * (8 / 45)))
+        self.preptextFont = font.Font(OPEN_SANS, int(self.virtual_height * (1 / 18)))
+        self.prepoptionFont = font.Font(PACIFICO, int(self.virtual_height * (1 / 18)))
+        self.prepgoFont = font.Font(LOBSTER, int(self.virtual_height * (1 / 15)))
+        self.playtimerFont = font.Font(OPEN_SANS, int(self.virtual_height * (2 / 45)))
+        self.playscoreFont = font.Font(BLACKJACK, int(self.virtual_height * (2 / 15)))
+        self.playtextFont = font.Font(BLACKJACK, int(self.virtual_height * (1 / 18)))
+        self.playutilFont = font.Font(OPEN_SANS, int(self.virtual_height * (1 / 18)))
+        self.confFont1 =  font.Font(PACIFICO, int(self.virtual_height * (7 / 90)))
+        self.confFont2 =  font.Font(OPEN_SANS, int(self.virtual_height * (2 / 45)))
+        self.confFont3 = font.Font(OPEN_SANS, int(self.virtual_height * (4 / 45)))
+        self.confFont4 = font.Font(OPEN_SANS, int(self.virtual_height * (1 / 10)))
     
     # This function is called to loop through the game and render each frame while game is still running
     def run(self):
@@ -163,7 +199,7 @@ class Game():
         # Play BGM, display title
         self.play_main_bgm()
         self.screen.fill(black)
-        title = maintitleFont.render("OTHELLO", True, main_title_color)
+        title = self.maintitleFont.render("OTHELLO", True, main_title_color)
         titleRect = title.get_rect()
         titleRect.center = (self.virtual_width / 2, self.virtual_height * 0.2)
         self.screen.blit(title, titleRect)
@@ -175,16 +211,16 @@ class Game():
             if 0 <= i <= 3:
                 buttonRect = pygame.Rect((self.virtual_width / 4), ((6 + 2 * i) / 16) * self.virtual_height, self.virtual_width / 2, self.virtual_height / 10)
                 if self.hover_main[i] == True: buttonRect = pygame.Rect((self.virtual_width / 4) - (self.virtual_width / 2) * 0.02, ((6 + 2 * i) / 16) * self.virtual_height, (self.virtual_width / 2) * 1.04, (self.virtual_height / 10) * 1.05)
-                buttonText = mainbuttonFont1.render(button_texts[i], True, main_button1_text_color)
-                if self.hover_main[i] == True: buttonText = mainbuttonHoverFont1.render(button_texts[i], True, main_button1_text_hover_color)
+                buttonText = self.mainbuttonFont1.render(button_texts[i], True, main_button1_text_color)
+                if self.hover_main[i] == True: buttonText = self.mainbuttonHoverFont1.render(button_texts[i], True, main_button1_text_hover_color)
                 if i != 3:
                     if self.hover_main[i] == True: pygame.draw.rect(self.screen, main_button1_hover_color, buttonRect)
                     else: pygame.draw.rect(self.screen, main_button1_color, buttonRect)
             elif 4 <= i <= 6:
                 buttonRect = pygame.Rect(self.virtual_width * (0.1 + 0.25 * (i - 4)), self.virtual_height * 0.8, self.virtual_width * 0.2, self.virtual_height / 10)
                 if self.hover_main[i] == True: buttonRect = pygame.Rect((self.virtual_width * (0.1 + 0.25 * (i - 4))) - (self.virtual_width * 0.2) * 0.02, self.virtual_height * 0.8, (self.virtual_width * 0.2) * 1.04, (self.virtual_height / 10) * 1.03)
-                buttonText = mainbuttonFont2.render(button_texts[i], True, main_button2_text_color)
-                if self.hover_main[i] == True: buttonText = mainbuttonHoverFont2.render(button_texts[i], True, main_button2_text_hover_color)
+                buttonText = self.mainbuttonFont2.render(button_texts[i], True, main_button2_text_color)
+                if self.hover_main[i] == True: buttonText = self.mainbuttonHoverFont2.render(button_texts[i], True, main_button2_text_hover_color)
                 if self.hover_main[i] == True: pygame.draw.rect(self.screen, main_button2_hover_color, buttonRect)
                 else: pygame.draw.rect(self.screen, main_button2_color, buttonRect)
             button_dict[i] = buttonRect
@@ -210,7 +246,7 @@ class Game():
     def state_pre_classic(self):
         # Display game mode as main title
         self.screen.fill(black)
-        title = titleFont.render("Classic Mode", True, mode_title)
+        title = self.titleFont.render("Classic Mode", True, mode_title)
         titleRect = title.get_rect()
         titleRect.center = (self.virtual_width / 2, 50)
         self.screen.blit(title, titleRect)
@@ -226,16 +262,16 @@ class Game():
         for i in range(len(button_texts)):
             if 0 <= i <= 3:
                 buttonRect = pygame.Rect(self.board_start[0], self.board_height * (0.25 + 0.3 * i), self.virtual_width / 3, self.virtual_height / 10)
-                buttonText = preptextFont.render(button_texts[i], True, (prep_text_color1 if i == 0 else prep_text_color2))
+                buttonText = self.preptextFont.render(button_texts[i], True, (prep_text_color1 if i == 0 else prep_text_color2))
             if 4 <= i <= 5:
                 buttonRect = pygame.Rect(self.virtual_width * (0.4 + 0.3 * (i - 4)), self.virtual_height * 0.25, self.virtual_width * 0.27, self.virtual_height / 5)
-                buttonText = prepoptionFont.render(button_texts[i], True, (prep_option_color1 if self.hover_pre_classic[i] == False else prep_button_hover_color1))
+                buttonText = self.prepoptionFont.render(button_texts[i], True, (prep_option_color1 if self.hover_pre_classic[i] == False else prep_button_hover_color1))
             if 6 <= i <= 13:
                 buttonRect = pygame.Rect(self.virtual_width * (0.4 + 0.2 * ((i - 6) % 3)), self.virtual_height * (0.5 + 0.12 * math.floor((i - 6) / 3)), self.virtual_width * 0.15, self.virtual_height / 12)
-                buttonText = prepoptionFont.render(button_texts[i], True, (prep_option_color2 if self.hover_pre_classic[i] == False else prep_button_hover_color1))
+                buttonText = self.prepoptionFont.render(button_texts[i], True, (prep_option_color2 if self.hover_pre_classic[i] == False else prep_button_hover_color1))
             if 14 <= i <= 15:
                 buttonRect = pygame.Rect(self.virtual_width * (0.1 + 0.4 * (i - 14)), self.virtual_height * 0.88, self.virtual_width * 0.3, self.virtual_height / 10)
-                buttonText = prepgoFont.render(button_texts[i], True, (prep_option_color3 if self.hover_pre_classic[i] == False else prep_button_hover_color2))
+                buttonText = self.prepgoFont.render(button_texts[i], True, (prep_option_color3 if self.hover_pre_classic[i] == False else prep_button_hover_color2))
             button_dict[i] = buttonRect
             buttonTextRect = buttonText.get_rect()
             buttonTextRect.center = buttonRect.center
@@ -349,23 +385,23 @@ class Game():
         for i in range(len(button_texts)):
             if (i == 0 or i == 1) and self.classic_time != -1:
                 buttonRect = pygame.Rect((self.virtual_width * (0.58 + i * 0.18)), (self.virtual_height * 0.07), self.virtual_width / 6, self.virtual_height / 15)
-                buttonText = playtimerFont.render(button_texts[i], True, play_timer_color)
+                buttonText = self.playtimerFont.render(button_texts[i], True, play_timer_color)
                 color_x = play_score_color
             elif i == 2 or i == 3:
                 buttonRect = pygame.Rect((self.virtual_width * (0.58 + (i - 2) * 0.18)), (self.virtual_height * 0.16), self.virtual_width / 6, self.virtual_height / 5)
-                buttonText = playscoreFont.render(button_texts[i], True, play_sb_text_color)
+                buttonText = self.playscoreFont.render(button_texts[i], True, play_sb_text_color)
                 color_x = play_score_color
             elif i == 4 or i == 5:
                 buttonRect = pygame.Rect((self.virtual_width * (0.58 + (i - 4) * 0.18)), (self.virtual_height * 0.32), self.virtual_width / 6, self.virtual_height / 15)
-                buttonText = playcolorFont.render(button_texts[i], True, play_sb_text_color)
+                buttonText = self.playtextFont.render(button_texts[i], True, play_sb_text_color)
                 color_x = play_score_color
             elif i == 6 or i == 7:
                 buttonRect = pygame.Rect((self.virtual_width * 0.55), (self.virtual_height * (0.45 + (i - 6) / 6)), self.virtual_width * 0.35, self.virtual_height / 8)
-                buttonText = playtextFont.render(button_texts[i], True, play_rect_text_color)
+                buttonText = self.playtextFont.render(button_texts[i], True, play_rect_text_color)
                 color_x = play_rect_displayer_color
             else:
                 buttonRect = pygame.Rect((self.virtual_width * (0.55 + (i - 8) * 0.12)), (self.virtual_height * 0.79), self.virtual_width * 0.1, self.virtual_height / 8)
-                buttonText = playutilFont.render(button_texts[i], True, (play_utility_text_color_hover if self.hover_play_util[i] else play_utility_text_color))
+                buttonText = self.playutilFont.render(button_texts[i], True, (play_utility_text_color_hover if self.hover_play_util[i] else play_utility_text_color))
                 color_x = play_utility_button_color
             button_dict[i] = buttonRect
             buttonTextRect = buttonText.get_rect()
@@ -404,17 +440,17 @@ class Game():
         if self.confirmation_action != "":
             confRectborder = pygame.Rect((self.virtual_width / 4), (self.virtual_height / 4), (self.virtual_width / 2), (self.virtual_height / 2))
             confRect = pygame.Rect((self.virtual_width / 4 + 3), (self.virtual_height / 4 + 3), (self.virtual_width / 2 - 6), (self.virtual_height / 2 - 6))
-            confText1 = confFont1.render(f"Confirm {self.confirmation_action}?", True, conf_text1_color)
-            confText2 = confFont2.render("Warning! This cannot be undone!", True, conf_text2_color)
+            confText1 = self.confFont1.render(f"Confirm {self.confirmation_action}?", True, conf_text1_color)
+            confText2 = self.confFont2.render("Warning! This cannot be undone!", True, conf_text2_color)
             confTextRect1 = confText1.get_rect(center = (self.virtual_width / 2, self.virtual_height * 0.35))
             confTextRect2 = confText2.get_rect(center = (self.virtual_width / 2, self.virtual_height * 0.45))
             pygame.draw.rect(self.screen, conf_screen_border_color, confRectborder)
             pygame.draw.rect(self.screen, conf_screen_color, confRect)
             self.screen.blit(confText1, confTextRect1)
             self.screen.blit(confText2, confTextRect2)
-            yes, no = confFont3.render("Yes", True, black), confFont3.render("No", True, black)
-            if self.hover_yes: yes = confFont4.render("Yes", True, conf_hover_color)
-            if self.hover_no: no = confFont4.render("No", True, conf_hover_color)
+            yes, no = self.confFont3.render("Yes", True, black), self.confFont3.render("No", True, black)
+            if self.hover_yes: yes = self.confFont4.render("Yes", True, conf_hover_color)
+            if self.hover_no: no = self.confFont4.render("No", True, conf_hover_color)
             yes_rect = yes.get_rect(center = (self.virtual_width * 0.4, self.virtual_height * 0.6))
             no_rect = no.get_rect(center = (self.virtual_width * 0.6, self.virtual_height * 0.6))
             self.screen.blit(yes, yes_rect)

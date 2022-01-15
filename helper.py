@@ -1,5 +1,5 @@
 # Helper file associated with runner.py
-from pygame import font, init, mixer, image
+from pygame import font, init, image
 
 # This library is used to ensure that the assets can be loaded independently of user's operating system
 from os import path
@@ -63,24 +63,7 @@ LOBSTER = path.join("assets", "fonts", "Lobster.otf")
 ARIZONIA = path.join("assets", "fonts", "Arizonia-Regular.ttf")
 
 init()
-maintitleFont = font.Font(LOBSTER, 100)
-mainbuttonFont1 = font.Font(OPEN_SANS, 30)
-mainbuttonHoverFont1 = font.Font(OPEN_SANS, 32)
-mainbuttonFont2 = font.Font(BLACKJACK, 25)
-mainbuttonHoverFont2 = font.Font(BLACKJACK, 27)
-titleFont = font.Font(ARIZONIA, 80)
-preptextFont = font.Font(OPEN_SANS, 25)
-prepoptionFont = font.Font(PACIFICO, 25)
-prepgoFont = font.Font(LOBSTER, 30)
-playtimerFont = font.Font(OPEN_SANS, 20)
-playscoreFont = font.Font(BLACKJACK, 60)
-playcolorFont = font.Font(BLACKJACK, 25)
-playtextFont = font.Font(BLACKJACK, 25)
-playutilFont = font.Font(OPEN_SANS, 25)
-confFont1 =  font.Font(PACIFICO, 35)
-confFont2 =  font.Font(OPEN_SANS, 20)
-confFont3 = font.Font(OPEN_SANS, 40)
-confFont4 = font.Font(OPEN_SANS, 45)
+
 
 
 # Define all background musics used here
