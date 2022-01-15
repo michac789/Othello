@@ -263,7 +263,7 @@ class Game():
                 buttonRect = pygame.Rect(self.virtual_width * (0.4 + 0.3 * (i - 4)), self.virtual_height * 0.25, self.virtual_width * 0.27, self.virtual_height / 5)
                 buttonText = self.prepoptionFont.render(button_texts[i], True, (prep_option_color1 if self.hover_pre_classic[i] == False else prep_button_hover_color1))
             if 6 <= i <= 13:
-                buttonRect = pygame.Rect(self.virtual_width * (0.4 + 0.2 * ((i - 6) % 3)), self.virtual_height * (0.5 + 0.12 * math.floor((i - 6) / 3)), self.virtual_width * 0.15, self.virtual_height / 12)
+                buttonRect = pygame.Rect(self.virtual_width * (0.4 + 0.18 * ((i - 6) % 3)), self.virtual_height * (0.5 + 0.12 * math.floor((i - 6) / 3)), self.virtual_width * 0.15, self.virtual_height / 12)
                 buttonText = self.prepoptionFont.render(button_texts[i], True, (prep_option_color2 if self.hover_pre_classic[i] == False else prep_button_hover_color1))
             if 14 <= i <= 15:
                 buttonRect = pygame.Rect(self.virtual_width * (0.1 + 0.4 * (i - 14)), self.virtual_height * 0.88, self.virtual_width * 0.3, self.virtual_height / 10)
@@ -397,8 +397,8 @@ class Game():
                 color_x = play_rect_displayer_color
             else:
                 buttonRect = pygame.Rect((self.virtual_width * (0.55 + (i - 8) * 0.12)), (self.virtual_height * 0.79), self.virtual_width * 0.1, self.virtual_height / 8)
-                buttonText = self.playutilFont.render(button_texts[i], True, (play_utility_text_color_hover if self.hover_play_util[i] else play_utility_text_color))
-                color_x = play_utility_button_color
+                buttonText = self.playutilFont.render(button_texts[i], True, (play_utility_text_color_hover if self.hover_play_util[i] and (self.classic_undo or i != 8) else play_utility_text_color))
+                color_x = (dark_grey if not self.classic_undo and i == 8 else play_utility_button_color)
             button_dict[i] = buttonRect
             buttonTextRect = buttonText.get_rect()
             buttonTextRect.center = buttonRect.center
@@ -425,7 +425,9 @@ class Game():
                                 elif self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_BUTTON_INVALID))
                 if button_dict[8].collidepoint(mouse) or button_dict[9].collidepoint(mouse) or button_dict[10].collidepoint(mouse):
                     if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
-                if button_dict[8].collidepoint(mouse): self.confirmation_action = "Undo" # Undo last move button
+                if button_dict[8].collidepoint(mouse):
+                    if self.classic_undo: self.confirmation_action = "Undo" # Undo last move button
+                    elif self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_INVALID))
                 if button_dict[9].collidepoint(mouse): self.confirmation_action = "Reset" # Reset board button (restart game with the same configuration)
                 if button_dict[10].collidepoint(mouse): self.confirmation_action = "Quit" # Quit button (back to main menu)
         self.hover_play_util = [False for i in range(11)]
@@ -497,10 +499,9 @@ if __name__ == "__main__":
 
 - Pre_custom UI
 - Fix UI, texts and colors
-- Add Undo Feature
+
 - AI simple level 1 (random moves)
 - Custom othello sizes and vs ai mode
 - etc.. (coming soon)
-BUGS:
-Handles self.timer when choosing timer!!!
+
 """

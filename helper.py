@@ -44,6 +44,7 @@ play_conf_text_hover_color = ()
 
 black = (0, 0, 0)
 white = (255, 255, 255)
+dark_grey = (60, 60, 60)
 tile_color = (0, 160, 0)
 tile_border_color = (110, 38, 14)
 board_color = (50, 50, 50)
@@ -61,10 +62,6 @@ PACIFICO = path.join("assets", "fonts", "Pacifico.ttf")
 BLACKJACK = path.join("assets", "fonts", "blackjack.otf")
 LOBSTER = path.join("assets", "fonts", "Lobster.otf")
 ARIZONIA = path.join("assets", "fonts", "Arizonia-Regular.ttf")
-
-init()
-
-
 
 # Define all background musics used here
 BGM_MENU = path.join("assets", "bgm", "menumusic.mp3")
