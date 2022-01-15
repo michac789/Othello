@@ -144,10 +144,6 @@ class Game():
             elif self.game_menu == "play":
                 self.state_play()
             pygame.display.flip()
-
-    # Reset configuration made to self, called upon when restarting or quitting a game
-    def set_config(self):
-        pygame.mixer.music.unload()
     
     # Handles all the choosing mode buttons and its action towards self.classic_(xxx) in the 'pre_classic' state
     def classic_choose(self, index):
@@ -313,7 +309,7 @@ class Game():
     def state_play(self):
         # Initialize game with the required settings; added bgm for gameplay
         if self.game_state == "prep":
-            self.set_config()
+            pygame.mixer.music.unload()
             self.ot = Othello(self.dim_height, self.dim_width)
             self.ot.set_initial_position(self.init_white, self.init_black)
             self.ot.turn = 1
@@ -468,11 +464,11 @@ class Game():
                         if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_QUIT_GAME))
                         self.game_menu = "start"
                         self.game_state = "prep"
-                        self.set_config()
+                        pygame.mixer.music.unload()
                     if self.confirmation_action == "Reset":
                         if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_RESET_GAME))
                         self.game_state = "prep"
-                        self.set_config()
+                        pygame.mixer.music.unload()
                         self.classic_choose(-1)
                     self.confirmation_action = ""
                     time.sleep(0.2)
@@ -492,7 +488,6 @@ if __name__ == "__main__":
 
 # TODO
 """
-1. Improve UI in pre_classic state (hover effects) and play state
 
 3. Create pre_custom feature user interface
 4. Add AI level 1 and basic against AI gameplay
