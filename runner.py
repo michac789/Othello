@@ -11,42 +11,20 @@ from helper import *
 class Game():
     
     def __init__(self):
-        # Default normal board size and configuration (changeable from custom mode or set_config method)
-        self.dim_height = 8
-        self.dim_width = 8
-        self.init_white = [(3, 3), (4, 4)]
-        self.init_black = [(3, 4), (4, 3)]
+        # Initialize pygame, board default configuration, set title, set default 16:9 resizable screen
+        self.dim_height, self.dim_width = 8, 8
+        self.init_white, self.init_black = [(3, 3), (4, 4)], [(3, 4), (4, 3)]
         self.ot = None
-        
-        # Initialize pygame, set title, set default screen size with 9:16 resizable aspect ratio
-        self.screen_width = 800
-        self.screen_height = 450
+        self.screen_width, self.screen_height = 800, 450
         pygame.init()
         pygame.mixer.init()
         pygame.display.set_caption("Othello")
         self.screen = pygame.display.set_mode((800, 450), pygame.RESIZABLE)
         
-        # Compute various component sizes relative to screen_width and screen_height
-        self.virtual_height = min((9 / 16) * self.screen_width, self.screen_height)
-        self.virtual_width = (16 / 9) * self.virtual_height
-        self.board_padding = self.virtual_height / 15
-        self.board_width = ((9 / 16) * self.virtual_width) - (2 * self.board_padding)
-        self.board_height = self.virtual_height - (2 * self.board_padding)
-        self.tile_size = int(min(self.board_width / self.dim_width, self.board_height / self.dim_height))
-        self.board_start = (self.board_padding, self.board_padding)
-        self.piece_radius = math.floor(self.tile_size / 2 - 5)
-        self.icon_sides = math.floor(self.virtual_height / 9)
-        
-        # Keep track of game menus and states (state machine updator)
-        # Menu: start, play, pre_classic, pre_custom, pre_puzzle, tutorial, leaderboard
-        # State (when menu is play): prep, play, end
+        # State machine updator; Menu: start, play, pre_classic, pre_custom, pre_puzzle, tutorial, leaderboard; 
         self.game_menu = "start"
-        self.game_state = "prep"
-        
-        # Confirmation window displayer
-        self.confirmation_action = ""
-        self.hover_yes = False
-        self.hover_no = False
+        self.game_state = "prep" # State: prep, play, end
+        self.confirmation_action = "" # Confirmation window displayer
         
         # Choose modes in 'pre_classic' state
         self.classic_mode = "Human" # 'Human' by default for 2 players, or 'AI' against computer
@@ -57,42 +35,20 @@ class Game():
         self.classic_chosen = [False for i in range(16)] # For UI purposes
         
         # Keep track of time (time left & time since pygame was init for starting relative time)
-        self.timer_player1 = 0
-        self.timer_player2 = 0
-        self.time_start1 = None
-        self.time_start2 = None
+        self.timer_player1, self.timer_player2 = 0, 0
+        self.time_start1, self.time_start2 = None, None
         
         # Keep track whether bgm and soundfx is on or not, by default is on, can be turned off
-        self.bgm_on = True
-        self.sfx_on = True
-        self.bgm_hover = False
-        self.sfx_hover = False
+        self.bgm_on, self.sfx_on = True, True
+        self.bgm_hover, self.sfx_hover = False, False
         
         # Various hover effects tracker
         self.hover_main = [False for i in range(9)]
         self.hover_pre_classic = [False for i in range(16)]
         self.hover_play_util = [False for i in range(11)]
-        
-        # Define all fonts used here
-        self.maintitleFont = font.Font(LOBSTER, 100)
-        self.mainbuttonFont1 = font.Font(OPEN_SANS, 30)
-        self.mainbuttonHoverFont1 = font.Font(OPEN_SANS, 32)
-        self.mainbuttonFont2 = font.Font(BLACKJACK, 25)
-        self.mainbuttonHoverFont2 = font.Font(BLACKJACK, 27)
-        self.titleFont = font.Font(ARIZONIA, 80)
-        self.preptextFont = font.Font(OPEN_SANS, 25)
-        self.prepoptionFont = font.Font(PACIFICO, 25)
-        self.prepgoFont = font.Font(LOBSTER, 30)
-        self.playtimerFont = font.Font(OPEN_SANS, 20)
-        self.playscoreFont = font.Font(BLACKJACK, 60)
-        self.playtextFont = font.Font(BLACKJACK, 25)
-        self.playutilFont = font.Font(OPEN_SANS, 25)
-        self.confFont1 =  font.Font(PACIFICO, 35)
-        self.confFont2 =  font.Font(OPEN_SANS, 20)
-        self.confFont3 = font.Font(OPEN_SANS, 40)
-        self.confFont4 = font.Font(OPEN_SANS, 45)
+        self.hover_yes, self.hover_no = False, False
     
-    # Resize components relative to the overall screen width and height; maintaining 16:9 aspect ratio
+    # Resize various components relative to the virtual screen width and height; maintaining 16:9 aspect ratio
     def resize(self):
         self.virtual_height = min((9 / 16) * self.screen_width, self.screen_height)
         self.virtual_width = (16 / 9) * self.virtual_height
@@ -199,7 +155,7 @@ class Game():
         self.sfx_hover = (True if button_dict[1].collidepoint(mouse) else False)
     
     # Prepare othello object from play state when first launched (prep stage)
-    def set_config(self):
+    def play_set_config(self):
         pygame.mixer.music.unload()
         self.ot = Othello(self.dim_height, self.dim_width)
         self.ot.set_initial_position(self.init_white, self.init_black)
@@ -208,9 +164,11 @@ class Game():
         self.time_start1 = pygame.time.get_ticks()
         pygame.mixer.music.load(BGM_GAME)
         pygame.mixer.music.play(loops = -1)
+        self.ai_turn = -1
         if self.classic_mode == "AI":
-            self.classic_time = -1
-            self.classic_undo = True
+            self.classic_time, self.classic_undo = -1, True
+            self.ai_turn = (1 if self.classic_ai_black else 2)
+            self.human_turn = (2 if self.classic_ai_black else 1)
     
     def state_mainmenu(self):
         # Play BGM, display title
@@ -336,7 +294,8 @@ class Game():
     def state_play(self):
         # Initialize game with the required settings; added bgm for gameplay
         if self.game_state == "prep":
-            self.set_config()
+            self.play_set_config()
+            self.loop = 0
         pygame.mixer.music.set_volume((0.2 if self.bgm_on == True else 0))
         
         # Draw board and all the tiles
@@ -383,6 +342,7 @@ class Game():
         if self.ot.check_victory() != 0 and self.game_state != "end":
             if self.sfx_on: pygame.mixer.Channel(2).play(pygame.mixer.Sound(SFX_WIN_GAME))
             self.game_state = "end"
+            self.classic_undo = False
         
         # Message to be displayed on screen
         time1, time2 = (self.timer_player1 if self.timer_player1 > 0 else 0), (self.timer_player2 if self.timer_player2 > 0 else 0)
@@ -425,12 +385,20 @@ class Game():
             pygame.draw.rect(self.screen, color_x, buttonRect)
             self.screen.blit(buttonText, buttonTextRect)
         
+        # AI Move (only for Human VS AI mode)
+        if self.game_state == "play" and (self.classic_mode == "AI" and self.ai_turn == self.ot.turn):
+            self.loop += 1
+            if self.loop == 2:
+                self.ot.make_computer_move(self.classic_ai_level)
+                pygame.mixer.Channel(1).play(pygame.mixer.Sound((SFX_WHITE_MOVE if self.ai_turn == 2 else SFX_BLACK_MOVE)))
+                self.loop = 0
+        
         # Update changes when a valid tile is clicked, or when a button is clicked
         mouse = pygame.mouse.get_pos()
         if self.confirmation_action == "":
             left, _, _ = pygame.mouse.get_pressed()
             if left == 1:
-                if self.game_state == "play":
+                if self.game_state == "play" and (self.classic_mode != "AI" or self.human_turn == self.ot.turn):
                     for i in range(self.dim_height):
                         for j in range(self.dim_width):
                             if tiles[i][j].collidepoint(mouse):

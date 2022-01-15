@@ -2,6 +2,7 @@ import copy
 import sys
 import operator
 import random
+import time
 
 
 class Othello():
@@ -158,14 +159,15 @@ class Othello():
     
     # Level 1 AI: return random move
     def level1(self, moves):
+        time.sleep(0.5)
         return random.choice(moves)
     
     # Level 2 AI: minimax algorithm with depth 2
-    def level2(self):
+    def level2(self, moves):
         raise NotImplementedError
     
     # Level 3 AI: minimax algorithm with depth 4
-    def level3(self):
+    def level3(self, moves):
         raise NotImplementedError
     
     # Return the point of a tile (for minimax algorithm)
