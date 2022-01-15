@@ -89,6 +89,7 @@ class Othello():
     
     # Updates the board with the current move, assuming that the 'move' parameter should already be valid
     def make_move(self, move):
+        self.last_player_turn = self.turn
         self.moves_made[self.move_no] = (copy.deepcopy(self.board), (self.recent_move, self.stored_move, self.skip_index, self.skip_turn, self.last_player_turn))
         for t in self.surrounding_tiles:
             if self.is_valid_tile((move[0] + t[0], move[1] + t[1])):
@@ -104,7 +105,6 @@ class Othello():
                     if change:
                         for m in range(k):
                             self.board[move[0] + t[0] * m][move[1] + t[1] * m] = self.turn
-        self.last_player_turn = self.turn
         self.turn = self.turn % 2 + 1
         self.move_no += 1
         self.update_piece_count()

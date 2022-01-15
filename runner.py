@@ -286,8 +286,6 @@ class Game():
             pygame.mixer.music.play(loops = -1)
         pygame.mixer.music.set_volume((0.2 if self.bgm_on == True else 0))
         
-        #print(self.ot.moves_made)
-        
         # Draw board and all the tiles
         self.screen.fill(black)
         tiles = []
@@ -455,7 +453,7 @@ if __name__ == "__main__":
 # TODO
 """
 1. Improve UI in pre_classic state (hover effects) and play state
-2. Add undo feature
+
 3. Create pre_custom feature user interface
 4. Add AI level 1 and basic against AI gameplay
 5. 'How to play' pages and pics, UI
