@@ -156,6 +156,7 @@ class Game():
     
     # Prepare othello object from play state when first launched (prep stage)
     def play_set_config(self):
+        self.prevent_undo = False
         pygame.mixer.music.unload()
         self.ot = Othello(self.dim_height, self.dim_width)
         self.ot.set_initial_position(self.init_white, self.init_black)
@@ -342,7 +343,7 @@ class Game():
         if self.ot.check_victory() != 0 and self.game_state != "end":
             if self.sfx_on: pygame.mixer.Channel(2).play(pygame.mixer.Sound(SFX_WIN_GAME))
             self.game_state = "end"
-            self.classic_undo = False
+            self.prevent_undo = True
         
         # Message to be displayed on screen
         time1, time2 = (self.timer_player1 if self.timer_player1 > 0 else 0), (self.timer_player2 if self.timer_player2 > 0 else 0)
@@ -377,8 +378,8 @@ class Game():
                 color_x = play_rect_displayer_color
             else:
                 buttonRect = pygame.Rect((self.virtual_width * (0.55 + (i - 8) * 0.12)), (self.virtual_height * 0.79), self.virtual_width * 0.1, self.virtual_height / 8)
-                buttonText = self.playutilFont.render(button_texts[i], True, (play_utility_text_color_hover if self.hover_play_util[i] and (self.classic_undo or i != 8) else play_utility_text_color))
-                color_x = (dark_grey if not self.classic_undo and i == 8 else play_utility_button_color)
+                buttonText = self.playutilFont.render(button_texts[i], True, (play_utility_text_color_hover if self.hover_play_util[i] and ((not self.prevent_undo and self.classic_undo) or i != 8) else play_utility_text_color))
+                color_x = (dark_grey if (not self.classic_undo or self.prevent_undo) and i == 8 else play_utility_button_color)
             button_dict[i] = buttonRect
             buttonTextRect = buttonText.get_rect()
             buttonTextRect.center = buttonRect.center
@@ -390,7 +391,7 @@ class Game():
             self.loop += 1
             if self.loop == 2:
                 self.ot.make_computer_move(self.classic_ai_level)
-                pygame.mixer.Channel(1).play(pygame.mixer.Sound((SFX_WHITE_MOVE if self.ai_turn == 2 else SFX_BLACK_MOVE)))
+                if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound((SFX_WHITE_MOVE if self.ai_turn == 2 else SFX_BLACK_MOVE)))
                 self.loop = 0
         
         # Update changes when a valid tile is clicked, or when a button is clicked
@@ -414,7 +415,7 @@ class Game():
                 if button_dict[8].collidepoint(mouse) or button_dict[9].collidepoint(mouse) or button_dict[10].collidepoint(mouse):
                     if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
                 if button_dict[8].collidepoint(mouse):
-                    if self.classic_undo: self.confirmation_action = "Undo" # Undo last move button
+                    if self.classic_undo and not self.prevent_undo: self.confirmation_action = "Undo" # Undo last move button
                     elif self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_INVALID))
                 if button_dict[9].collidepoint(mouse): self.confirmation_action = "Reset" # Reset board button (restart game with the same configuration)
                 if button_dict[10].collidepoint(mouse): self.confirmation_action = "Quit" # Quit button (back to main menu)
@@ -449,7 +450,10 @@ class Game():
                         if self.ot.move_no == 1: self.confirmation_action = "Reset"
                         if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_UNDO_GAME))
                         self.ot.undo_move()
-                        time.sleep(0.2)
+                        if self.classic_mode == "AI" and len(self.ot.moves_made) > 1:
+                            if self.ot.move_no == 1 and self.ot.moves_made[self.ot.move_no][1][4] == self.ai_turn: self.confirmation_action = "Reset"
+                            if self.ot.moves_made[self.ot.move_no][1][4] == self.ai_turn: self.ot.undo_move()
+                    time.sleep(0.2)
                     if self.confirmation_action == "Quit":
                         if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_QUIT_GAME))
                         self.game_menu = "start"
@@ -480,7 +484,7 @@ if __name__ == "__main__":
 """
 
 3. Create pre_custom feature user interface
-4. Add AI level 1 and basic against AI gameplay
+
 5. 'How to play' pages and pics, UI
 6. AI minimax algorithm??
 7. Puzzle mode??
@@ -488,7 +492,7 @@ if __name__ == "__main__":
 - Pre_custom UI
 - Fix UI, texts and colors
 
-- AI simple level 1 (random moves)
+
 - Custom othello sizes and vs ai mode
 - etc.. (coming soon)
 

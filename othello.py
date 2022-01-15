@@ -22,7 +22,7 @@ class Othello():
         # Used when time runs out in runner.py file to force a certain player to win
         self.force_win = -1 
         # Dictionary mapping move_no to be made with tuple (current board state, (tuple2)) for tracking purpose & undo functionality
-        # tuple2 = (self.recent_move, self.stored_move, self.skip_index, self.skip_turn)
+        # tuple2 = (self.recent_move, self.stored_move, self.skip_index, self.skip_turn, self.last_player_turn)
         self.moves_made = {}
         # Tracker self objects to detect when a game is over when there are no more moves to be made
         self.recent_move = (-1, -1)
