@@ -54,7 +54,7 @@ class Game():
         self.classic_undo = True # Allow undo move by default, can be set to False
         self.classic_ai_level = 1 # Level 1 AI (easiest) by default, available up to level 6 (hopefully) #TODO
         self.classic_ai_black = False # AI goes later (second turn) as white by default, can be set to true so AI makes first turn
-        self.classic_chosen = [False for i in range(16)]
+        self.classic_chosen = [False for i in range(16)] # For UI purposes
         
         # Keep track of time (time left & time since pygame was init for starting relative time)
         self.timer_player1 = 0
@@ -149,18 +149,25 @@ class Game():
     def classic_choose(self, index):
         self.classic_chosen = [False for i in range(16)]
         if 4 <= index <= 5: self.classic_mode = ("Human" if index == 4 else "AI")
-        if 6 <= index <= 11: self.classic_time = (-1 if index == 6 else int(-30 + 5 * index) if 7 <= index <= 10 else 30)
-        if 12 <= index <= 13: self.classic_undo = (True if index == 12 else False)
         if self.classic_mode == "Human": self.classic_chosen[4] = True
         else: self.classic_chosen[5] = True
-        if self.classic_time == -1: self.classic_chosen[6] = True
-        elif self.classic_time == 30: self.classic_chosen[11] = True
-        else: self.classic_chosen[int(self.classic_time / 5 + 6)] = True
-        if self.classic_undo == True: self.classic_chosen[12] = True
-        else: self.classic_chosen[13] = True
-        if self.classic_time > 0: self.timer_player1, self.timer_player2 = 60000 * self.classic_time, 60000 * self.classic_time
-        else: self.timer_player1, self.timer_player2 = 0, 0
-    
+        if self.classic_mode == "Human":
+            if 6 <= index <= 11: self.classic_time = (-1 if index == 6 else int(-30 + 5 * index) if 7 <= index <= 10 else 30)
+            if 12 <= index <= 13: self.classic_undo = (True if index == 12 else False)
+            if self.classic_time == -1: self.classic_chosen[6] = True
+            elif self.classic_time == 30: self.classic_chosen[11] = True
+            else: self.classic_chosen[int(self.classic_time / 5 + 6)] = True
+            if self.classic_undo == True: self.classic_chosen[12] = True
+            else: self.classic_chosen[13] = True
+            if self.classic_time > 0: self.timer_player1, self.timer_player2 = 60000 * self.classic_time, 60000 * self.classic_time
+            else: self.timer_player1, self.timer_player2 = 0, 0
+        if self.classic_mode == "AI":
+            if 6 <= index <= 11: self.classic_ai_level = index - 5
+            if 12 <= index <= 13: self.classic_ai_black = (True if index == 13 else False)
+            self.classic_chosen[self.classic_ai_level + 5] = True
+            if self.classic_ai_black: self.classic_chosen[13] = True
+            else: self.classic_chosen[12] = True
+
     # Called upon to play main menu bgm and set its volume when not played yet, also called from several other game states
     def play_main_bgm(self):
         if not pygame.mixer.music.get_busy():
@@ -190,6 +197,20 @@ class Game():
             time.sleep(0.2)
         self.bgm_hover = (True if button_dict[0].collidepoint(mouse) else False)
         self.sfx_hover = (True if button_dict[1].collidepoint(mouse) else False)
+    
+    # Prepare othello object from play state when first launched (prep stage)
+    def set_config(self):
+        pygame.mixer.music.unload()
+        self.ot = Othello(self.dim_height, self.dim_width)
+        self.ot.set_initial_position(self.init_white, self.init_black)
+        self.ot.turn = 1
+        self.game_state = "play"
+        self.time_start1 = pygame.time.get_ticks()
+        pygame.mixer.music.load(BGM_GAME)
+        pygame.mixer.music.play(loops = -1)
+        if self.classic_mode == "AI":
+            self.classic_time = -1
+            self.classic_undo = True
     
     def state_mainmenu(self):
         # Play BGM, display title
@@ -250,10 +271,16 @@ class Game():
         self.play_main_bgm()
         
         # Display various buttons
-        button_texts = ["Choose your opponent:",
-                        "Choose time constraint:", "Allow undo move:", "",
-                        "Human VS Human", "Human VS AI", "No Limit", "5 Mins", "10 Mins", "15 Mins", "20 Mins", "30 Mins", "Yes", "No",
-                        "Back to Menu", "Play Game"]
+        if self.classic_mode == "Human":
+            button_texts = ["Choose your opponent:",
+                            "Choose time constraint:", "Allow undo move:", "",
+                            "Human VS Human", "Human VS AI", "No Limit", "5 Mins", "10 Mins", "15 Mins", "20 Mins", "30 Mins", "Yes", "No",
+                            "Back to Menu", "Play Game"]
+        if self.classic_mode == "AI":
+            button_texts = ["Choose your opponent:",
+                            "Choose AI difficulty:", "Your color piece:", "",
+                            "Human VS Human", "Human VS AI", "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6", "Black", "White",
+                            "Back to Menu", "Play Game"]
         button_dict = {}
         for i in range(len(button_texts)):
             if 0 <= i <= 3:
@@ -309,14 +336,7 @@ class Game():
     def state_play(self):
         # Initialize game with the required settings; added bgm for gameplay
         if self.game_state == "prep":
-            pygame.mixer.music.unload()
-            self.ot = Othello(self.dim_height, self.dim_width)
-            self.ot.set_initial_position(self.init_white, self.init_black)
-            self.ot.turn = 1
-            self.game_state = "play"
-            self.time_start1 = pygame.time.get_ticks()
-            pygame.mixer.music.load(BGM_GAME)
-            pygame.mixer.music.play(loops = -1)
+            self.set_config()
         pygame.mixer.music.set_volume((0.2 if self.bgm_on == True else 0))
         
         # Draw board and all the tiles
