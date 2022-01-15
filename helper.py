@@ -35,12 +35,12 @@ play_sb_text_color = (0, 60, 102)
 play_rect_displayer_color = (218, 179, 255)
 play_rect_text_color = (51, 51, 0)
 play_utility_text_color = (0, 64, 128)
+play_utility_text_color_hover = (115, 0, 153)
 play_utility_button_color = (223, 255, 128)
 play_conf_screen_border_color = ()
 play_conf_screen_color = ()
 play_conf_text_color = ()
 play_conf_text_hover_color = ()
-
 
 black = (0, 0, 0)
 white = (255, 255, 255)
@@ -51,6 +51,8 @@ moves_color = (100, 100, 100)
 recent_move_color = (255, 0, 0)
 conf_screen_border_color = (30, 45, 240)
 conf_screen_color = (75, 145, 200)
+conf_text1_color = (96, 31, 64)
+conf_text2_color = (179, 0, 0)
 conf_hover_color = (159, 200, 45)
 
 # Define all fonts used here
@@ -75,18 +77,10 @@ playscoreFont = font.Font(BLACKJACK, 60)
 playcolorFont = font.Font(BLACKJACK, 25)
 playtextFont = font.Font(BLACKJACK, 25)
 playutilFont = font.Font(OPEN_SANS, 25)
-
-
-
-smallFont = font.Font(OPEN_SANS, 20)
-hugeFont = font.Font(OPEN_SANS, 40)
-
-
-buttonFont = font.Font(OPEN_SANS, 30)
-confFont1 =  font.Font(OPEN_SANS, 25)
-confFont2 =  font.Font(OPEN_SANS, 15)
-confFont3 = font.Font(OPEN_SANS, 30)
-confFont4 = font.Font(OPEN_SANS, 35)
+confFont1 =  font.Font(PACIFICO, 35)
+confFont2 =  font.Font(OPEN_SANS, 20)
+confFont3 = font.Font(OPEN_SANS, 40)
+confFont4 = font.Font(OPEN_SANS, 45)
 
 
 # Define all background musics used here

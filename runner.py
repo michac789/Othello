@@ -68,9 +68,10 @@ class Game():
         self.bgm_hover = False
         self.sfx_hover = False
         
-        # Various hover effects
+        # Various hover effects tracker
         self.hover_main = [False for i in range(9)]
         self.hover_pre_classic = [False for i in range(16)]
+        self.hover_play_util = [False for i in range(11)]
     
     # Resize components relative to the overall screen width and height; maintaining 16:9 aspect ratio
     def resize(self):
@@ -340,7 +341,7 @@ class Game():
             b1 = f"{ms} ({self.ot.move_no} turns)"
             b2 = f"{self.ot.get_color(self.ot.check_victory())} wins!"
         button_texts = [f"{time1}", f"{time2}", f"{self.ot.black_tiles}", f"{self.ot.white_tiles}", "Black", "White", b1, b2, b3, b4, b5]
-
+        
         # Display various user interfaces (scoreboards, messages, buttons)
         scoreRect = pygame.Rect((self.virtual_width * 0.55), (self.virtual_height * 0.05), (self.virtual_width * 0.4), (self.virtual_height * 0.37))
         pygame.draw.rect(self.screen, play_scoreboard_color, scoreRect)
@@ -364,7 +365,7 @@ class Game():
                 color_x = play_rect_displayer_color
             else:
                 buttonRect = pygame.Rect((self.virtual_width * (0.55 + (i - 8) * 0.12)), (self.virtual_height * 0.79), self.virtual_width * 0.1, self.virtual_height / 8)
-                buttonText = playutilFont.render(button_texts[i], True, play_utility_text_color)
+                buttonText = playutilFont.render(button_texts[i], True, (play_utility_text_color_hover if self.hover_play_util[i] else play_utility_text_color))
                 color_x = play_utility_button_color
             button_dict[i] = buttonRect
             buttonTextRect = buttonText.get_rect()
@@ -373,9 +374,9 @@ class Game():
             self.screen.blit(buttonText, buttonTextRect)
         
         # Update changes when a valid tile is clicked, or when a button is clicked
+        mouse = pygame.mouse.get_pos()
         if self.confirmation_action == "":
             left, _, _ = pygame.mouse.get_pressed()
-            mouse = pygame.mouse.get_pos()
             if left == 1:
                 if self.game_state == "play":
                     for i in range(self.dim_height):
@@ -395,13 +396,16 @@ class Game():
                 if button_dict[8].collidepoint(mouse): self.confirmation_action = "Undo" # Undo last move button
                 if button_dict[9].collidepoint(mouse): self.confirmation_action = "Reset" # Reset board button (restart game with the same configuration)
                 if button_dict[10].collidepoint(mouse): self.confirmation_action = "Quit" # Quit button (back to main menu)
+        self.hover_play_util = [False for i in range(11)]
+        for i in range(8, 11, 1):
+            if button_dict[i].collidepoint(mouse): self.hover_play_util[i] = True
                 
         # Display confirmation screen and yes/no buttons, proceed with action when 'yes' is clicked, back to game when 'no' is clicked
         if self.confirmation_action != "":
             confRectborder = pygame.Rect((self.virtual_width / 4), (self.virtual_height / 4), (self.virtual_width / 2), (self.virtual_height / 2))
             confRect = pygame.Rect((self.virtual_width / 4 + 3), (self.virtual_height / 4 + 3), (self.virtual_width / 2 - 6), (self.virtual_height / 2 - 6))
-            confText1 = confFont1.render(f"Confirm {self.confirmation_action}?", True, black)
-            confText2 = confFont2.render("Warning! This cannot be undone!", True, black)
+            confText1 = confFont1.render(f"Confirm {self.confirmation_action}?", True, conf_text1_color)
+            confText2 = confFont2.render("Warning! This cannot be undone!", True, conf_text2_color)
             confTextRect1 = confText1.get_rect(center = (self.virtual_width / 2, self.virtual_height * 0.35))
             confTextRect2 = confText2.get_rect(center = (self.virtual_width / 2, self.virtual_height * 0.45))
             pygame.draw.rect(self.screen, conf_screen_border_color, confRectborder)
@@ -411,8 +415,8 @@ class Game():
             yes, no = confFont3.render("Yes", True, black), confFont3.render("No", True, black)
             if self.hover_yes: yes = confFont4.render("Yes", True, conf_hover_color)
             if self.hover_no: no = confFont4.render("No", True, conf_hover_color)
-            yes_rect = yes.get_rect(center = (self.virtual_width * 0.45, self.virtual_height * 0.55))
-            no_rect = no.get_rect(center = (self.virtual_width * 0.55, self.virtual_height * 0.55))
+            yes_rect = yes.get_rect(center = (self.virtual_width * 0.4, self.virtual_height * 0.6))
+            no_rect = no.get_rect(center = (self.virtual_width * 0.6, self.virtual_height * 0.6))
             self.screen.blit(yes, yes_rect)
             self.screen.blit(no, no_rect)
             left, _, _ = pygame.mouse.get_pressed()
