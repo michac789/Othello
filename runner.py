@@ -418,9 +418,7 @@ class Game():
                 self.ot.make_move(AI_move(self.ot, self.classic_ai_level, True))
                 if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound((SFX_WHITE_MOVE if self.ai_turn == 2 else SFX_BLACK_MOVE)))
                 self.loop = 0
-                
-        print(self.ot.moves_made)
-                
+        
         # AI VS AI Move (only for AI VS AI mode)
         if self.game_state == "play" and self.classic_mode == "AI2":
             self.loop += 1

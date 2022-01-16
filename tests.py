@@ -1,6 +1,7 @@
 import unittest
 
 from othello import *
+from othello_ai import heuristic_eval
 
 
 class is_valid_tile_func(unittest.TestCase):
@@ -62,6 +63,12 @@ class get_possible_moves_func(unittest.TestCase):
         expected = [(1, 1), (1, 3), (3, 0)]
         self.assertCountEqual(self.ot.get_possible_moves(), expected)
 
+    def test_5(self):
+        self.ot.board = [[1,1,1,1,1,1],[2,2,2,2,2,0],[0,2,2,2,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]]
+        self.ot.turn = 2
+        expected = []
+        self.assertCountEqual(self.ot.get_possible_moves(), expected)
+
 
 class make_move_func(unittest.TestCase):
 
@@ -120,6 +127,25 @@ class check_victory_func(unittest.TestCase):
         self.assertEqual(self.ot.check_victory(), 1)
         
     # DO MORE TEST
+
+class heuristic_eval_func(unittest.TestCase):
+    
+    def setUp(self):
+        self.ot = Othello(8, 8)
+        
+    def test_1(self):
+        self.ot.board = [[1,1,2,0,0,0,0,0],[1,1,1,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,2,1,0,0,0],
+                         [0,0,0,1,2,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0]]
+        expected = -3
+        self.assertEqual(heuristic_eval(self.ot.board), expected)
+        
+    def test_2(self):
+        self.ot.board = [[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,2,1,0,0,0],
+                         [0,0,0,2,1,1,0,0],[0,2,2,2,1,2,0,0],[0,0,0,1,0,0,0,0],[0,2,2,2,0,0,0,0]]
+        expected = 0
+        self.assertEqual(heuristic_eval(self.ot.board), expected)
+        
+        
 
 
 if __name__ == "__main__":
