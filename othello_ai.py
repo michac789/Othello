@@ -85,7 +85,7 @@ def minimax(ot, depth, alpha, beta):
         for move in moves:
             temp_ot = deepcopy(ot)
             temp_ot.make_move(move)
-            new_score = minimax(temp_ot, depth - 1, -99999, 99999)
+            new_score = minimax(temp_ot, depth - 1, alpha, beta)
             score = max(score, new_score)
             alpha = max(alpha, score)
             if beta <= alpha:
@@ -95,7 +95,7 @@ def minimax(ot, depth, alpha, beta):
         for move in moves:
             temp_ot = deepcopy(ot)
             temp_ot.make_move(move)
-            new_score = minimax(temp_ot, depth - 1, -99999, 99999)
+            new_score = minimax(temp_ot, depth - 1, alpha, beta)
             score = min(score, new_score)
             beta = min(beta, score)
             if beta <= alpha:
