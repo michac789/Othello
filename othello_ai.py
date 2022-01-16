@@ -34,11 +34,11 @@ def level1(ot, delay):
 # Level 2 AI: the ai tries to maximize its piece count for every move
 def level2(ot, delay):
     moves = ot.get_possible_moves()
-    score_move = [0, [None]]
+    score_move = [-99999, [None]]
     for move in moves:
         temp_ot = deepcopy(ot)
         temp_ot.make_move(move)
-        new_score = (temp_ot.white_tiles if temp_ot.turn == 1 else temp_ot.black_tiles)
+        new_score = heuristic_eval(temp_ot.board) * (1 if temp_ot.turn == 2 else -1)
         if new_score > score_move[0]: score_move = [new_score, [move]]
         elif new_score == score_move[0]: score_move[1].append(move)
     if delay: sleep(0.5)
@@ -50,11 +50,9 @@ def level3(ot, delay):
     for move in moves:
         temp_ot = deepcopy(ot)
         temp_ot.make_move(move)
-        new_score = heuristic_eval(temp_ot.board) * (1 if temp_ot.turn == 2 else -1)
-        print(move, "  ", new_score)
+        new_score = minimax(temp_ot, 2, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
         if new_score > score_move[0]: score_move = [new_score, [move]]
         elif new_score == score_move[0]: score_move[1].append(move)
-        print(score_move)
     if delay: sleep(0.5)
     return choice(score_move[1])
 
@@ -77,8 +75,46 @@ def heuristic_eval(state):
     return score
 
 def minimax(ot, depth, alpha, beta):
-    pass
+    if depth == 0 or ot.check_victory() != 0:
+        return heuristic_eval(ot.board)
+    moves = ot.get_possible_moves()
+    ot.check_no_move(moves)
+    # !!!
+    if ot.turn == 1:
+        score = -99999
+        for move in moves:
+            temp_ot = deepcopy(ot)
+            temp_ot.make_move(move)
+            new_score = minimax(temp_ot, depth - 1, -99999, 99999)
+            score = max(score, new_score)
+            alpha = max(alpha, score)
+            if beta <= alpha:
+                break
+    elif ot.turn == 2:
+        score = 99999
+        for move in moves:
+            temp_ot = deepcopy(ot)
+            temp_ot.make_move(move)
+            new_score = minimax(temp_ot, depth - 1, -99999, 99999)
+            score = min(score, new_score)
+            beta = min(beta, score)
+            if beta <= alpha:
+                break
+    return score
+            
 
+# This AI picks the move that maximizes its piece in the next state; it is bad, as it loses quite frequently even with level 1 ai
+def extra_ai1(ot, delay):
+    moves = ot.get_possible_moves()
+    score_move = [0, [None]]
+    for move in moves:
+        temp_ot = deepcopy(ot)
+        temp_ot.make_move(move)
+        new_score = (temp_ot.white_tiles if temp_ot.turn == 1 else temp_ot.black_tiles)
+        if new_score > score_move[0]: score_move = [new_score, [move]]
+        elif new_score == score_move[0]: score_move[1].append(move)
+    if delay: sleep(0.5)
+    return choice(score_move[1])
 
 # def AI_1(ot):
 #     pass
