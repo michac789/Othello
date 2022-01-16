@@ -1,8 +1,10 @@
 import copy
+from msilib.schema import Error
 import sys
 import operator
 import random
 import time
+from xml.dom import NoDataAllowedErr
 from othello_ai import AI_move
 
 
@@ -117,6 +119,7 @@ class Othello():
         return 0
     
     # Update some self tracker attribute, which adjust self.skip_turn to n, where for n consecutive turns there are no moves possible
+    # Always call this function after getting all moves from get_possible_moves
     def check_no_move(self, moves):
         if len(moves) == 0:
             if self.skip_index != self.turn and self.skip_turn == 1:
@@ -143,50 +146,6 @@ class Othello():
             self.update_piece_count()
             return True
         return False
-    
-    # Returns True and create computer move where possible, otherwise returns False (TO BE REMOVED)
-    def make_computer_move(self, level):
-        moves = self.get_possible_moves()
-        if len(moves) == 0: return False
-        if level == 1: move = self.level1(moves)
-        if level == 2: move = self.level2(moves)
-        if level == 3: move = self.level3(moves)
-        self.make_move(move)
-        return True
-    
-    # Level 1 AI: return random move
-    def level1(self, moves):
-        time.sleep(0.5)
-        return random.choice(moves)
-    
-    # Level 2 AI: minimax algorithm with depth 2
-    def level2(self, moves):
-        for move in moves:
-            pass
-        raise NotImplementedError
-    
-    # Level 3 AI: minimax algorithm with depth 4
-    def level3(self, moves):
-        raise NotImplementedError
-    
-    # Return the score of a board position
-    def heuristic_eval(self, board):
-        score = 0
-        for i in range(self.height):
-            for j in range(self.width):
-                tile_point = self.tile_point((i, j))
-                if board[i][j] == 1:
-                    score += tile_point
-                elif board[i][j] == 2:
-                    score -= tile_point
-        return score
-    
-    # Return move with greatest minimax value (turn 1 'black' maximizing, turn 2 'white' minimizing)
-    def negamax(self, board, depth, turn, alpha, beta):
-        if depth == 0 or self.check_victory != 0:
-            return self.heuristic_eval()
-        pass
-    #TODO
 
 
 # This is used only for initial testing purposes using the terminal
@@ -200,11 +159,11 @@ def main():
     ot.terminal_print()
     
     # Testing purpose
-    ot = Othello(4, 4)
-    init_white = [(1, 1), (2, 2)]
-    init_black = [(1, 2), (2, 1)]
-    ot.set_initial_position(init_white, init_black)
-    ot.terminal_print()
+    # ot = Othello(4, 4)
+    # init_white = [(1, 1), (2, 2)]
+    # init_black = [(1, 2), (2, 1)]
+    # ot.set_initial_position(init_white, init_black)
+    # ot.terminal_print()
     
     # Prompt for game mode
     while True:
@@ -256,7 +215,8 @@ def human_vs_human(ot):
         winner = ("White" if ot.check_victory() == 2 else "Black")
         print(f"Congratulations! {winner} wins the game!")
 
-def human_vs_ai(ot, level):
+def human_vs_ai(ot, level): #THIS IS NOT FUNCTIONING ANYMORE
+    raise NoDataAllowedErr
     # Loop through while the game is not ended; human is player 1 (goes first)
     while(True):
         print(f"It is your turn")
