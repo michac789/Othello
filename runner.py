@@ -1,3 +1,4 @@
+from turtle import delay
 import pygame
 import sys
 import math
@@ -27,12 +28,13 @@ class Game():
         self.confirmation_action = "" # Confirmation window displayer
         
         # Choose modes in 'pre_classic' state
-        self.classic_mode = "Human" # 'Human' by default for 2 players, or 'AI' against computer
+        self.classic_mode = "Human" # 'Human' by default for 2 players, or 'AI' against computer, or "AI2" for both computer players
         self.classic_time = -1 # '-1' for no time limit by default, or 5/10/15/20/30 mins for each player
         self.classic_undo = True # Allow undo move by default, can be set to False
         self.classic_ai_level = 1 # Level 1 AI (easiest) by default, available up to level 6 (hopefully) #TODO
         self.classic_ai_black = False # AI goes later (second turn) as white by default, can be set to true so AI makes first turn
         self.classic_chosen = [False for i in range(16)] # For UI purposes
+        self.classic_ai2_level_b, self.classic_ai2_level_w, self.classic_ai2_color = 1, 1, 'b' # Level for AI VS AI Mode (black and white)
         
         # Keep track of time (time left & time since pygame was init for starting relative time)
         self.timer_player1, self.timer_player2 = 0, 0
@@ -104,9 +106,10 @@ class Game():
     # Handles all the choosing mode buttons and its action towards self.classic_(xxx) in the 'pre_classic' state
     def classic_choose(self, index):
         self.classic_chosen = [False for i in range(16)]
-        if 4 <= index <= 5: self.classic_mode = ("Human" if index == 4 else "AI")
+        if 4 <= index <= 6: self.classic_mode = ("Human" if index == 4 else "AI" if index == 5 else "AI2")
         if self.classic_mode == "Human": self.classic_chosen[4] = True
-        else: self.classic_chosen[5] = True
+        elif self.classic_mode == "AI": self.classic_chosen[5] = True
+        else: self.classic_chosen[6] = True
         if self.classic_mode == "Human":
             if 7 <= index <= 12: self.classic_time = (-1 if index == 7 else int(-30 + 5 * index) if 8 <= index <= 11 else 30)
             if 13 <= index <= 14: self.classic_undo = (True if index == 13 else False)
@@ -123,6 +126,14 @@ class Game():
             self.classic_chosen[self.classic_ai_level + 6] = True
             if self.classic_ai_black: self.classic_chosen[14] = True
             else: self.classic_chosen[13] = True
+        if self.classic_mode == "AI2":
+            if 7 <= index <= 12 and self.classic_ai2_color == "b": self.classic_ai2_level_b = index - 6
+            if 7 <= index <= 12 and self.classic_ai2_color == "w": self.classic_ai2_level_w = index - 6
+            if 13 <= index <= 14: self.classic_ai2_color = ("b" if index == 13 else "w")
+            if self.classic_ai2_color == "b": self.classic_chosen[13] = True
+            else: self.classic_chosen[14] = True
+            if self.classic_ai2_color == "b": self.classic_chosen[self.classic_ai2_level_b + 6] = True
+            if self.classic_ai2_color == "w": self.classic_chosen[self.classic_ai2_level_w + 6] = True
 
     # Called upon to play main menu bgm and set its volume when not played yet, also called from several other game states
     def play_main_bgm(self):
@@ -170,6 +181,8 @@ class Game():
             self.classic_time, self.classic_undo = -1, True
             self.ai_turn = (1 if self.classic_ai_black else 2)
             self.human_turn = (2 if self.classic_ai_black else 1)
+        if self.classic_mode == "AI2":
+            self.classic_time, self.prevent_undo = -1, True
     
     def state_mainmenu(self):
         # Play BGM, display title
@@ -236,9 +249,15 @@ class Game():
                             "Human VS Human", "Human VS AI", "AI VS AI",
                             "No Limit", "5 Mins", "10 Mins", "15 Mins", "20 Mins", "30 Mins", "Yes", "No",
                             "Back to Menu", "Play Game"]
-        if self.classic_mode == "AI":
+        elif self.classic_mode == "AI":
             button_texts = ["Choose classic mode:",
                             "Choose AI difficulty:", "Your color piece:", "",
+                            "Human VS Human", "Human VS AI", "AI VS AI",
+                            "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6", "Black", "White",
+                            "Back to Menu", "Play Game"]
+        elif self.classic_mode == "AI2":
+            button_texts = ["Choose classic mode:",
+                            "Choose AI difficulty:", "Level for this piece:", "",
                             "Human VS Human", "Human VS AI", "AI VS AI",
                             "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6", "Black", "White",
                             "Back to Menu", "Play Game"]
@@ -394,8 +413,19 @@ class Game():
         if self.game_state == "play" and (self.classic_mode == "AI" and self.ai_turn == self.ot.turn):
             self.loop += 1
             if self.loop == 2:
-                self.ot.make_move(AI_move(self.ot, self.classic_ai_level))
+                self.ot.make_move(AI_move(self.ot, self.classic_ai_level, True))
                 if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound((SFX_WHITE_MOVE if self.ai_turn == 2 else SFX_BLACK_MOVE)))
+                self.loop = 0
+                
+        print(self.ot.moves_made)
+                
+        # AI VS AI Move (only for AI VS AI mode)
+        if self.game_state == "play" and self.classic_mode == "AI2":
+            self.loop += 1
+            if self.loop == 2:
+                if self.ot.turn == 1: self.ot.make_move(AI_move(self.ot, self.classic_ai2_level_b, False))
+                elif self.ot.turn == 2: self.ot.make_move(AI_move(self.ot, self.classic_ai2_level_w, False))
+                if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound((SFX_WHITE_MOVE if self.ot.turn == 1 else SFX_BLACK_MOVE)))
                 self.loop = 0
         
         # Update changes when a valid tile is clicked, or when a button is clicked
@@ -403,7 +433,7 @@ class Game():
         if self.confirmation_action == "":
             left, _, _ = pygame.mouse.get_pressed()
             if left == 1:
-                if self.game_state == "play" and (self.classic_mode != "AI" or self.human_turn == self.ot.turn):
+                if self.game_state == "play" and (self.classic_mode == "human" or self.human_turn == self.ot.turn):
                     for i in range(self.dim_height):
                         for j in range(self.dim_width):
                             if tiles[i][j].collidepoint(mouse):
