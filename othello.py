@@ -53,7 +53,7 @@ class Othello():
     
     # Return the color given the turn number
     def get_color(self, turn):
-        return ("Black" if turn == 1 else "White")
+        return ("Black" if turn == 1 else "White" if turn == 2 else "INVALID")
     
     # Returns True if 'tile' is a valid tile on the board, otherwise False
     def is_valid_tile(self, tile):

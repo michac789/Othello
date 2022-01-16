@@ -183,6 +183,7 @@ class Game():
             self.human_turn = (2 if self.classic_ai_black else 1)
         if self.classic_mode == "AI2":
             self.classic_time, self.prevent_undo = -1, True
+            self.human_turn = -1
     
     def state_mainmenu(self):
         # Play BGM, display title
@@ -376,6 +377,7 @@ class Game():
             ms = ("No more moves!" if self.ot.force_win == -1 else "Time is up!")
             b1 = f"{ms} ({self.ot.move_no} turns)"
             b2 = f"{self.ot.get_color(self.ot.check_victory())} wins!"
+            if self.ot.check_victory() == 3: b2 = "Game draw!"
         button_texts = [f"{time1}", f"{time2}", f"{self.ot.black_tiles}", f"{self.ot.white_tiles}", "Black", "White", b1, b2, b3, b4, b5]
         
         # Display various user interfaces (scoreboards, messages, buttons)
