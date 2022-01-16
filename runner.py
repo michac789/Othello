@@ -44,7 +44,7 @@ class Game():
         
         # Various hover effects tracker
         self.hover_main = [False for i in range(9)]
-        self.hover_pre_classic = [False for i in range(16)]
+        self.hover_pre_classic = [False for i in range(17)]
         self.hover_play_util = [False for i in range(11)]
         self.hover_yes, self.hover_no = False, False
     
@@ -108,21 +108,21 @@ class Game():
         if self.classic_mode == "Human": self.classic_chosen[4] = True
         else: self.classic_chosen[5] = True
         if self.classic_mode == "Human":
-            if 6 <= index <= 11: self.classic_time = (-1 if index == 6 else int(-30 + 5 * index) if 7 <= index <= 10 else 30)
-            if 12 <= index <= 13: self.classic_undo = (True if index == 12 else False)
-            if self.classic_time == -1: self.classic_chosen[6] = True
-            elif self.classic_time == 30: self.classic_chosen[11] = True
-            else: self.classic_chosen[int(self.classic_time / 5 + 6)] = True
-            if self.classic_undo == True: self.classic_chosen[12] = True
-            else: self.classic_chosen[13] = True
+            if 7 <= index <= 12: self.classic_time = (-1 if index == 7 else int(-30 + 5 * index) if 8 <= index <= 11 else 30)
+            if 13 <= index <= 14: self.classic_undo = (True if index == 13 else False)
+            if self.classic_time == -1: self.classic_chosen[7] = True
+            elif self.classic_time == 30: self.classic_chosen[12] = True
+            else: self.classic_chosen[int(self.classic_time / 5 + 7)] = True
+            if self.classic_undo == True: self.classic_chosen[13] = True
+            else: self.classic_chosen[14] = True
             if self.classic_time > 0: self.timer_player1, self.timer_player2 = 60000 * self.classic_time, 60000 * self.classic_time
             else: self.timer_player1, self.timer_player2 = 0, 0
         if self.classic_mode == "AI":
-            if 6 <= index <= 11: self.classic_ai_level = index - 5
-            if 12 <= index <= 13: self.classic_ai_black = (True if index == 13 else False)
-            self.classic_chosen[self.classic_ai_level + 5] = True
-            if self.classic_ai_black: self.classic_chosen[13] = True
-            else: self.classic_chosen[12] = True
+            if 7 <= index <= 12: self.classic_ai_level = index - 6
+            if 13 <= index <= 14: self.classic_ai_black = (True if index == 14 else False)
+            self.classic_chosen[self.classic_ai_level + 6] = True
+            if self.classic_ai_black: self.classic_chosen[14] = True
+            else: self.classic_chosen[13] = True
 
     # Called upon to play main menu bgm and set its volume when not played yet, also called from several other game states
     def play_main_bgm(self):
@@ -231,34 +231,37 @@ class Game():
         
         # Display various buttons
         if self.classic_mode == "Human":
-            button_texts = ["Choose your opponent:",
+            button_texts = ["Choose classic mode:",
                             "Choose time constraint:", "Allow undo move:", "",
-                            "Human VS Human", "Human VS AI", "No Limit", "5 Mins", "10 Mins", "15 Mins", "20 Mins", "30 Mins", "Yes", "No",
+                            "Human VS Human", "Human VS AI", "AI VS AI",
+                            "No Limit", "5 Mins", "10 Mins", "15 Mins", "20 Mins", "30 Mins", "Yes", "No",
                             "Back to Menu", "Play Game"]
         if self.classic_mode == "AI":
-            button_texts = ["Choose your opponent:",
+            button_texts = ["Choose classic mode:",
                             "Choose AI difficulty:", "Your color piece:", "",
-                            "Human VS Human", "Human VS AI", "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6", "Black", "White",
+                            "Human VS Human", "Human VS AI", "AI VS AI",
+                            "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6", "Black", "White",
                             "Back to Menu", "Play Game"]
         button_dict = {}
         for i in range(len(button_texts)):
             if 0 <= i <= 3:
                 buttonRect = pygame.Rect(self.board_start[0], self.board_height * (0.25 + 0.3 * i), self.virtual_width / 3, self.virtual_height / 10)
                 buttonText = self.preptextFont.render(button_texts[i], True, (prep_text_color1 if i == 0 else prep_text_color2))
-            if 4 <= i <= 5:
-                buttonRect = pygame.Rect(self.virtual_width * (0.4 + 0.3 * (i - 4)), self.virtual_height * 0.25, self.virtual_width * 0.27, self.virtual_height / 5)
+            if 4 <= i <= 6:
+                if i != 6: buttonRect = pygame.Rect(self.virtual_width * (0.4 + 0.3 * (i - 4)), self.virtual_height * 0.25, self.virtual_width * 0.27, self.virtual_height / 11)
+                else: buttonRect = pygame.Rect(self.virtual_width * (0.55), self.virtual_height * 0.37, self.virtual_width * 0.27, self.virtual_height / 11)
                 buttonText = self.prepoptionFont.render(button_texts[i], True, (prep_option_color1 if self.hover_pre_classic[i] == False else prep_button_hover_color1))
-            if 6 <= i <= 13:
-                buttonRect = pygame.Rect(self.virtual_width * (0.4 + 0.18 * ((i - 6) % 3)), self.virtual_height * (0.5 + 0.12 * math.floor((i - 6) / 3)), self.virtual_width * 0.15, self.virtual_height / 12)
+            if 7 <= i <= 14:
+                buttonRect = pygame.Rect(self.virtual_width * (0.4 + 0.18 * ((i - 7) % 3)), self.virtual_height * (0.5 + 0.12 * math.floor((i - 7) / 3)), self.virtual_width * 0.15, self.virtual_height / 12)
                 buttonText = self.prepoptionFont.render(button_texts[i], True, (prep_option_color2 if self.hover_pre_classic[i] == False else prep_button_hover_color1))
-            if 14 <= i <= 15:
-                buttonRect = pygame.Rect(self.virtual_width * (0.1 + 0.4 * (i - 14)), self.virtual_height * 0.88, self.virtual_width * 0.3, self.virtual_height / 10)
+            if 15 <= i <= 16:
+                buttonRect = pygame.Rect(self.virtual_width * (0.1 + 0.4 * (i - 15)), self.virtual_height * 0.88, self.virtual_width * 0.3, self.virtual_height / 10)
                 buttonText = self.prepgoFont.render(button_texts[i], True, (prep_option_color3 if self.hover_pre_classic[i] == False else prep_button_hover_color2))
             button_dict[i] = buttonRect
             buttonTextRect = buttonText.get_rect()
             buttonTextRect.center = buttonRect.center
             if 0 <= i <= 3: pygame.draw.rect(self.screen, black, buttonRect)
-            elif i == 14 or i == 15: pygame.draw.rect(self.screen, (prep_button_color2 if self.hover_pre_classic[i] == False else prep_rect_hover_color), buttonRect)
+            elif i == 15 or i == 16: pygame.draw.rect(self.screen, (prep_button_color2 if self.hover_pre_classic[i] == False else prep_rect_hover_color), buttonRect)
             else: pygame.draw.rect(self.screen, (prep_button_color1 if self.classic_chosen[i] == False else prep_chosen_color), buttonRect)
             self.screen.blit(buttonText, buttonTextRect)
         self.display_icon()
@@ -267,22 +270,23 @@ class Game():
         left, _, _ = pygame.mouse.get_pressed()
         mouse = pygame.mouse.get_pos()
         if left == 1:
-            for i in range(4, 14, 1):
+            for i in range(4, 15, 1):
                 if button_dict[i].collidepoint(mouse):
                     if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
                     self.classic_choose(i)
-            if button_dict[14].collidepoint(mouse):
+            if button_dict[15].collidepoint(mouse):
                 if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
                 self.game_menu = "start"
-            if button_dict[15].collidepoint(mouse):
+            if button_dict[16].collidepoint(mouse):
                 if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
                 self.init_white, self.init_black = [(3, 3), (4, 4)], [(3, 4), (4, 3)]
                 self.dim_height, self.dim_width = 8, 8
                 self.game_menu = "play"
                 time.sleep(0.2)
-        for i in range(4, 16, 1):
+        for i in range(4, 17, 1):
             self.hover_pre_classic[i] = False
-            if button_dict[i].collidepoint(mouse): self.hover_pre_classic[i] = True
+            if button_dict[i].collidepoint(mouse):
+                self.hover_pre_classic[i] = True
     
     def state_pre_custom(self): #TODO        
         self.init_white = [(0, 0), (0, 1), (0, 2), (0, 3)]
