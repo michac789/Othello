@@ -1,10 +1,10 @@
-from turtle import color
 import pygame
 import sys
 import math
 import time
 
 from othello import Othello
+from othello_ai import AI_move
 from helper import *
 
 
@@ -390,7 +390,7 @@ class Game():
         if self.game_state == "play" and (self.classic_mode == "AI" and self.ai_turn == self.ot.turn):
             self.loop += 1
             if self.loop == 2:
-                self.ot.make_computer_move(self.classic_ai_level)
+                self.ot.make_move(AI_move(self.ot, self.classic_ai_level))
                 if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound((SFX_WHITE_MOVE if self.ai_turn == 2 else SFX_BLACK_MOVE)))
                 self.loop = 0
         

@@ -3,6 +3,7 @@ import sys
 import operator
 import random
 import time
+from othello_ai import AI_move
 
 
 class Othello():
@@ -143,7 +144,7 @@ class Othello():
             return True
         return False
     
-    # Returns True and create computer move where possible, otherwise returns False
+    # Returns True and create computer move where possible, otherwise returns False (TO BE REMOVED)
     def make_computer_move(self, level):
         moves = self.get_possible_moves()
         if len(moves) == 0: return False
@@ -160,6 +161,8 @@ class Othello():
     
     # Level 2 AI: minimax algorithm with depth 2
     def level2(self, moves):
+        for move in moves:
+            pass
         raise NotImplementedError
     
     # Level 3 AI: minimax algorithm with depth 4
