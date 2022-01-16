@@ -30,10 +30,6 @@ class Othello():
         self.skip_index = -1
         self.skip_turn = 0
         self.last_player_turn = 1
-        
-        self.tiles_corner = [(0, 0), (0, self.width - 1), (self.height - 1, 0), (self.height - 1, self.width - 1)]
-        self.tiles_near_corner = [(0, 1), (1, 0), (1, 1), (0, self.width - 2), (1, self.width - 2), (1, self.width - 1), (self.height - 2, 0), (self.height - 1, 1), (self.height - 2, 1), (self.height - 2, self.width - 1), (self.height - 1, self.width - 2), (self.height - 2, self.width - 2)]
-        self.tiles_edge = [(i, j) for i in range(self.height) for j in range(self.width) if i == 0 or i != self.height - 1 or j != 0 or j != self.width - 1]
     
     # Accepts a list of initial white and black tiles to be filled with its respective colors, clear previous board
     def set_initial_position(self, initial_white, initial_black):
@@ -170,25 +166,24 @@ class Othello():
     def level3(self, moves):
         raise NotImplementedError
     
-    # Return the point of a tile (for minimax algorithm)
-    def tile_point(self, tile):
-        return (4 if tile in self.tiles_corner else 3 if tile in self.tiles_near_corner else 2 if tile in self.tiles_edge else 1)
-    
     # Return the score of a board position
-    def heuristic_eval(self):
+    def heuristic_eval(self, board):
         score = 0
         for i in range(self.height):
             for j in range(self.width):
                 tile_point = self.tile_point((i, j))
-                if self.board[i][j] == 1:
+                if board[i][j] == 1:
                     score += tile_point
-                elif self.board[i][j] == 2:
+                elif board[i][j] == 2:
                     score -= tile_point
         return score
     
-    # Return move with greatest minimax value (white max, black min)
-    def minimax(self):
+    # Return move with greatest minimax value (turn 1 'black' maximizing, turn 2 'white' minimizing)
+    def negamax(self, board, depth, turn, alpha, beta):
+        if depth == 0 or self.check_victory != 0:
+            return self.heuristic_eval()
         pass
+    #TODO
 
 
 # This is used only for initial testing purposes using the terminal
