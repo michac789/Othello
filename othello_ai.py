@@ -66,10 +66,30 @@ def level3(ot, delay):
 
 def level4(ot, delay):
     # Early game (move 1-10), Mid game (move 11-52), End game (move 53-60)
-    raise NotImplementedError
+    moves = ot.get_possible_moves()
+    score_move = [-99999, [None]]
+    for move in moves:
+        temp_ot = deepcopy(ot)
+        temp_ot.make_move(move)
+        if ot.move_no < 51:
+            new_score = negamax(temp_ot, 2, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
+        else:
+            print("ho")
+            new_score = negamax_late(temp_ot, 10, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
+        if new_score > score_move[0]: score_move = [new_score, [move]]
+        elif new_score == score_move[0]: score_move[1].append(move)
+    return choice(score_move[1])
 
 def level5(ot, delay):
-    raise NotImplementedError
+    moves = ot.get_possible_moves()
+    score_move = [-99999, [None]]
+    for move in moves:
+        temp_ot = deepcopy(ot)
+        temp_ot.make_move(move)
+        new_score = negamax_late(temp_ot, 0, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
+        if new_score > score_move[0]: score_move = [new_score, [move]]
+        elif new_score == score_move[0]: score_move[1].append(move)
+    return choice(score_move[1])
 
 def level6(ot, delay):
     raise NotImplementedError
@@ -126,6 +146,31 @@ def negamax(ot, depth, alpha, beta):
         if beta <= alpha:
             break
     return score * (1 if ot.turn == 1 else -1)
+
+
+def negamax_late(ot, depth, alpha, beta):
+    if depth == 0 or ot.check_victory() != 0:
+        return heur_pieces(ot.black_tiles, ot.white_tiles)
+    moves = ot.get_possible_moves()
+    ot.check_no_move(moves)
+    score = -99999
+    for move in moves:
+        temp_ot = deepcopy(ot)
+        temp_ot.make_move(move)
+        new_score = negamax_late(temp_ot, depth - 1, -beta, -alpha) * (1 if ot.turn == 1 else -1)
+        score = max(score, new_score)
+        alpha = max(alpha, score)
+        if beta <= alpha:
+            break
+    return score * (1 if ot.turn == 1 else -1)
+
+# Given a board, this function will return the difference of black pieces and white pieces
+def heur_pieces(ot_black, ot_white):
+    return ot_black - ot_white
+
+
+
+
 
 # This AI picks the move that maximizes its piece in the next state; it is bad, as it loses quite frequently even with level 1 ai
 def extra_ai1(ot, delay):
