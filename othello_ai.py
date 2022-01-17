@@ -20,10 +20,10 @@ val = [[10, -3, 2, 1, 1, 2, -3, 10],
 def AI_move(othello, level, delay):
     if level == 1: return level1(othello, delay)
     if level == 2: return level2(othello, delay)
-    if level == 3: return level3(othello, delay)
-    if level == 4: return level4(othello, delay)
-    if level == 5: return level5(othello, delay)
-    if level == 6: return level6(othello, delay)
+    if level == 3: return level3(othello)
+    if level == 4: return level4(othello)
+    if level == 5: return level5(othello)
+    if level == 6: return level6(othello)
 
 # Level 1 AI: make completely random moves
 def level1(ot, delay):
@@ -31,7 +31,7 @@ def level1(ot, delay):
     if delay: sleep(0.5)
     return choice(moves)
 
-# Level 2 AI: the ai tries to maximize its piece count for every move
+# Level 2 AI: the ai tries to capture corners and prevent capturing buffer pieces
 def level2(ot, delay):
     moves = ot.get_possible_moves()
     score_move = [-99999, [None]]
@@ -44,7 +44,8 @@ def level2(ot, delay):
     if delay: sleep(0.5)
     return choice(score_move[1])
 
-def level3(ot, delay):
+# Level 3 AI: looks 3 move ahead, focus on capturing corner and important tiles, prevent from capturing buffer zones
+def level3(ot):
     moves = ot.get_possible_moves()
     score_move = [-99999, [None]]
     for move in moves:
@@ -53,19 +54,10 @@ def level3(ot, delay):
         new_score = negamax(temp_ot, 2, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
         if new_score > score_move[0]: score_move = [new_score, [move]]
         elif new_score == score_move[0]: score_move[1].append(move)
-    print("negamax", score_move)
-    score_move = [-99999, [None]]
-    for move in moves:
-        temp_ot = deepcopy(ot)
-        temp_ot.make_move(move)
-        new_score = minimax(temp_ot, 2, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
-        if new_score > score_move[0]: score_move = [new_score, [move]]
-        elif new_score == score_move[0]: score_move[1].append(move)
-    print("minimax", score_move)
     return choice(score_move[1])
 
-def level4(ot, delay):
-    # Early game (move 1-10), Mid game (move 11-52), End game (move 53-60)
+def level4(ot):
+    # Early game (move 1-10), Mid game (move 11-51), End game (move 52-60)
     moves = ot.get_possible_moves()
     score_move = [-99999, [None]]
     for move in moves:
@@ -74,7 +66,6 @@ def level4(ot, delay):
         if ot.move_no < 51:
             new_score = negamax(temp_ot, 2, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
         else:
-            print("ho")
             new_score = negamax_late(temp_ot, 10, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
         if new_score > score_move[0]: score_move = [new_score, [move]]
         elif new_score == score_move[0]: score_move[1].append(move)
@@ -94,40 +85,12 @@ def level5(ot, delay):
 def level6(ot, delay):
     raise NotImplementedError
 
-# Given an othello object state, return the score of that state (max for black aka player 1, min for white)
+# Given an othello object state, return the score of that state based on some tile score (max for black aka player 1, min for white)
 def heuristic_eval(state):
     score = 0
     for i in range(8):
         for j in range(8):
             score += val[i][j] * (1 if state[i][j] == 1 else -1 if state[i][j] == 2 else 0)
-    return score
-
-def minimax(ot, depth, alpha, beta):
-    if depth == 0 or ot.check_victory() != 0:
-        return heuristic_eval(ot.board)
-    moves = ot.get_possible_moves()
-    ot.check_no_move(moves)
-    # !!!
-    if ot.turn == 1:
-        score = -99999
-        for move in moves:
-            temp_ot = deepcopy(ot)
-            temp_ot.make_move(move)
-            new_score = minimax(temp_ot, depth - 1, alpha, beta)
-            score = max(score, new_score)
-            alpha = max(alpha, score)
-            if beta <= alpha:
-                break
-    elif ot.turn == 2:
-        score = 99999
-        for move in moves:
-            temp_ot = deepcopy(ot)
-            temp_ot.make_move(move)
-            new_score = minimax(temp_ot, depth - 1, alpha, beta)
-            score = min(score, new_score)
-            beta = min(beta, score)
-            if beta <= alpha:
-                break
     return score
 
 
