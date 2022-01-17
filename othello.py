@@ -1,11 +1,8 @@
 import copy
-from msilib.schema import Error
 import sys
 import operator
 import random
 import time
-from xml.dom import NoDataAllowedErr
-from othello_ai import AI_move
 
 
 class Othello():
@@ -216,7 +213,7 @@ def human_vs_human(ot):
         print(f"Congratulations! {winner} wins the game!")
 
 def human_vs_ai(ot, level): #THIS IS NOT FUNCTIONING ANYMORE
-    raise NoDataAllowedErr
+    raise NotImplemented
     # Loop through while the game is not ended; human is player 1 (goes first)
     while(True):
         print(f"It is your turn")
