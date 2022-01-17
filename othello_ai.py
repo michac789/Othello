@@ -50,7 +50,7 @@ def level3(ot, delay):
     for move in moves:
         temp_ot = deepcopy(ot)
         temp_ot.make_move(move)
-        new_score = negamax(temp_ot, 2) * (1 if temp_ot.turn == 2 else -1)
+        new_score = negamax(temp_ot, 2, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
         if new_score > score_move[0]: score_move = [new_score, [move]]
         elif new_score == score_move[0]: score_move[1].append(move)
     print("negamax", score_move)
@@ -111,7 +111,7 @@ def minimax(ot, depth, alpha, beta):
     return score
 
 
-def negamax(ot, depth):
+def negamax(ot, depth, alpha, beta):
     if depth == 0 or ot.check_victory() != 0:
         return heuristic_eval(ot.board)
     moves = ot.get_possible_moves()
@@ -120,8 +120,11 @@ def negamax(ot, depth):
     for move in moves:
         temp_ot = deepcopy(ot)
         temp_ot.make_move(move)
-        new_score = negamax(temp_ot, depth - 1) * (1 if ot.turn == 1 else -1)
+        new_score = negamax(temp_ot, depth - 1, -beta, -alpha) * (1 if ot.turn == 1 else -1)
         score = max(score, new_score)
+        alpha = max(alpha, score)
+        if beta <= alpha:
+            break
     return score * (1 if ot.turn == 1 else -1)
 
 # This AI picks the move that maximizes its piece in the next state; it is bad, as it loses quite frequently even with level 1 ai
