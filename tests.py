@@ -123,7 +123,7 @@ class check_victory_func(unittest.TestCase):
         self.ot.update_piece_count()
         self.ot.turn = 2
         self.assertEqual(len(self.ot.get_possible_moves()), 0)
-        self.ot.skip_turn = 2
+        self.ot.no_more_move = True
         self.assertEqual(self.ot.check_victory(), 1)
         
     # DO MORE TEST

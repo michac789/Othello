@@ -25,6 +25,7 @@ class Game():
         self.game_menu = "start"
         self.game_state = "prep" # State: prep, play, end
         self.confirmation_action = "" # Confirmation window displayer
+        self.tracker = False # Track to only launch method check_no_move once every time a move is done
         
         # Choose modes in 'pre_classic' state
         self.classic_mode = "Human" # 'Human' by default for 2 players, or 'AI' against computer, or "AI2" for both computer players
@@ -172,10 +173,11 @@ class Game():
         self.ot.set_initial_position(self.init_white, self.init_black)
         self.ot.turn = 1
         self.game_state = "play"
+        self.tracker = False
         self.time_start1 = pygame.time.get_ticks()
         pygame.mixer.music.load(BGM_GAME)
         pygame.mixer.music.play(loops = -1)
-        self.ai_turn = -1
+        self.ai_turn, self.human_turn = -1, -1
         if self.classic_mode == "AI":
             self.classic_time, self.classic_undo = -1, True
             self.ai_turn = (1 if self.classic_ai_black else 2)
@@ -335,9 +337,11 @@ class Game():
             tiles.append(row_tiles)
         self.display_icon()
         
-        # Continue to next turn if there are no moves available; end game if no moves in 2 consecutive turns
+        # Generate all valid moves, continue to next turn if there are no moves available; end game if no moves in 2 consecutive turns
         moves = self.ot.get_possible_moves()
-        self.ot.check_no_move(moves)
+        if not self.tracker:
+            self.ot.check_no_move(moves)
+            self.tracker = True
         
         # Keep track of time if time limit is given; opponent wins if your time runs out and there are still moves possible to made
         if self.classic_time != -1 and self.game_state != "end":
@@ -359,7 +363,7 @@ class Game():
                     circ = pygame.draw.circle(self.screen, (white if self.ot.board[i][j] == 2 else black), coordinate, self.piece_radius)
                 if (i, j) in moves:
                     circ = pygame.draw.circle(self.screen, moves_color, coordinate, self.piece_radius, int(self.piece_radius / 2))
-                if self.ot.recent_move == (i, j):
+                if self.ot.move_no > 0 and self.ot.moves_made[self.ot.move_no - 1][2] == (i, j):
                     circ = pygame.draw.circle(self.screen, recent_move_color, coordinate, self.piece_radius / 3)
         
         # Check if victory
@@ -415,6 +419,7 @@ class Game():
             self.loop += 1
             if self.loop == 2:
                 self.ot.make_move(AI_move(self.ot, self.classic_ai_level, True))
+                self.tracker = False
                 if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound((SFX_WHITE_MOVE if self.ai_turn == 2 else SFX_BLACK_MOVE)))
                 self.loop = 0
         
@@ -424,6 +429,7 @@ class Game():
             if self.loop == 2:
                 if self.ot.turn == 1: self.ot.make_move(AI_move(self.ot, self.classic_ai2_level_b, False))
                 elif self.ot.turn == 2: self.ot.make_move(AI_move(self.ot, self.classic_ai2_level_w, False))
+                self.tracker = False
                 if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound((SFX_WHITE_MOVE if self.ot.turn == 1 else SFX_BLACK_MOVE)))
                 self.loop = 0
         
@@ -432,12 +438,14 @@ class Game():
         if self.confirmation_action == "":
             left, _, _ = pygame.mouse.get_pressed()
             if left == 1:
-                if self.game_state == "play" and (self.classic_mode == "human" or self.human_turn == self.ot.turn):
+                #if self.game_state == "play" and (self.classic_mode == "human" or self.human_turn == self.ot.turn):
+                if self.game_state == "play":
                     for i in range(self.dim_height):
                         for j in range(self.dim_width):
                             if tiles[i][j].collidepoint(mouse):
                                 if (i, j) in moves:
                                     self.ot.make_move((i, j))
+                                    self.tracker = False
                                     if self.ot.turn == 1:
                                         self.time_start1 = pygame.time.get_ticks()
                                         if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_WHITE_MOVE))
@@ -484,8 +492,7 @@ class Game():
                         if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_UNDO_GAME))
                         self.ot.undo_move()
                         if self.classic_mode == "AI" and len(self.ot.moves_made) > 1:
-                            if self.ot.move_no == 1 and self.ot.moves_made[self.ot.move_no][1][4] == self.ai_turn: self.confirmation_action = "Reset"
-                            if self.ot.moves_made[self.ot.move_no][1][4] == self.ai_turn: self.ot.undo_move()
+                            if self.ot.moves_made[self.ot.move_no][1] == self.ai_turn: self.ot.undo_move()
                     time.sleep(0.2)
                     if self.confirmation_action == "Quit":
                         if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_QUIT_GAME))

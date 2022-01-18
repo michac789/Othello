@@ -8,7 +8,7 @@ from othello_ai import AI_move
 N = 1000
 
 def main():
-    simulate(11, 1, 1)
+    simulate(1000, 1, 1)
 
 
 # This function simulates N games with 2 ai levels representing black and white, printing the number and percentage of wins, loses and draws
