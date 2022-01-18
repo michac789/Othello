@@ -113,7 +113,7 @@ def negamax(ot, depth, alpha, beta):
 
 def negamax_late(ot, depth, alpha, beta):
     if depth == 0 or ot.check_victory() != 0:
-        return heur_pieces(ot.black_tiles, ot.white_tiles)
+        return heur_pieces(ot)
     moves = ot.get_possible_moves()
     ot.check_no_move(moves)
     score = -99999
@@ -127,13 +127,49 @@ def negamax_late(ot, depth, alpha, beta):
             break
     return score * (1 if ot.turn == 1 else -1)
 
-# Given a board, this function will return the difference of black pieces and white pieces
-def heur_pieces(ot_black, ot_white):
-    return ot_black - ot_white
+def heuristic_trial(ot):
+    pass
 
+# Given an othello object, this function will return the difference of black pieces and white pieces
+def heur_pieces(ot):
+    return ot.black_tiles - ot.white_tiles
 
+# Given an othello object, this function will return the number of moves possible to be made
+def heur_mobiity(ot):
+    moves = ot.get_possible_moves()
+    return len(moves)
 
+# Given an othello object, this function .. #TODO
+def heur_stable_pieces(ot):
+    all_tiles = [(i, j) for i in range(ot.height) for j in range(ot.width)]
+    stable_black, stable_white = 0, 0
+    for tile in all_tiles:
+        tile_color = ot.board[tile[0]][tile[1]]
+        if tile_color != 0:
+            for t in ot.surrounding_tiles:
+                if ot.is_valid_tile((tile[0] + t[0], tile[1] + t[1])):
+                    if ot.board[tile[0] + t[0]][tile[1] + t[1]] == tile_color % 2 + 1:
+                        pass
+                    elif ot.board[tile[0] + t[0]][tile[1] + t[1]] == tile_color: continue
+                    elif ot.board[tile[0] + t[0]][tile[1] + t[1]] == 0: break
+    raise NotImplementedError
 
+    # def get_possible_moves(self):
+    #     possible_moves = set()
+    #     all_tiles = [(i, j) for i in range(self.height) for j in range(self.width)]
+    #     for tile in all_tiles:
+    #         if self.board[tile[0]][tile[1]] == 0:
+    #             for t in self.surrounding_tiles:
+    #                 if self.is_valid_tile((tile[0] + t[0], tile[1] + t[1])):
+    #                     if self.board[tile[0] + t[0]][tile[1] + t[1]] == self.turn % 2 + 1:
+    #                         k = 1
+    #                         while True:
+    #                             k += 1
+    #                             if not self.is_valid_tile((tile[0] + t[0] * k, tile[1] + t[1] * k)): break
+    #                             if self.board[tile[0] + t[0] * k][tile[1] + t[1] * k] == 0: break
+    #                             if self.board[tile[0] + t[0] * k][tile[1] + t[1] * k] == self.turn:
+    #                                 possible_moves.add(tile)
+    #     return list(possible_moves)
 
 # This AI picks the move that maximizes its piece in the next state; it is bad, as it loses quite frequently even with level 1 ai
 def extra_ai1(ot, delay):
