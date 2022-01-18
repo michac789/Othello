@@ -19,6 +19,9 @@ class Othello():
         self.black_tiles = 0
         self.move_no = 0
         self.surrounding_tiles = [(i, j) for i in range(-1, 2, 1) for j in range(-1, 2, 1) if i != 0 or j != 0]
+        
+        self.no_more_move = False
+        
         # Used when time runs out in runner.py file to force a certain player to win
         self.force_win = -1 
         # Dictionary mapping move_no to be made with tuple (current board state, (tuple2)) for tracking purpose & undo functionality
@@ -110,25 +113,36 @@ class Othello():
     # Check for a certain board state, return 2 if white wins, 1 if black wins, 3 if draw, 0 if neither wins
     def check_victory(self):
         if self.force_win != -1: return (self.force_win)
-        if self.black_tiles + self.white_tiles == self.height * self.width or self.skip_turn == 2:
+        if self.black_tiles + self.white_tiles == self.height * self.width or self.skip_turn == 2 or self.no_more_move == True:
             self.moves_made[self.move_no] = (copy.deepcopy(self.board), (self.recent_move, self.stored_move, self.skip_index, self.skip_turn, self.last_player_turn))
             return (2 if self.white_tiles > self.black_tiles else 1 if self.white_tiles < self.black_tiles else 3)
         return 0
     
     # Update some self tracker attribute, which adjust self.skip_turn to n, where for n consecutive turns there are no moves possible
     # Always call this function after getting all moves from get_possible_moves
+    # def check_no_move(self, moves):
+    #     if len(moves) == 0:
+    #         if self.skip_index != self.turn and self.skip_turn == 1:
+    #             self.skip_turn = 2
+    #         if self.recent_move != self.stored_move:
+    #             self.skip_turn = 1
+    #             self.skip_index = self.turn
+    #             self.turn = self.turn % 2 + 1
+    #         self.stored_move = self.recent_move
+    #     else:
+    #         self.skip_turn = 0
+    #         self.skip_index = -1
+    
+    # Always call this function after get_possible_moves, returns True if there is no move and do some modifications, otherwise returns False
     def check_no_move(self, moves):
         if len(moves) == 0:
-            if self.skip_index != self.turn and self.skip_turn == 1:
-                self.skip_turn = 2
-            if self.recent_move != self.stored_move:
-                self.skip_turn = 1
-                self.skip_index = self.turn
-                self.turn = self.turn % 2 + 1
-            self.stored_move = self.recent_move
+            self.turn = self.turn % 2 + 1
+            if len(self.get_possible_moves()) == 0:
+                self.no_more_move = True
+            return True
         else:
-            self.skip_turn = 0
-            self.skip_index = -1
+            return False
+            
     
     # Undo last move made, revert all self properties to previous state, returns False if no more undo possible, otherwise True
     def undo_move(self):
