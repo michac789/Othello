@@ -1,8 +1,4 @@
 import copy
-import sys
-import operator
-import random
-import time
 
 
 class Othello():
