@@ -8,8 +8,8 @@ from csv import writer
 
 
 def main():
-    #simulate(3, 1, 1)
-    export_data(3, 1, 1)
+    simulate(10, 5, 4)
+    #export_data(20, 4, 5)
 
 
 # This function simulates N games with 2 ai levels representing black and white, printing the number and percentage of wins, loses and draws

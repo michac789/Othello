@@ -16,6 +16,15 @@ val = [[10, -3, 2, 1, 1, 2, -3, 10],
        [-3, -5, 0, 0, 0, 0, -5, -2],
        [10, -3, 2, 1, 1, 2, -3, 10]]
 
+val2 = [[5, -3, 2, 1, 1, 2, -3, 5],
+       [-3, -5, 0, 0, 0, 0, -5, -2],
+       [2, 0, 0, 0, 0, 0, 0, 2],
+       [1, 0, 0, 0, 0, 0, 0, 1],
+       [1, 0, 0, 0, 0, 0, 0, 1],
+       [2, 0, 0, 0, 0, 0, 0, 2],
+       [-3, -5, 0, 0, 0, 0, -5, -2],
+       [5, -3, 2, 1, 1, 2, -3, 5]]
+
 # Given an othello object and ai level, return the move made by the ai
 def AI_move(othello, level, delay):
     if level == 1: return level1(othello, delay)
@@ -59,11 +68,12 @@ def level3(ot):
 def level4(ot):
     # Early game (move 1-10), Mid game (move 11-51), End game (move 52-60)
     moves = ot.get_possible_moves()
+    ot.check_no_move(moves)
     score_move = [-99999, [None]]
     for move in moves:
         temp_ot = deepcopy(ot)
         temp_ot.make_move(move)
-        if ot.move_no < 51:
+        if ot.move_no < 53: # <51 for better
             new_score = negamax(temp_ot, 2, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
         else:
             new_score = negamax_late(temp_ot, 10, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
@@ -71,18 +81,22 @@ def level4(ot):
         elif new_score == score_move[0]: score_move[1].append(move)
     return choice(score_move[1])
 
-def level5(ot, delay):
+def level5(ot):
     moves = ot.get_possible_moves()
+    ot.check_no_move(moves)
     score_move = [-99999, [None]]
     for move in moves:
         temp_ot = deepcopy(ot)
         temp_ot.make_move(move)
-        new_score = negamax_late(temp_ot, 0, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
+        if ot.move_no < 53:
+            new_score = negamax2(temp_ot, 2, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
+        else:
+            new_score = negamax_late(temp_ot, 10, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
         if new_score > score_move[0]: score_move = [new_score, [move]]
         elif new_score == score_move[0]: score_move[1].append(move)
     return choice(score_move[1])
 
-def level6(ot, delay):
+def level6(ot):
     raise NotImplementedError
 
 # Given an othello object state, return the score of that state based on some tile score (max for black aka player 1, min for white)
@@ -93,12 +107,20 @@ def heuristic_eval(state):
             score += val[i][j] * (1 if state[i][j] == 1 else -1 if state[i][j] == 2 else 0)
     return score
 
+def heuristic_eval2(state):
+    score = 0
+    for i in range(8):
+        for j in range(8):
+            score += val2[i][j] * (1 if state[i][j] == 1 else -1 if state[i][j] == 2 else 0)
+    return score
+
 
 def negamax(ot, depth, alpha, beta):
     if depth == 0 or ot.check_victory() != 0:
         return heuristic_eval(ot.board)
     moves = ot.get_possible_moves()
     ot.check_no_move(moves)
+    if ot.check_victory() != 0: return heuristic_eval(ot.board)
     score = -99999
     for move in moves:
         temp_ot = deepcopy(ot)
@@ -110,6 +132,23 @@ def negamax(ot, depth, alpha, beta):
             break
     return score * (1 if ot.turn == 1 else -1)
 
+
+def negamax2(ot, depth, alpha, beta):
+    if depth == 0 or ot.check_victory() != 0:
+        return heuristic_eval2(ot.board)
+    moves = ot.get_possible_moves()
+    ot.check_no_move(moves)
+    if ot.check_victory() != 0: return heuristic_eval2(ot.board)
+    score = -99999
+    for move in moves:
+        temp_ot = deepcopy(ot)
+        temp_ot.make_move(move)
+        new_score = negamax(temp_ot, depth - 1, -beta, -alpha) * (1 if ot.turn == 1 else -1)
+        score = max(score, new_score)
+        alpha = max(alpha, score)
+        if beta <= alpha:
+            break
+    return score * (1 if ot.turn == 1 else -1)
 
 def negamax_late(ot, depth, alpha, beta):
     if depth == 0 or ot.check_victory() != 0:
