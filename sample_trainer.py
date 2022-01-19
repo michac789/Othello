@@ -12,6 +12,7 @@ import sklearn.linear_model
 import sklearn.metrics
 import csv
 import os
+import pickle
 
 
 # Load training data, split into training and test sets, train and analyze model, getting result from new data
@@ -28,10 +29,20 @@ def main():
     predictions2 = logreg_model.predict(x_test2)
     analyze_model_logreg(logreg_model, y_test2, predictions2)
     
-    # Using the above models to predict result based on some evidences
+    # Save model in a wav file
+    print("Saving models...")
+    save_path_1 = os.path.join("learning_data", "sample_linreg.sav")
+    save_path_2 = os.path.join("learning_data", "sample_logreg.sav")
+    pickle.dump(linreg_model, open(save_path_1, 'wb'))
+    pickle.dump(logreg_model, open(save_path_2, 'wb'))
+    print("Models saved.\n")
+
+    # Using the saved models to predict result based on some evidences
     # Expected func: y=3a1+2a2-a3; 10, 7, 6, 4; win win lose lose
+    loaded_model1 = pickle.load(open(save_path_1, 'rb'))
+    loaded_model2 = pickle.load(open(save_path_2, 'rb'))
     data = [[6, 1, 10], [4, 2, 9], [1, 2, 1], [1, 2, 3]]
-    make_predictions(data, linreg_model, logreg_model)
+    make_predictions(data, loaded_model1, loaded_model2)
 
 
 # Load the necessary data from the csv file, divide into training and test parameters and outcome, return those values
@@ -96,9 +107,11 @@ def analyze_model_logreg(model, y_test, predictions):
 
 # Based on model 1 (linear regression) and model 2 (logistic regression), print the predicted outcome based on the test cases
 def make_predictions(test_cases, model1, model2):
+    print("Predictions based on test cases:")
     print(model1.predict(test_cases))
     print(model2.predict(test_cases))
     print(model2.predict_proba(test_cases))
+    print("")
 
 
 if __name__ == "__main__":
