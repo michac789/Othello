@@ -18,18 +18,20 @@ import os
 def main():
     # (1) Linear Regression:
     x_train1, x_test1, y_train1, y_test1 = load_data(os.path.join("learning_data", "sample1.csv"), 1)
-    model1 = train_model_linreg(x_train1, y_train1)
-    predictions1 = model1.predict(x_test1)
-    analyze_model_linreg(model1, y_test1, predictions1)
+    linreg_model = train_model_linreg(x_train1, y_train1)
+    predictions1 = linreg_model.predict(x_test1)
+    analyze_model_linreg(linreg_model, y_test1, predictions1)
     
     # (2) Logistic Regression
     x_train2, x_test2, y_train2, y_test2 = load_data(os.path.join("learning_data", "sample2.csv"), 2)
-    model2 = train_model_logreg(x_train2, y_train2)
-    predictions2 = model2.predict(x_test2)
-    analyze_model_logreg(model2, y_test2, predictions2)
+    logreg_model = train_model_logreg(x_train2, y_train2)
+    predictions2 = logreg_model.predict(x_test2)
+    analyze_model_logreg(logreg_model, y_test2, predictions2)
     
-    # Using the above models to predict based on some evidences
-    # TODO
+    # Using the above models to predict result based on some evidences
+    # Expected func: y=3a1+2a2-a3; 10, 7, 6, 4; win win lose lose
+    data = [[6, 1, 10], [4, 2, 9], [1, 2, 1], [1, 2, 3]]
+    make_predictions(data, linreg_model, logreg_model)
 
 
 # Load the necessary data from the csv file, divide into training and test parameters and outcome, return those values
@@ -69,6 +71,7 @@ def analyze_model_linreg(model, y_test, predictions):
 
 # Print out the true positive (win) rate and true negative (lose) rate (logistic regression)
 def analyze_model_logreg(model, y_test, predictions):
+    print("Coefficients gained: \n", model.coef_)
     positive_labels_count, negative_labels_count, positive_labels_accurate, negative_labels_accurate = 0, 0, 0, 0
     for label, prediction in zip(y_test, predictions):
         if label == "win":
@@ -89,6 +92,13 @@ def analyze_model_logreg(model, y_test, predictions):
         print(f"True Negative Rate: {100 * specificity:.2f}%")
     else: print("True Negative Rate: Undetermined (not enough test data)")
     print("")
+
+
+# Based on model 1 (linear regression) and model 2 (logistic regression), print the predicted outcome based on the test cases
+def make_predictions(test_cases, model1, model2):
+    print(model1.predict(test_cases))
+    print(model2.predict(test_cases))
+    print(model2.predict_proba(test_cases))
 
 
 if __name__ == "__main__":
