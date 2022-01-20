@@ -165,6 +165,16 @@ class Game():
         self.bgm_hover = (True if button_dict[0].collidepoint(mouse) else False)
         self.sfx_hover = (True if button_dict[1].collidepoint(mouse) else False)
     
+    # Before play states, display the title of the current screen and make some common settings
+    def display_title(self, title):
+        self.screen.fill(black)
+        title = self.titleFont.render(title, True, mode_title)
+        titleRect = title.get_rect()
+        titleRect.center = (self.virtual_width / 2, 50)
+        self.screen.blit(title, titleRect)
+        self.classic_choose(-1)
+        self.play_main_bgm()
+    
     # Prepare othello object from play state when first launched (prep stage)
     def play_set_config(self):
         self.prevent_undo = False
@@ -235,14 +245,7 @@ class Game():
             if button_dict[i].collidepoint(mouse): self.hover_main[i] = True
         
     def state_pre_classic(self):
-        # Display game mode as main title
-        self.screen.fill(black)
-        title = self.titleFont.render("Classic Mode", True, mode_title)
-        titleRect = title.get_rect()
-        titleRect.center = (self.virtual_width / 2, 50)
-        self.screen.blit(title, titleRect)
-        self.classic_choose(-1)
-        self.play_main_bgm()
+        self.display_title("Classic Mode")
         
         # Display various buttons
         if self.classic_mode == "Human":
@@ -310,11 +313,16 @@ class Game():
                 self.hover_pre_classic[i] = True
     
     def state_pre_custom(self): #TODO        
-        self.init_white = [(0, 0), (0, 1), (0, 2), (0, 3)]
-        self.init_black = [(1, 0), (1, 1), (1, 2), (1, 3)]
-        self.dim_height, self.dim_width = 4, 4
-        self.game_menu = "play"
-        time.sleep(0.2)
+        self.display_title("Custom Mode")
+        
+        # time.sleep(5)
+        
+        # self.init_white = [(0, 0), (0, 1), (0, 2), (0, 3)]
+        # self.init_black = [(1, 0), (1, 1), (1, 2), (1, 3)]
+        # self.dim_height, self.dim_width = 4, 4
+        # self.game_menu = "play"
+        # time.sleep(0.2)
+        
         # TEMPORARY PLACEHOLDER TODO
 
     def state_play(self):

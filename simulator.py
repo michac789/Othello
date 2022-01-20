@@ -8,7 +8,7 @@ from csv import writer
 
 
 def main():
-    simulate(10, 5, 4)
+    simulate(100, 3, 3)
     #export_data(20, 4, 5)
 
 
@@ -22,6 +22,8 @@ def simulate(N, level_black, level_white):
         while True:
             moves = ot.get_possible_moves()
             ot.check_no_move(moves)
+            moves = ot.get_possible_moves()
+            #print(len(moves))
             if ot.check_victory() != 0: break
             if ot.turn == 1: ot.make_move(AI_move(ot, level_black, False))
             elif ot.turn == 2: ot.make_move(AI_move(ot, level_white, False))
