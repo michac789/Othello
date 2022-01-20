@@ -283,14 +283,10 @@ class Game():
         self.display_buttons()
         self.display_icon()
         if self.classic_mode == "Human":
-            button_texts = ["Choose classic mode:",
-                            "Choose time constraint:", "Allow undo move:", "",
-                            "Human VS Human", "Human VS AI", "AI VS AI",
+            button_texts = ["Choose classic mode:", "Choose time constraint:", "Allow undo move:", "", "Human VS Human", "Human VS AI", "AI VS AI",
                             "No Limit", "5 Mins", "10 Mins", "15 Mins", "20 Mins", "30 Mins", "Yes", "No"]
         elif self.classic_mode == "AI" or self.classic_mode == "AI2":
-            button_texts = ["Choose classic mode:",
-                            "Choose AI difficulty:", "Your color piece:", "",
-                            "Human VS Human", "Human VS AI", "AI VS AI",
+            button_texts = ["Choose classic mode:", "Choose AI difficulty:", "Your color piece:", "", "Human VS Human", "Human VS AI", "AI VS AI",
                             "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6", "Black", "White"]
         if self.classic_mode == "AI2": button_texts[3] = "Level for this piece:"
         button_dict = {}
@@ -332,9 +328,9 @@ class Game():
         
         # time.sleep(5)
         
-        # self.init_white = [(0, 0), (0, 1), (0, 2), (0, 3)]
-        # self.init_black = [(1, 0), (1, 1), (1, 2), (1, 3)]
-        # self.dim_height, self.dim_width = 4, 4
+        self.init_white = [(0, 0), (0, 1), (0, 2), (0, 3)]
+        self.init_black = [(1, 0), (1, 1), (1, 2), (1, 3)]
+        self.dim_height, self.dim_width = 4, 4
         # self.game_menu = "play"
         # time.sleep(0.2)
         
@@ -545,16 +541,12 @@ if __name__ == "__main__":
 
 # TODO
 """
-
+- Custom mode (othello sizes & starting positions)
 3. Create pre_custom feature user interface
 
 5. 'How to play' pages and pics, UI
-6. AI minimax algorithm??
+
 7. Puzzle mode??
-
-- Pre_custom UI
-- Fix UI, texts and colors
-
 
 - Custom othello sizes and vs ai mode
 - etc.. (coming soon)

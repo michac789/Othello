@@ -8,7 +8,7 @@ from csv import writer
 
 
 def main():
-    simulate(100, 4, 4)
+    simulate(100, 3, 4)
     #export_data(20, 4, 5)
 
 
