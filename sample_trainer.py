@@ -3,7 +3,7 @@ This is a sample trainer file, used to test both linear regression and logistic 
 Sample1.csv is trained using linear regression, while sample2.csv is trained using logistic regression.
 Assuming you are in the main 'Othello' directory, launch the file immediately to train sample1.csv and sample2.csv.
 Some analytics from both linear and logistic regression will be printed out on the terminal window.
-Please note that this is only using some arbitrary data, and not used to train the othello heuristic function.
+Please note that this is only using some arbitrary data, and not the one used to train the othello heuristic function.
 """
 
 import sklearn

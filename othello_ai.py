@@ -5,6 +5,7 @@ All AI algorithms are handled in this file
 from copy import deepcopy
 from random import choice
 from time import sleep
+import pickle
 
 # Board score used for heuristic function
 val = [[10, -3, 2, 1, 1, 2, -3, 10],
@@ -106,10 +107,8 @@ def heuristic_eval(state):
     return score
 
 def heuristic_eval2(state):
-    score = 0
-    for i in range(8):
-        for j in range(8):
-            score += val2[i][j] * (1 if state[i][j] == 1 else -1 if state[i][j] == 2 else 0)
+    model = pickle.load(open("trial_model.sav", 'rb'))
+    score = model.predict(state)
     return score
 
 def negamax(ot, depth, alpha, beta): #TESTED OKAY

@@ -12,7 +12,7 @@ from csv import writer
 def main():
     #simulate(100, 3, 4)
     #export_data(20, 4, 5)
-    export_tile_heur(10, 1, 1)
+    export_tile_heur(1000, 1, 1)
 
 # This function simulates N games with 2 ai levels representing black and white, printing the number and percentage of wins, loses and draws
 def simulate(N, level_black, level_white):
@@ -64,9 +64,9 @@ def export_tile_heur(N, level_black, level_white):
                 row = get_values(ot.moves_made[key][0])
                 row.append(move_no)
                 move_no += 1
-                if winner == 3: row.append(0)
-                elif winner == ot.moves_made[key][1]: row.append(1)
-                else: row.append(-1)
+                if winner == 1: row.append(1)
+                elif winner == 2: row.append(-1)
+                else: row.append(0)
                 csv_writer.writerow(row)
                 
     print(f"Out of {N} games, black wins {win_black} times, white wins {win_white} times, and {N - win_black - win_white} draws.")
