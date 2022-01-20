@@ -70,6 +70,7 @@ def level4(ot):
     moves = ot.get_possible_moves()
     ot.check_no_move(moves)
     score_move = [-99999, [None]]
+    print(ot.move_no)
     for move in moves:
         temp_ot = deepcopy(ot)
         temp_ot.make_move(move)

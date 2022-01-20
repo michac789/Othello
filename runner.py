@@ -46,7 +46,8 @@ class Game():
         
         # Various hover effects tracker
         self.hover_main = [False for i in range(9)]
-        self.hover_pre_classic = [False for i in range(17)]
+        self.hover_pre_buttons = [False for i in range(2)]
+        self.hover_pre_classic = [False for i in range(15)]
         self.hover_play_util = [False for i in range(11)]
         self.hover_yes, self.hover_no = False, False
     
@@ -165,7 +166,7 @@ class Game():
         self.bgm_hover = (True if button_dict[0].collidepoint(mouse) else False)
         self.sfx_hover = (True if button_dict[1].collidepoint(mouse) else False)
     
-    # Before play states, display the title of the current screen and make some common settings
+    # Used in pre__ states, display the title of the current screen and make some common settings
     def display_title(self, title):
         self.screen.fill(black)
         title = self.titleFont.render(title, True, mode_title)
@@ -174,6 +175,38 @@ class Game():
         self.screen.blit(title, titleRect)
         self.classic_choose(-1)
         self.play_main_bgm()
+    
+    # Used in pre__ states, display 'play' and 'back' buttons, along with its functionality
+    def display_buttons(self):
+        # Draw 'back to menu' and 'play game' buttons
+        buttons = ["Back to Menu", "Play Game"]
+        button_dict = {}
+        for i in range(2):
+            buttonRect = pygame.Rect(self.virtual_width * (0.1 + 0.4 * (i)), self.virtual_height * 0.88, self.virtual_width * 0.3, self.virtual_height / 10)
+            buttonText = self.prepgoFont.render(buttons[i], True, (prep_option_color3 if self.hover_pre_buttons[i] == False else prep_button_hover_color2))
+            button_dict[i] = buttonRect
+            buttonTextRect = buttonText.get_rect()
+            buttonTextRect.center = buttonRect.center
+            pygame.draw.rect(self.screen, (prep_button_color2 if self.hover_pre_buttons[i] == False else prep_rect_hover_color), buttonRect)
+            self.screen.blit(buttonText, buttonTextRect)
+        
+        # Implement buttons functionality (when clicked & hover effect)
+        left, _, _ = pygame.mouse.get_pressed()
+        mouse = pygame.mouse.get_pos()
+        if left == 1:
+            if button_dict[0].collidepoint(mouse):
+                if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
+                self.game_menu = "start"
+            if button_dict[1].collidepoint(mouse):
+                if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
+                self.init_white, self.init_black = [(3, 3), (4, 4)], [(3, 4), (4, 3)]
+                self.dim_height, self.dim_width = 8, 8
+                self.game_menu = "play"
+                time.sleep(0.2)
+        for i in range(2):
+            self.hover_pre_buttons[i] = False
+            if button_dict[i].collidepoint(mouse):
+                self.hover_pre_buttons[i] = True
     
     # Prepare othello object from play state when first launched (prep stage)
     def play_set_config(self):
@@ -245,27 +278,21 @@ class Game():
             if button_dict[i].collidepoint(mouse): self.hover_main[i] = True
         
     def state_pre_classic(self):
+        # Display title and various buttons
         self.display_title("Classic Mode")
-        
-        # Display various buttons
+        self.display_buttons()
+        self.display_icon()
         if self.classic_mode == "Human":
             button_texts = ["Choose classic mode:",
                             "Choose time constraint:", "Allow undo move:", "",
                             "Human VS Human", "Human VS AI", "AI VS AI",
-                            "No Limit", "5 Mins", "10 Mins", "15 Mins", "20 Mins", "30 Mins", "Yes", "No",
-                            "Back to Menu", "Play Game"]
-        elif self.classic_mode == "AI":
+                            "No Limit", "5 Mins", "10 Mins", "15 Mins", "20 Mins", "30 Mins", "Yes", "No"]
+        elif self.classic_mode == "AI" or self.classic_mode == "AI2":
             button_texts = ["Choose classic mode:",
                             "Choose AI difficulty:", "Your color piece:", "",
                             "Human VS Human", "Human VS AI", "AI VS AI",
-                            "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6", "Black", "White",
-                            "Back to Menu", "Play Game"]
-        elif self.classic_mode == "AI2":
-            button_texts = ["Choose classic mode:",
-                            "Choose AI difficulty:", "Level for this piece:", "",
-                            "Human VS Human", "Human VS AI", "AI VS AI",
-                            "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6", "Black", "White",
-                            "Back to Menu", "Play Game"]
+                            "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6", "Black", "White"]
+        if self.classic_mode == "AI2": button_texts[3] = "Level for this piece:"
         button_dict = {}
         for i in range(len(button_texts)):
             if 0 <= i <= 3:
@@ -278,19 +305,14 @@ class Game():
             if 7 <= i <= 14:
                 buttonRect = pygame.Rect(self.virtual_width * (0.4 + 0.18 * ((i - 7) % 3)), self.virtual_height * (0.5 + 0.12 * math.floor((i - 7) / 3)), self.virtual_width * 0.15, self.virtual_height / 12)
                 buttonText = self.prepoptionFont.render(button_texts[i], True, (prep_option_color2 if self.hover_pre_classic[i] == False else prep_button_hover_color1))
-            if 15 <= i <= 16:
-                buttonRect = pygame.Rect(self.virtual_width * (0.1 + 0.4 * (i - 15)), self.virtual_height * 0.88, self.virtual_width * 0.3, self.virtual_height / 10)
-                buttonText = self.prepgoFont.render(button_texts[i], True, (prep_option_color3 if self.hover_pre_classic[i] == False else prep_button_hover_color2))
             button_dict[i] = buttonRect
             buttonTextRect = buttonText.get_rect()
             buttonTextRect.center = buttonRect.center
-            if 0 <= i <= 3: pygame.draw.rect(self.screen, black, buttonRect)
-            elif i == 15 or i == 16: pygame.draw.rect(self.screen, (prep_button_color2 if self.hover_pre_classic[i] == False else prep_rect_hover_color), buttonRect)
+            if 0 <= i <= 3: pygame.draw.rect(self.screen, black, buttonRect) 
             else: pygame.draw.rect(self.screen, (prep_button_color1 if self.classic_chosen[i] == False else prep_chosen_color), buttonRect)
             self.screen.blit(buttonText, buttonTextRect)
-        self.display_icon()
 
-        # Buttons functionality when clicked
+        # Buttons functionality when clicked & hover effects
         left, _, _ = pygame.mouse.get_pressed()
         mouse = pygame.mouse.get_pos()
         if left == 1:
@@ -298,22 +320,15 @@ class Game():
                 if button_dict[i].collidepoint(mouse):
                     if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
                     self.classic_choose(i)
-            if button_dict[15].collidepoint(mouse):
-                if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
-                self.game_menu = "start"
-            if button_dict[16].collidepoint(mouse):
-                if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
-                self.init_white, self.init_black = [(3, 3), (4, 4)], [(3, 4), (4, 3)]
-                self.dim_height, self.dim_width = 8, 8
-                self.game_menu = "play"
-                time.sleep(0.2)
-        for i in range(4, 17, 1):
+        for i in range(4, 15, 1):
             self.hover_pre_classic[i] = False
             if button_dict[i].collidepoint(mouse):
                 self.hover_pre_classic[i] = True
     
     def state_pre_custom(self): #TODO        
         self.display_title("Custom Mode")
+        self.display_buttons()
+        self.display_icon()
         
         # time.sleep(5)
         
