@@ -3,15 +3,16 @@ Simulator
 """
 
 from othello import Othello
-from othello_ai import AI_move
+from othello_ai import *
 from csv import writer
 
 
 # Modify this function
 def main():
-    simulate(1000, 3, 4)
-    #export_data(20, 4, 5)
+    #simulate(10, 3, 4)
     #export_tile_heur(1000, 3, 3)
+    export_heuristics(3, 1, 1)
+
 
 # This function simulates N games with 2 ai levels representing black and white, printing the number and percentage of wins, loses and draws
 def simulate(N, level_black, level_white):
@@ -33,6 +34,8 @@ def simulate(N, level_black, level_white):
     win_rate_b, win_rate_w = round(win_black * 100 / N, 2), round(win_white * 100 / N, 2)
     print(f"Win rate: black {win_rate_b}%, white {win_rate_w}%, draw {abs(round(100 - win_rate_b - win_rate_w, 2))}%")
 
+
+# Does simulations similar to 'simulate' func, and extract the heuristics for learning purpose on a seperate csv file
 def export_heuristics(N, level_black, level_white):
     win_black, win_white = 0, 0
     for i in range(N):
@@ -53,9 +56,12 @@ def export_heuristics(N, level_black, level_white):
             csv_writer = writer(infile)
             move_no = 0
             for key in ot.moves_made.keys():
-                row = get_values(ot.moves_made[key][0])
-                row.append(move_no)
+                board = ot.moves_made[key][0]
+                turn = ot.moves_made[key][1]
+                row = [move_no]
                 move_no += 1
+                heuristics = heur_pieces(board), heur_weight(board), heur_mobility(board), heur_parity(board, turn), heur_stablility(board)
+                row.extend(heuristics)
                 if winner == 1: row.append(1)
                 elif winner == 2: row.append(-1)
                 else: row.append(0)
@@ -104,6 +110,7 @@ def export_tile_heur(N, level_black, level_white):
     win_rate_b, win_rate_w = round(win_black * 100 / N, 2), round(win_white * 100 / N, 2)
     print(f"Win rate: black {win_rate_b}%, white {win_rate_w}%, draw {abs(round(100 - win_rate_b - win_rate_w, 2))}%")
 
+
 # Return a list containing 10 values of a certain board state; see above comments for more detail
 def get_values(board):
     a, b, c, d, e, f, g, h, i, j = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -121,35 +128,6 @@ def get_values(board):
             if (p, q) in [(2, 3), (2, 4), (3, 2), (3, 5), (4, 2), (4, 5), (5, 3), (5, 4)]: i += 1 * mul
             if (p, q) in [(3, 3), (4, 4), (4, 4), (3, 3)]: j += 1 * mul
     return [a, b, c, d, e, f, g, h, i, j]
-
-# Simulates N game played by 2 ai levels, exporting necessary information to an external csv file for learning purpose
-def export_data(N, level_black, level_white):
-    win_black, win_white = 0, 0
-    for i in range(N):
-        print(f"Playing game {i+1} out of {N}...")
-        ot = Othello(8, 8)
-        ot.set_initial_position([(3, 3), (4, 4)], [(3, 4), (4, 3)])
-        while True:
-            moves = ot.get_possible_moves()
-            ot.check_no_move(moves)
-            if ot.check_victory() != 0: break
-            if ot.turn == 1: ot.make_move(AI_move(ot, level_black, False))
-            elif ot.turn == 2: ot.make_move(AI_move(ot, level_white, False))
-        if ot.check_victory() == 1: win_black += 1
-        elif ot.check_victory() == 2: win_white += 1
-        
-        with open("data.csv", "w", newline = "") as infile:
-            csv_writer = writer(infile)
-            for key in ot.moves_made.keys():
-                row = []
-                row.append(ot.moves_made[key][0])
-                row.append(ot.moves_made[key][1])
-                row.append(ot.moves_made[key][2])
-                csv_writer.writerow(row)
-            
-    print(f"Out of {N} games, black wins {win_black} times, white wins {win_white} times, and {N - win_black - win_white} draws.")
-    win_rate_b, win_rate_w = round(win_black * 100 / N, 2), round(win_white * 100 / N, 2)
-    print(f"Win rate: black {win_rate_b}%, white {win_rate_w}%, draw {abs(round(100 - win_rate_b - win_rate_w, 2))}%")
 
 
 main()

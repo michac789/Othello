@@ -5,10 +5,12 @@ All AI algorithms are handled in this file
 from copy import deepcopy
 from random import choice
 from time import sleep
-import pickle
+from pickle import load
+from othello import Othello
 
-# Board score used for heuristic function
-val = [[10, -3, 2, 1, 1, 2, -3, 10],
+
+# Board score based on position used for heuristic function
+val1 = [[10, -3, 2, 1, 1, 2, -3, 10],
        [-3, -5, 0, 0, 0, 0, -5, -3],
        [2, 0, 0, 0, 0, 0, 0, 2],
        [1, 0, 0, 0, 0, 0, 0, 1],
@@ -61,7 +63,7 @@ def level3(ot):
     for move in moves:
         temp_ot = deepcopy(ot)
         temp_ot.make_move(move)
-        new_score = negamax(temp_ot, 0, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
+        new_score = negamax(temp_ot, 2, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
         if new_score > score_move[0]: score_move = [new_score, [move]]
         elif new_score == score_move[0]: score_move[1].append(move)
     return choice(score_move[1])
@@ -72,7 +74,7 @@ def level4(ot):
     for move in moves:
         temp_ot = deepcopy(ot)
         temp_ot.make_move(move)
-        new_score = negamax3(temp_ot, 0, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
+        new_score = negamax3(temp_ot, 2, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
         if new_score > score_move[0]: score_move = [new_score, [move]]
         elif new_score == score_move[0]: score_move[1].append(move)
     return choice(score_move[1])
@@ -99,7 +101,7 @@ def heuristic_eval(state):
     score = 0
     for i in range(8):
         for j in range(8):
-            score += val[i][j] * (1 if state[i][j] == 1 else -1 if state[i][j] == 2 else 0)
+            score += val1[i][j] * (1 if state[i][j] == 1 else -1 if state[i][j] == 2 else 0)
     return score
 
 def heuristic_eval3(state):
@@ -110,7 +112,7 @@ def heuristic_eval3(state):
     return score
 
 def heuristic_eval2(state, turn):
-    model = pickle.load(open("trial_model2.sav", 'rb'))
+    model = load(open("trial_model2.sav", 'rb'))
     prob_array = model.predict_proba([get_values(state, turn)])
     score = int(prob_array[0][2] * 20 - 10)
     return score
@@ -179,20 +181,22 @@ def negamax_late(ot, depth, alpha, beta): #BUGGY
     return score * (1 if ot.turn == 1 else -1)
 
 # Returns the difference between the black pieces and white pieces
-def heur_pieces(ot):
-    return ot.black_tiles - ot.white_tiles
+def heur_pieces(board):
+    black_tiles, white_tiles = count_tiles(board)
+    return black_tiles - white_tiles
 
 # Returns a weighted score of a board state based on different tile weights
-def heur_weight(ot):
+def heur_weight(board):
     score = 0
     for i in range(8):
         for j in range(8):
-            score += val[i][j] * (1 if ot.board[i][j] == 1 else -1 if ot.board[i][j] == 2 else 0)
+            score += val2[i][j] * (1 if board[i][j] == 1 else -1 if board[i][j] == 2 else 0)
     return score
 
 # Returns the difference between the possible move that can be made by black and white on a certain state
-def heur_mobility(ot):
-    temp_ot = deepcopy(ot)
+def heur_mobility(board):
+    temp_ot = Othello(8, 8)
+    temp_ot.board = board
     temp_ot.turn = 1
     moves_black = len(temp_ot.get_possible_moves())
     temp_ot.turn = 2
@@ -200,21 +204,22 @@ def heur_mobility(ot):
     return moves_black - moves_white
 
 # Returns 1 if black is expected to make the last move in the game, otherwise returns -1
-def heur_parity(ot):
-    empty_tiles = ot.height * ot.width - ot.black_tiles - ot.white_tiles
-    return (-1 * (1 if ot.turn == 1 else -1) if empty_tiles % 2 == 0 else 1 * (1 if ot.turn == 1 else -1))
+def heur_parity(board, turn):
+    black_tiles, white_tiles = count_tiles(board)
+    empty_tiles = 64 - black_tiles - white_tiles
+    return (-1 * (1 if turn == 1 else -1) if empty_tiles % 2 == 0 else 1 * (1 if turn == 1 else -1))
 
-# Returns the difference of stable black and white tiles on the side only
-def heur_stablility(ot):
-    sides = [[ot.board[0][i] for i in range(8)], [ot.board[7][i] for i in range(8)], [ot.board[i][0] for i in range(8)], [ot.board[i][7] for i in range(8)]]
-    score = 0
-    for side in sides: score += check_stable_side(side)
+# Returns the difference of lower bound of stable black and white tiles on the sides only
+def heur_stablility(board):
+    sides = [[board[0][i] for i in range(8)], [board[7][i] for i in range(8)], [board[i][0] for i in range(8)], [board[i][7] for i in range(8)]]
+    score = sum(check_stable_side(side) for side in sides)
+    score += sum((1 if board[x[0]][x[1]] == 1 else - 1) if board[x[0]][x[1]] != 0 else 0 for x in [(0, 0), (0, 7), (7, 0), (7, 7)])
     return score
 
-# Returns the difference 
+# Returns the difference of stable black and white tiles on a side excluding the corner
 def check_stable_side(tiles):
     if all(tile != 0 for tile in tiles):
-        return sum((1 if tile == 1 else -1) for tile in tiles)
+        return sum((1 if tiles[i] == 1 else -1) for i in range(1, 7, 1))
     score = 0
     if tiles[0] != 0:
         for i in range(6):
@@ -228,7 +233,15 @@ def check_stable_side(tiles):
             else: break
     return score
 
-    
+# Given a board, returns the number of black tiles, number of white tiles
+def count_tiles(board):
+    black_tiles, white_tiles = 0, 0
+    for i in range(8):
+        for j in range(8):
+            if board[i][j] == 1: black_tiles += 1
+            if board[i][j] == 2: white_tiles += 1
+    return black_tiles, white_tiles
+
 def get_values(board, turn):
     a, b, c, d, e, f, g, h, i, j = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     for p in range(8):
@@ -258,6 +271,3 @@ def extra_ai1(ot, delay):
         elif new_score == score_move[0]: score_move[1].append(move)
     if delay: sleep(0.5)
     return choice(score_move[1])
-
-# def AI_1(ot):
-#     pass
