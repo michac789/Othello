@@ -11,7 +11,8 @@ print(heur_pieces(ot))
 print(heur_weight(ot))
 print(heur_mobility(ot))
 
-
+list = [1,1,0,1,2,2,2,2]
+print(check_stable_side(list))
 
 
 

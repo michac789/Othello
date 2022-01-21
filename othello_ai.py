@@ -61,7 +61,7 @@ def level3(ot):
     for move in moves:
         temp_ot = deepcopy(ot)
         temp_ot.make_move(move)
-        new_score = negamax(temp_ot, 2, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
+        new_score = negamax(temp_ot, 0, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
         if new_score > score_move[0]: score_move = [new_score, [move]]
         elif new_score == score_move[0]: score_move[1].append(move)
     return choice(score_move[1])
@@ -72,7 +72,7 @@ def level4(ot):
     for move in moves:
         temp_ot = deepcopy(ot)
         temp_ot.make_move(move)
-        new_score = negamax3(temp_ot, 2, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
+        new_score = negamax3(temp_ot, 0, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
         if new_score > score_move[0]: score_move = [new_score, [move]]
         elif new_score == score_move[0]: score_move[1].append(move)
     return choice(score_move[1])
@@ -202,48 +202,32 @@ def heur_mobility(ot):
 # Returns 1 if black is expected to make the last move in the game, otherwise returns -1
 def heur_parity(ot):
     empty_tiles = ot.height * ot.width - ot.black_tiles - ot.white_tiles
-    if ot.turn == 1:
-        if empty_tiles % 2 == 0: return -1
-        else: return 1
-    elif ot.turn == 2:
-        pass
+    return (-1 * (1 if ot.turn == 1 else -1) if empty_tiles % 2 == 0 else 1 * (1 if ot.turn == 1 else -1))
 
-def heur_stability(ot):
-    pass
+# Returns the difference of stable black and white tiles on the side only
+def heur_stablility(ot):
+    sides = [[ot.board[0][i] for i in range(8)], [ot.board[7][i] for i in range(8)], [ot.board[i][0] for i in range(8)], [ot.board[i][7] for i in range(8)]]
+    score = 0
+    for side in sides: score += check_stable_side(side)
+    return score
 
+# Returns the difference 
+def check_stable_side(tiles):
+    if all(tile != 0 for tile in tiles):
+        return sum((1 if tile == 1 else -1) for tile in tiles)
+    score = 0
+    if tiles[0] != 0:
+        for i in range(6):
+            if tiles[1 + i] == tiles[0]:
+                score += (1 if tiles[0] == 1 else -1)
+            else: break
+    if tiles[7] != 0:
+        for i in range(6):
+            if tiles[6 - i] == tiles[7]:
+                score += (1 if tiles[7] == 1 else -1)
+            else: break
+    return score
 
-
-# Given an othello object, this function .. #TODO
-def heur_stable_pieces(ot):
-    all_tiles = [(i, j) for i in range(ot.height) for j in range(ot.width)]
-    stable_black, stable_white = 0, 0
-    for tile in all_tiles:
-        tile_color = ot.board[tile[0]][tile[1]]
-        if tile_color != 0:
-            for t in ot.surrounding_tiles:
-                if ot.is_valid_tile((tile[0] + t[0], tile[1] + t[1])):
-                    if ot.board[tile[0] + t[0]][tile[1] + t[1]] == tile_color % 2 + 1:
-                        pass
-                    elif ot.board[tile[0] + t[0]][tile[1] + t[1]] == tile_color: continue
-                    elif ot.board[tile[0] + t[0]][tile[1] + t[1]] == 0: break
-    raise NotImplementedError
-
-    # def get_possible_moves(self):
-    #     possible_moves = set()
-    #     all_tiles = [(i, j) for i in range(self.height) for j in range(self.width)]
-    #     for tile in all_tiles:
-    #         if self.board[tile[0]][tile[1]] == 0:
-    #             for t in self.surrounding_tiles:
-    #                 if self.is_valid_tile((tile[0] + t[0], tile[1] + t[1])):
-    #                     if self.board[tile[0] + t[0]][tile[1] + t[1]] == self.turn % 2 + 1:
-    #                         k = 1
-    #                         while True:
-    #                             k += 1
-    #                             if not self.is_valid_tile((tile[0] + t[0] * k, tile[1] + t[1] * k)): break
-    #                             if self.board[tile[0] + t[0] * k][tile[1] + t[1] * k] == 0: break
-    #                             if self.board[tile[0] + t[0] * k][tile[1] + t[1] * k] == self.turn:
-    #                                 possible_moves.add(tile)
-    #     return list(possible_moves)
     
 def get_values(board, turn):
     a, b, c, d, e, f, g, h, i, j = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
