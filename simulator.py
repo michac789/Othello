@@ -11,7 +11,7 @@ from csv import writer
 def main():
     #simulate(10, 3, 4)
     #export_tile_heur(1000, 3, 3)
-    export_heuristics(3, 1, 1)
+    export_heuristics(100000, 1, 1)
 
 
 # This function simulates N games with 2 ai levels representing black and white, printing the number and percentage of wins, loses and draws

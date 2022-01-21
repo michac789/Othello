@@ -28,7 +28,7 @@ def main():
     
     # (2) Logistic Regression
     if MODE == 2:
-        x_train2, x_test2, y_train2, y_test2 = load_data(os.path.join("data1.csv"))
+        x_train2, x_test2, y_train2, y_test2 = load_data(os.path.join("data.csv"))
         logreg_model = train_model_logreg(x_train2, y_train2)
         predictions2 = logreg_model.predict(x_test2)
         analyze_model_logreg(logreg_model, y_test2, predictions2)
@@ -46,10 +46,9 @@ def load_data(dir):
         reader = csv.reader(file)
         parameters, real_values = [], []
         for row in reader:
-            parameters.append([int(row[0]), int(row[1]), int(row[2]), int(row[3]), int(row[4]),
-                               int(row[5]), int(row[6]), int(row[7]), int(row[8]), int(row[9]),
-                               int(row[10])])
-            real_values.append((int(row[11])) * 100)
+            parameters.append([int(row[0]), int(row[1]), int(row[2]), int(row[3]), int(row[4]),int(row[5])])
+            # parameters.append([int(row[0]), int(row[1]), int(row[2]), int(row[3]), int(row[4]),int(row[5])])
+            real_values.append((int(row[6])) * 100)
     x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(parameters, real_values, test_size = 0.2)
     return (x_train, x_test, y_train, y_test)
 
