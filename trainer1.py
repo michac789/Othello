@@ -18,23 +18,23 @@ import pickle
 # Load training data, split into training and test sets, train and analyze model, getting result from new data
 def main():
     # (1) Linear Regression:
-    x_train1, x_test1, y_train1, y_test1 = load_data(os.path.join("data.csv"), 1)
-    linreg_model = train_model_linreg(x_train1, y_train1)
-    predictions1 = linreg_model.predict(x_test1)
-    analyze_model_linreg(linreg_model, y_test1, predictions1)
+    # x_train1, x_test1, y_train1, y_test1 = load_data(os.path.join("data.csv"), 1)
+    # linreg_model = train_model_linreg(x_train1, y_train1)
+    # predictions1 = linreg_model.predict(x_test1)
+    # analyze_model_linreg(linreg_model, y_test1, predictions1)
     
     # (2) Logistic Regression
-    # x_train2, x_test2, y_train2, y_test2 = load_data(os.path.join("learning_data", "sample2.csv"), 2)
-    # logreg_model = train_model_logreg(x_train2, y_train2)
-    # predictions2 = logreg_model.predict(x_test2)
-    # analyze_model_logreg(logreg_model, y_test2, predictions2)
+    x_train2, x_test2, y_train2, y_test2 = load_data(os.path.join("data1.csv"))
+    logreg_model = train_model_logreg(x_train2, y_train2)
+    predictions2 = logreg_model.predict(x_test2)
+    analyze_model_logreg(logreg_model, y_test2, predictions2)
     
     # Save model in a wav file
     # print("Saving models...")
     # save_path_1 = os.path.join("learning_data", "sample_linreg.sav")
-    save_path_1 = "trial_model.sav"
+    save_path_1 = "trial_model2.sav"
     # save_path_2 = os.path.join("learning_data", "sample_logreg.sav")
-    pickle.dump(linreg_model, open(save_path_1, 'wb'))
+    pickle.dump(logreg_model, open(save_path_1, 'wb'))
     # pickle.dump(logreg_model, open(save_path_2, 'wb'))
     # print("Models saved.\n")
 
@@ -47,7 +47,7 @@ def main():
 
 
 # Load the necessary data from the csv file, divide into training and test parameters and outcome, return those values
-def load_data(dir, type):
+def load_data(dir):
     with open(dir) as file:
         next(file)
         reader = csv.reader(file)

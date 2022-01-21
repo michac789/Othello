@@ -2,7 +2,6 @@
 Simulator
 """
 
-from sre_parse import State
 from othello import Othello
 from othello_ai import AI_move
 from csv import writer
@@ -12,7 +11,7 @@ from csv import writer
 def main():
     #simulate(100, 3, 4)
     #export_data(20, 4, 5)
-    export_tile_heur(1000, 1, 1)
+    export_tile_heur(1000, 3, 3)
 
 # This function simulates N games with 2 ai levels representing black and white, printing the number and percentage of wins, loses and draws
 def simulate(N, level_black, level_white):

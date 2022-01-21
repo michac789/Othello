@@ -9,12 +9,12 @@ import pickle
 
 # Board score used for heuristic function
 val = [[10, -3, 2, 1, 1, 2, -3, 10],
-       [-3, -5, 0, 0, 0, 0, -5, -2],
+       [-3, -5, 0, 0, 0, 0, -5, -3],
        [2, 0, 0, 0, 0, 0, 0, 2],
        [1, 0, 0, 0, 0, 0, 0, 1],
        [1, 0, 0, 0, 0, 0, 0, 1],
        [2, 0, 0, 0, 0, 0, 0, 2],
-       [-3, -5, 0, 0, 0, 0, -5, -2],
+       [-3, -5, 0, 0, 0, 0, -5, -3],
        [10, -3, 2, 1, 1, 2, -3, 10]]
 
 val2 = [[5, -3, 2, 1, 1, 2, -3, 5],
@@ -106,9 +106,10 @@ def heuristic_eval(state):
             score += val[i][j] * (1 if state[i][j] == 1 else -1 if state[i][j] == 2 else 0)
     return score
 
-def heuristic_eval2(state):
-    model = pickle.load(open("trial_model.sav", 'rb'))
-    score = model.predict(state)
+def heuristic_eval2(state, turn):
+    model = pickle.load(open("trial_model2.sav", 'rb'))
+    prob_array = model.predict_proba([get_values(state, turn)])
+    score = int(prob_array[0][2] * 20 - 10)
     return score
 
 def negamax(ot, depth, alpha, beta): #TESTED OKAY
@@ -128,14 +129,15 @@ def negamax(ot, depth, alpha, beta): #TESTED OKAY
 
 def negamax2(ot, depth, alpha, beta):
     if depth == 0 or ot.check_victory() != 0:
-        return heuristic_eval2(ot.board)
+        x = heuristic_eval2(ot.board, ot.turn)
+        return x
     moves = ot.get_possible_moves()
     ot.check_no_move(moves)
     score = -99999
     for move in moves:
         temp_ot = deepcopy(ot)
         temp_ot.make_move(move)
-        new_score = negamax(temp_ot, depth - 1, -beta, -alpha) * (1 if ot.turn == 1 else -1)
+        new_score = negamax2(temp_ot, depth - 1, -beta, -alpha) * (1 if ot.turn == 1 else -1)
         score = max(score, new_score)
         alpha = max(alpha, score)
         if beta <= alpha:
@@ -201,6 +203,23 @@ def heur_stable_pieces(ot):
     #                             if self.board[tile[0] + t[0] * k][tile[1] + t[1] * k] == self.turn:
     #                                 possible_moves.add(tile)
     #     return list(possible_moves)
+    
+def get_values(board, turn):
+    a, b, c, d, e, f, g, h, i, j = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    for p in range(8):
+        for q in range(8):
+            mul = (1 if board[p][q] == 1 else -1 if board[p][q] == 2 else 0)
+            if (p, q) in [(0, 0), (0, 7), (7, 0), (7, 7)]: a += 1 * mul
+            if (p, q) in [(0, 1), (1, 0), (0, 6), (1, 7), (6, 0), (7, 1), (6, 7), (7, 6)]: b += 1 * mul
+            if (p, q) in [(0, 2), (2, 0), (0, 5), (2, 7), (5, 0), (7, 2), (5, 7), (7, 5)]: c += 1 * mul
+            if (p, q) in [(0, 3), (3, 0), (0, 4), (3, 7), (4, 0), (7, 3), (4, 7), (7, 4)]: d += 1 * mul
+            if (p, q) in [(1, 1), (1, 6), (6, 1), (6, 6)]: e += 1 * mul
+            if (p, q) in [(1, 2), (2, 1), (1, 5), (2, 6), (5, 1), (6, 2), (5, 6), (6, 5)]: f += 1 * mul
+            if (p, q) in [(1, 3), (3, 1), (1, 4), (3, 6), (4, 1), (6, 3), (4, 6), (6, 4)]: g += 1 * mul
+            if (p, q) in [(2, 2), (2, 5), (5, 2), (5, 5)]: h += 1 * mul
+            if (p, q) in [(2, 3), (2, 4), (3, 2), (3, 5), (4, 2), (4, 5), (5, 3), (5, 4)]: i += 1 * mul
+            if (p, q) in [(3, 3), (4, 4), (4, 4), (3, 3)]: j += 1 * mul
+    return [a, b, c, d, e, f, g, h, i, j, turn]
 
 # This AI picks the move that maximizes its piece in the next state; it is bad, as it loses quite frequently even with level 1 ai
 def extra_ai1(ot, delay):
