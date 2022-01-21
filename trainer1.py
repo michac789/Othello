@@ -14,36 +14,29 @@ import csv
 import os
 import pickle
 
+MODE = 1
+SAVE_PATH = "new_model.sav"
 
 # Load training data, split into training and test sets, train and analyze model, getting result from new data
 def main():
     # (1) Linear Regression:
-    # x_train1, x_test1, y_train1, y_test1 = load_data(os.path.join("data.csv"), 1)
-    # linreg_model = train_model_linreg(x_train1, y_train1)
-    # predictions1 = linreg_model.predict(x_test1)
-    # analyze_model_linreg(linreg_model, y_test1, predictions1)
+    if MODE == 1:
+        x_train1, x_test1, y_train1, y_test1 = load_data(os.path.join("data.csv"))
+        linreg_model = train_model_linreg(x_train1, y_train1)
+        predictions1 = linreg_model.predict(x_test1)
+        analyze_model_linreg(linreg_model, y_test1, predictions1)
     
     # (2) Logistic Regression
-    x_train2, x_test2, y_train2, y_test2 = load_data(os.path.join("data1.csv"))
-    logreg_model = train_model_logreg(x_train2, y_train2)
-    predictions2 = logreg_model.predict(x_test2)
-    analyze_model_logreg(logreg_model, y_test2, predictions2)
+    if MODE == 2:
+        x_train2, x_test2, y_train2, y_test2 = load_data(os.path.join("data1.csv"))
+        logreg_model = train_model_logreg(x_train2, y_train2)
+        predictions2 = logreg_model.predict(x_test2)
+        analyze_model_logreg(logreg_model, y_test2, predictions2)
     
     # Save model in a wav file
-    # print("Saving models...")
-    # save_path_1 = os.path.join("learning_data", "sample_linreg.sav")
-    save_path_1 = "trial_model2.sav"
-    # save_path_2 = os.path.join("learning_data", "sample_logreg.sav")
-    pickle.dump(logreg_model, open(save_path_1, 'wb'))
-    # pickle.dump(logreg_model, open(save_path_2, 'wb'))
-    # print("Models saved.\n")
-
-    # Using the saved models to predict result based on some evidences
-    # Expected func: y=3a1+2a2-a3; 10, 7, 6, 4; win win lose lose
-    # loaded_model1 = pickle.load(open(save_path_1, 'rb'))
-    # loaded_model2 = pickle.load(open(save_path_2, 'rb'))
-    # data = [[6, 1, 10], [4, 2, 9], [1, 2, 1], [1, 2, 3]]
-    # make_predictions(data, loaded_model1, loaded_model2)
+    print("Saving models...")
+    pickle.dump((linreg_model if MODE == 1 else logreg_model), open(SAVE_PATH, 'wb'))
+    print("Models saved.\n")
 
 
 # Load the necessary data from the csv file, divide into training and test parameters and outcome, return those values

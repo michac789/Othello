@@ -1,12 +1,18 @@
-# from simulator import get_values
+from othello import Othello
+from othello_ai import *
 
-board = [[1,1,2,0,0,0,0,0],[1,1,1,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,2,1,0,0,0],
+ot = Othello(8, 8)
+ot.board = [[1,1,2,0,0,0,0,0],[1,1,1,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,2,1,0,0,0],
          [0,0,0,1,2,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0]]
 # x = get_values(board)
 # print(x)
 
-from othello_ai import *
+print(heur_pieces(ot))
+print(heur_weight(ot))
+print(heur_mobility(ot))
 
-x = heuristic_eval2(board, 50)
+
+
+
 
 

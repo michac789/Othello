@@ -17,14 +17,14 @@ val = [[10, -3, 2, 1, 1, 2, -3, 10],
        [-3, -5, 0, 0, 0, 0, -5, -3],
        [10, -3, 2, 1, 1, 2, -3, 10]]
 
-val2 = [[5, -3, 2, 1, 1, 2, -3, 5],
-       [-3, -5, 0, 0, 0, 0, -5, -2],
-       [2, 0, 0, 0, 0, 0, 0, 2],
-       [1, 0, 0, 0, 0, 0, 0, 1],
-       [1, 0, 0, 0, 0, 0, 0, 1],
-       [2, 0, 0, 0, 0, 0, 0, 2],
-       [-3, -5, 0, 0, 0, 0, -5, -2],
-       [5, -3, 2, 1, 1, 2, -3, 5]]
+val2 = [[10, -3, 2, 1, 1, 2, -3, 10],
+       [-3, -5, -1, -1, -1, -1, -5, -3],
+       [2, -1, 2, 0, 0, 2, -1, 2],
+       [1, -1, 0, 0, 0, 0, -1, 1],
+       [1, -1, 0, 0, 0, 0, -1, 1],
+       [2, -1, 2, 0, 0, 2, -1, 2],
+       [-3, -5, -1, -1, -1, -1, -5, -3],
+       [10, -3, 2, 1, 1, 2, -3, 10]]
 
 # Given an othello object and ai level, return the move made by the ai
 def AI_move(othello, level, delay):
@@ -67,16 +67,12 @@ def level3(ot):
     return choice(score_move[1])
 
 def level4(ot):
-    # Early game (move 1-10), Mid game (move 11-51), End game (move 52-60)
     moves = ot.get_possible_moves()
     score_move = [-99999, []]
     for move in moves:
         temp_ot = deepcopy(ot)
         temp_ot.make_move(move)
-        if ot.move_no < 53: # <51 for better
-            new_score = negamax(temp_ot, 2, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
-        else:
-            new_score = negamax_late(temp_ot, 10, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
+        new_score = negamax3(temp_ot, 2, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
         if new_score > score_move[0]: score_move = [new_score, [move]]
         elif new_score == score_move[0]: score_move[1].append(move)
     return choice(score_move[1])
@@ -106,6 +102,13 @@ def heuristic_eval(state):
             score += val[i][j] * (1 if state[i][j] == 1 else -1 if state[i][j] == 2 else 0)
     return score
 
+def heuristic_eval3(state):
+    score = 0
+    for i in range(8):
+        for j in range(8):
+            score += val2[i][j] * (1 if state[i][j] == 1 else -1 if state[i][j] == 2 else 0)
+    return score
+
 def heuristic_eval2(state, turn):
     model = pickle.load(open("trial_model2.sav", 'rb'))
     prob_array = model.predict_proba([get_values(state, turn)])
@@ -122,6 +125,21 @@ def negamax(ot, depth, alpha, beta): #TESTED OKAY
         temp_ot = deepcopy(ot)
         temp_ot.make_move(move)
         new_score = negamax(temp_ot, depth - 1, -beta, -alpha) * (1 if ot.turn == 1 else -1)
+        score = max(score, new_score)
+        alpha = max(alpha, score)
+        if beta <= alpha: break
+    return score * (1 if ot.turn == 1 else -1)
+
+def negamax3(ot, depth, alpha, beta): #TESTED OKAY
+    if depth == 0 or ot.check_victory() != 0:
+        return heuristic_eval3(ot.board)
+    moves = ot.get_possible_moves()
+    ot.check_no_move(moves)
+    score = -99999
+    for move in moves:
+        temp_ot = deepcopy(ot)
+        temp_ot.make_move(move)
+        new_score = negamax3(temp_ot, depth - 1, -beta, -alpha) * (1 if ot.turn == 1 else -1)
         score = max(score, new_score)
         alpha = max(alpha, score)
         if beta <= alpha: break
@@ -160,17 +178,40 @@ def negamax_late(ot, depth, alpha, beta): #BUGGY
             break
     return score * (1 if ot.turn == 1 else -1)
 
-def heuristic_trial(ot):
-    pass
-
-# Given an othello object, this function will return the difference of black pieces and white pieces
+# Returns the difference between the black pieces and white pieces
 def heur_pieces(ot):
     return ot.black_tiles - ot.white_tiles
 
-# Given an othello object, this function will return the number of moves possible to be made
-def heur_mobiity(ot):
-    moves = ot.get_possible_moves()
-    return len(moves)
+# Returns a weighted score of a board state based on different tile weights
+def heur_weight(ot):
+    score = 0
+    for i in range(8):
+        for j in range(8):
+            score += val[i][j] * (1 if ot.board[i][j] == 1 else -1 if ot.board[i][j] == 2 else 0)
+    return score
+
+# Returns the difference between the possible move that can be made by black and white on a certain state
+def heur_mobility(ot):
+    temp_ot = deepcopy(ot)
+    temp_ot.turn = 1
+    moves_black = len(temp_ot.get_possible_moves())
+    temp_ot.turn = 2
+    moves_white = len(temp_ot.get_possible_moves())
+    return moves_black - moves_white
+
+# Returns 1 if black is expected to make the last move in the game, otherwise returns -1
+def heur_parity(ot):
+    empty_tiles = ot.height * ot.width - ot.black_tiles - ot.white_tiles
+    if ot.turn == 1:
+        if empty_tiles % 2 == 0: return -1
+        else: return 1
+    elif ot.turn == 2:
+        pass
+
+def heur_stability(ot):
+    pass
+
+
 
 # Given an othello object, this function .. #TODO
 def heur_stable_pieces(ot):
