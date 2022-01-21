@@ -1,0 +1,57 @@
+
+Linear Regression
+Coefficients gained:
+ [ 1.35409154 -0.12592402  8.14378625  4.96608423  4.77995807]
+Mean squared error: 5297.55
+
+Saving models...
+Models saved.
+
+
+Linear Regression
+Coefficients gained:
+ [ 0.00877109  0.60931268 -0.48534852  5.07244479  7.30069348]
+Mean squared error: 7186.89
+
+Saving models...
+Models saved.
+
+
+Linear Regression
+Coefficients gained:
+ [-0.02053262  1.13692994 -1.29558985  7.72737889  8.64167366]
+Mean squared error: 8277.17
+
+Saving models...
+Models saved.
+
+
+Linear Regression
+Coefficients gained:
+ [ 0.10177046  1.3477543  -0.98417635  8.18441793 10.81938277]
+Mean squared error: 8935.64
+
+Saving models...
+Models saved.
+
+
+Processing data (linear regression)... please wait...
+Linear Regression
+Coefficients gained: 
+ [-0.01261817  0.43659554  0.6280744   0.08674425  4.02274196  5.84078409]
+Mean squared error: 8271.92
+
+Saving models...
+Models saved.
+
+
+Processing data (linear regression)... please wait...
+Linear Regression
+Coefficients gained: 
+ [0.43368639 0.62985267 0.06741505 4.03302778 5.83887942]
+Mean squared error: 8270.91
+
+Saving models...
+Models saved.
+
+
