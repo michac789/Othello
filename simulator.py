@@ -9,7 +9,7 @@ from csv import writer
 
 # Modify this function
 def main():
-    simulate(100, 5, 4)
+    simulate(100, 5, 6)
     #export_tile_heur(1000, 3, 3)
     #export_heuristics(10000, 3, 3)
 

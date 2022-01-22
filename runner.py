@@ -541,6 +541,9 @@ if __name__ == "__main__":
 
 # TODO
 """
+
+
+
 - Custom mode (othello sizes & starting positions)
 - Create pre_custom feature user interface
 

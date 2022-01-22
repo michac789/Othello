@@ -14,9 +14,10 @@ import csv
 import os
 import pickle
 
-# adjust this
-MODE = 1
-SAVE_PATH = "m3_3.sav"
+# Adjust these to customize training
+MODE = 2
+LOAD_PATH = "data_1.csv"
+SAVE_PATH = "m04b.sav"
 
 # m01: move 51-60
 # m02: move 41-50
@@ -28,7 +29,7 @@ def main():
     # (1) Linear Regression:
     if MODE == 1:
         print("Processing data (linear regression)... please wait...")
-        x_train1, x_test1, y_train1, y_test1 = load_data(os.path.join("data_3.csv"))
+        x_train1, x_test1, y_train1, y_test1 = load_data(os.path.join(LOAD_PATH))
         linreg_model = train_model_linreg(x_train1, y_train1)
         predictions1 = linreg_model.predict(x_test1)
         analyze_model_linreg(linreg_model, y_test1, predictions1)
@@ -36,7 +37,7 @@ def main():
     # (2) Logistic Regression
     if MODE == 2:
         print("Processing data (logistic regression)... please wait...")
-        x_train2, x_test2, y_train2, y_test2 = load_data(os.path.join("data.csv"))
+        x_train2, x_test2, y_train2, y_test2 = load_data(os.path.join(LOAD_PATH))
         logreg_model = train_model_logreg(x_train2, y_train2)
         predictions2 = logreg_model.predict(x_test2)
         analyze_model_logreg(logreg_model, y_test2, predictions2)
@@ -56,7 +57,7 @@ def load_data(dir):
         for row in reader:
             # parameters.append([int(row[1]), int(row[2]), int(row[3]), int(row[4]), int(row[5])])
             # real_values.append((int(row[6])) * 100)
-            if 40 >= int(row[0]) >= 21:
+            if int(row[0]) <= 20:
                 parameters.append([int(row[1]), int(row[2]), int(row[3]), int(row[4]),int(row[5])])
                 real_values.append((int(row[6])) * 100)
     x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(parameters, real_values, test_size = 0.2)
