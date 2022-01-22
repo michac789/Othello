@@ -9,9 +9,9 @@ from csv import writer
 
 # Modify this function
 def main():
-    simulate(100, 5, 6)
+    #simulate(10, 5, 6)
     #export_tile_heur(1000, 3, 3)
-    #export_heuristics(10000, 3, 3)
+    export_heuristics(10000, 5, 5)
 
 
 # This function simulates N games with 2 ai levels representing black and white, printing the number and percentage of wins, loses and draws
@@ -24,7 +24,7 @@ def simulate(N, level_black, level_white):
         while True:
             moves = ot.get_possible_moves()
             ot.check_no_move(moves)
-            moves = ot.get_possible_moves()
+            #moves = ot.get_possible_moves()
             if ot.check_victory() != 0: break
             if ot.turn == 1: ot.make_move(AI_move(ot, level_black, False))
             elif ot.turn == 2: ot.make_move(AI_move(ot, level_white, False))

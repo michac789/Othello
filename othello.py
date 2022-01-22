@@ -1,3 +1,9 @@
+"""
+Warning!!! This is not the main game file, launch runner.py to operate the game with full user interface.
+This file is where Othello object is located, that contains all attributes and methods related to the functionality of the game.
+Launching this file will only display a simple command line interface, used on the early development stage for testing purpose.
+"""
+
 import copy
 
 
@@ -123,14 +129,6 @@ def main():
     init_white = [(3, 3), (4, 4)]
     init_black = [(3, 4), (4, 3)]
     ot.set_initial_position(init_white, init_black)
-    ot.terminal_print()
-    
-    # Testing purpose
-    # ot = Othello(4, 4)
-    # init_white = [(1, 1), (2, 2)]
-    # init_black = [(1, 2), (2, 1)]
-    # ot.set_initial_position(init_white, init_black)
-    # ot.terminal_print()
     
     # Prompt for game mode
     while True:
@@ -139,41 +137,39 @@ def main():
         mode = input("Enter mode here: ")
         if mode in ["1", "2"]:
             break
+        print("Invalid mode!")
     if mode == "1":
         human_vs_human(ot)
     else:
         while True:
-            level = input("Choose AI level (between 1 to 5): ")
+            level = input("Choose AI level (between 1 to 6): ")
             if check_int(level) and 1 <= int(level) <= 5:
                 break
+            print("Invalid level!")
         human_vs_ai(ot, int(level))
     
 def human_vs_human(ot):
     # Loop through while the game is not ended
     while(True):
-        print(f"It is {ot.get_color(ot.turn)}'s turn (Player {ot.turn})")
         
-        # Ensure a valid move is given by the user
+        # Show the board via the terminal, break if there are no more moves possible
+        ot.terminal_print()
+        if ot.check_victory() != 0: break
+        
+        # Ensure a valid move is given by the user, make the move if there is at least one valid move
+        print(f"It is {ot.get_color(ot.turn)}'s turn (Player {ot.turn})")
         moves = ot.get_possible_moves()
+        if len(moves) == 0:
+            print("No possible move!")
+            ot.check_no_move(moves)
+            continue
         while(True):
-            if len(moves) == 0:
-                print("No move possible.")
-                ot.skip_turn = 1
-                ot.turn = ot.turn % 2 + 1
-                if ot.skip_turn == 1: ot.skip_turn += 1
-                break
             move_y = input("Enter tile's height: ")
             move_x = input("Enter tile's width: ")
             if check_int(move_y) and check_int(move_x) and (int(move_y), int(move_x)) in moves:
                 break
             print("Invalid move!")
-        
-        # Make move, print the board, end the game if someone wins
-        if len(moves) != 0:
-            ot.make_move((int(move_y), int(move_x)))
-            ot.terminal_print()
-            if ot.check_victory() != 0:
-                break
+        ot.make_move((int(move_y), int(move_x)))
     
     # Display the winner or draw when game is over
     if ot.check_victory() == 3:

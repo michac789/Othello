@@ -84,5 +84,45 @@ Saving models...
 Models saved.
 
 
+LV 1 & 5:
+
+Processing data (linear regression)... please wait...
+Linear Regression
+Coefficients gained: 
+ [0.67758976 0.47078575 1.63716878 1.10626602 3.01974234]
+Mean squared error: 811.80
+
+Saving models...
+Models saved.
+
+
+Processing data (linear regression)... please wait...
+Linear Regression
+Coefficients gained: 
+ [ 0.55174892  0.89039604 -0.75614905  2.84295614  3.80585449]
+Mean squared error: 1058.88
+
+Saving models...
+Models saved.
+
+
+Processing data (linear regression)... please wait...
+Linear Regression
+Coefficients gained: 
+ [ 0.46073292  2.43125484 -3.27718503  6.31369046  2.96001049]
+Mean squared error: 1850.47
+
+Saving models...
+Models saved.
+
+
+Processing data (linear regression)... please wait...
+Linear Regression
+Coefficients gained: 
+ [-1.78179661  9.04419266 -5.62650764 -5.13935551 -8.56901005]
+Mean squared error: 4757.82
+
+Saving models...
+Models saved.
 
 

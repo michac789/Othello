@@ -15,9 +15,11 @@ import os
 import pickle
 
 # Adjust these to customize training
-MODE = 2
-LOAD_PATH = "data_1.csv"
-SAVE_PATH = "m04b.sav"
+MODE = 1
+LOAD_PATH = "data1v5.csv"
+SAVE_PATH = "mm4.sav"
+TURN_LOWER = 0
+TURN_UPPER = 20
 
 # m01: move 51-60
 # m02: move 41-50
@@ -57,7 +59,7 @@ def load_data(dir):
         for row in reader:
             # parameters.append([int(row[1]), int(row[2]), int(row[3]), int(row[4]), int(row[5])])
             # real_values.append((int(row[6])) * 100)
-            if int(row[0]) <= 20:
+            if TURN_LOWER <= int(row[0]) <= TURN_UPPER:
                 parameters.append([int(row[1]), int(row[2]), int(row[3]), int(row[4]),int(row[5])])
                 real_values.append((int(row[6])) * 100)
     x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(parameters, real_values, test_size = 0.2)
