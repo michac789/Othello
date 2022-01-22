@@ -5,6 +5,7 @@ Launching this file will only display a simple command line interface, used on t
 """
 
 import copy
+from othello_ai import *
 
 
 class Othello():
@@ -178,39 +179,33 @@ def human_vs_human(ot):
         winner = ("White" if ot.check_victory() == 2 else "Black")
         print(f"Congratulations! {winner} wins the game!")
 
-def human_vs_ai(ot, level): #THIS IS NOT FUNCTIONING ANYMORE
-    raise NotImplementedError
-    # Loop through while the game is not ended; human is player 1 (goes first)
+def human_vs_ai(ot, level):
+    # Loop through while the game is not ended; human is player 1 (goes first), then AI as player 2
     while(True):
-        print(f"It is your turn")
         
-        # Ensure a valid move is given by the user
-        moves = ot.get_possible_moves()
-        while(True):
+        # Show the board via the terminal, break if there are no more moves possible
+        ot.terminal_print()
+        if ot.check_victory() != 0: break
+        
+        # Human's move
+        if ot.turn == 1:
+            print(f"It is your turn.")
+            moves = ot.get_possible_moves()
             if len(moves) == 0:
-                print("No move possible.")
-                ot.skip_turn = 1
-                ot.turn = ot.turn % 2 + 1
-                if ot.skip_turn == 1: ot.skip_turn += 1
-                break
-            move_y = input("Enter tile's height: ")
-            move_x = input("Enter tile's width: ")
-            if check_int(move_y) and check_int(move_x) and (int(move_y), int(move_x)) in moves:
-                break
-            print("Invalid move!")
-        
-        # Make move, print the board, end the game if someone wins
-        if len(moves) != 0:
+                print("No possible move!")
+                ot.check_no_move(moves)
+                continue
+            while(True):
+                move_y = input("Enter tile's height: ")
+                move_x = input("Enter tile's width: ")
+                if check_int(move_y) and check_int(move_x) and (int(move_y), int(move_x)) in moves: break
+                print("Invalid move!")
             ot.make_move((int(move_y), int(move_x)))
-            ot.terminal_print()
-            if ot.check_victory() != 0:
-                break
             
-        # Make computer move
-        if ot.make_computer_move(level):
-            ot.terminal_print()
-        if ot.check_victory() != 0:
-            break
+        # Computer's move
+        elif ot.turn == 2:
+            print("Computer is thinking...")
+            ot.make_move(AI_move(ot, level, True))
     
     # Display the winner or draw when game is over
     if ot.check_victory() == 3:
