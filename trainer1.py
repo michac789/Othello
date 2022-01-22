@@ -14,11 +14,11 @@ import csv
 import os
 import pickle
 
-# Adjust these to customize training
+# Adjust these values to customize training
 MODE = 1
-LOAD_PATH = "data1v5.csv"
-SAVE_PATH = "mm4.sav"
-TURN_LOWER = 0
+LOAD_PATH = "data_x.csv"
+SAVE_PATH = "md4.sav"
+TURN_LOWER = 1
 TURN_UPPER = 20
 
 # m01: move 51-60

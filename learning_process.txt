@@ -126,3 +126,36 @@ Saving models...
 Models saved.
 
 
+
+
+
+Trainingggg
+
+Processing data (linear regression)... please wait...
+Linear Regression
+Coefficients gained: 
+ [ 0.14250772 -1.73677003  6.93336932  6.69736182  6.66409667]
+Mean squared error: 3069.65
+
+Saving models...
+Models saved.
+
+
+Processing data (linear regression)... please wait...
+Linear Regression
+Coefficients gained: 
+ [ 0.15792285 -1.73147711  7.0386816   6.71405469  6.65586862]
+Mean squared error: 3020.23
+
+Saving models...
+Models saved.
+
+
+Processing data (linear regression)... please wait...
+Linear Regression
+Coefficients gained: 
+ [-0.18400298 -0.10004921 11.90332179  0.          2.7718472 ]
+Mean squared error: 4696.81
+
+Saving models...
+Models saved.

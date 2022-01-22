@@ -96,7 +96,7 @@ def level6(ot):
     for move in moves:
         temp_ot = deepcopy(ot)
         temp_ot.make_move(move)
-        new_score = negamax4(temp_ot, 2, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
+        new_score = negamax4(temp_ot, 0, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
         if new_score > score_move[0]: score_move = [new_score, [move]]
         elif new_score == score_move[0]: score_move[1].append(move)
     return choice(score_move[1])
@@ -147,10 +147,10 @@ def heuristic_eval2(state, turn, move_no):
 
 def heuristic_eval4(state, turn, move_no):
     #model = load(open("trial_model2.sav", 'rb'))
-    m01 = load(open("mm1.sav", 'rb'))
-    m02 = load(open("mm2.sav", 'rb'))
-    m03 = load(open("mm3.sav", 'rb'))
-    m04 = load(open("mm4.sav", 'rb'))
+    m01 = load(open("md1.sav", 'rb'))
+    m02 = load(open("md2.sav", 'rb'))
+    m03 = load(open("m03.sav", 'rb'))
+    m04 = load(open("m04.sav", 'rb'))
     heuristics = heuristics_all(state, turn)
     if move_no >= 50: prob_array = m01.predict([heuristics])
     if 41 <= move_no <= 50: prob_array = m02.predict([heuristics])
