@@ -1,3 +1,9 @@
+""" 
+This is the main game launcher file with full user interface using pygame.
+Be sure to have this file in the same directory with all of the other files, and ensure to have pygame installed.
+Most configurations such as music/sfx, images, hover effects, main functionality of the app are all performed here.
+"""
+
 import pygame
 import sys
 import math
@@ -35,6 +41,9 @@ class Game():
         self.classic_ai_black = False # AI goes later (second turn) as white by default, can be set to true so AI makes first turn
         self.classic_chosen = [False for i in range(16)] # For UI purposes
         self.classic_ai2_level_b, self.classic_ai2_level_w, self.classic_ai2_color = 1, 1, 'b' # Level for AI VS AI Mode (black and white)
+        
+        # Choose modes in 'pre_custom' state
+        # TODO
         
         # Keep track of time (time left & time since pygame was init for starting relative time)
         self.timer_player1, self.timer_player2 = 0, 0
@@ -112,7 +121,7 @@ class Game():
         elif self.classic_mode == "AI": self.classic_chosen[5] = True
         else: self.classic_chosen[6] = True
         if self.classic_mode == "Human":
-            if 7 <= index <= 12: self.classic_time = (-1 if index == 7 else int(-30 + 5 * index) if 8 <= index <= 11 else 30)
+            if 7 <= index <= 12: self.classic_time = (-1 if index == 7 else int(-35 + 5 * index) if 8 <= index <= 11 else 30)
             if 13 <= index <= 14: self.classic_undo = (True if index == 13 else False)
             if self.classic_time == -1: self.classic_chosen[7] = True
             elif self.classic_time == 30: self.classic_chosen[12] = True
@@ -326,7 +335,27 @@ class Game():
         self.display_buttons()
         self.display_icon()
         
-        # time.sleep(5)
+        timer = 0
+        button_texts = ["Choose board height:", "Choose board width:", "Time limit (minutes):", "Initial board position:", "",
+                        self.dim_height, self.dim_width, timer, "+", "-", "+", "-", "+", "-", "Set Board"]
+        button_dict = {}
+        for i in range(len(button_texts)):
+            if 0 <= i <= 4:
+                buttonRect = pygame.Rect(self.board_start[0], self.board_height * (0.25 + 0.3 * i), self.virtual_width / 3, self.virtual_height / 10)
+                buttonText = self.preptextFont.render(button_texts[i], True, (prep_text_color1 if i == 0 else prep_text_color2))
+            if 4 <= i <= 6:
+                if i != 6: buttonRect = pygame.Rect(self.virtual_width * (0.4 + 0.3 * (i - 4)), self.virtual_height * 0.25, self.virtual_width * 0.27, self.virtual_height / 11)
+                else: buttonRect = pygame.Rect(self.virtual_width * (0.55), self.virtual_height * 0.37, self.virtual_width * 0.27, self.virtual_height / 11)
+                buttonText = self.prepoptionFont.render(button_texts[i], True, (prep_option_color1 if self.hover_pre_classic[i] == False else prep_button_hover_color1))
+            if 7 <= i <= 14:
+                buttonRect = pygame.Rect(self.virtual_width * (0.4 + 0.18 * ((i - 7) % 3)), self.virtual_height * (0.5 + 0.12 * math.floor((i - 7) / 3)), self.virtual_width * 0.15, self.virtual_height / 12)
+                buttonText = self.prepoptionFont.render(button_texts[i], True, (prep_option_color2 if self.hover_pre_classic[i] == False else prep_button_hover_color1))
+            button_dict[i] = buttonRect
+            buttonTextRect = buttonText.get_rect()
+            buttonTextRect.center = buttonRect.center
+            if 0 <= i <= 3: pygame.draw.rect(self.screen, black, buttonRect) 
+            else: pygame.draw.rect(self.screen, (prep_button_color1 if self.classic_chosen[i] == False else prep_chosen_color), buttonRect)
+            self.screen.blit(buttonText, buttonTextRect)
         
         self.init_white = [(0, 0), (0, 1), (0, 2), (0, 3)]
         self.init_black = [(1, 0), (1, 1), (1, 2), (1, 3)]

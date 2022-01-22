@@ -5,7 +5,11 @@ Launching this file will only display a simple command line interface, used on t
 """
 
 import copy
-from othello_ai import *
+# from othello_ai import AI_move
+
+# Please uncomment line 8 and line 212, and comment line 213, to use human vs AI feature on the CLI
+# It is purposely disabled due to circular import problem in the main runner.py file
+# You are suggested though, to interact right away through the UI from runner.py instead of using the terminal
 
 
 class Othello():
@@ -205,7 +209,8 @@ def human_vs_ai(ot, level):
         # Computer's move
         elif ot.turn == 2:
             print("Computer is thinking...")
-            ot.make_move(AI_move(ot, level, True))
+            # ot.make_move(AI_move(ot, level, True))
+            raise NameError
     
     # Display the winner or draw when game is over
     if ot.check_victory() == 3:
