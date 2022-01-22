@@ -55,3 +55,34 @@ Saving models...
 Models saved.
 
 
+using lv3 game data:
+Coefficients gained:
+ [0.85847738 0.17268551 9.02456929 2.38540691 3.22092074]
+Mean squared error: 3433.13
+
+Saving models...
+Models saved.
+
+
+Processing data (linear regression)... please wait...
+Linear Regression
+Coefficients gained:
+ [-0.08030818  1.01508596  4.68116794  2.12349656  3.88863075]
+Mean squared error: 6499.18
+
+Saving models...
+Models saved.
+
+
+Processing data (linear regression)... please wait...
+Linear Regression
+Coefficients gained: 
+ [-1.49193549  1.70908642  1.96577796  1.57597051  4.75899044]
+Mean squared error: 9068.12
+
+Saving models...
+Models saved.
+
+
+
+

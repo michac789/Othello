@@ -9,9 +9,9 @@ from csv import writer
 
 # Modify this function
 def main():
-    #simulate(10, 3, 4)
+    simulate(100, 5, 4)
     #export_tile_heur(1000, 3, 3)
-    export_heuristics(100000, 1, 1)
+    #export_heuristics(10000, 3, 3)
 
 
 # This function simulates N games with 2 ai levels representing black and white, printing the number and percentage of wins, loses and draws
@@ -30,6 +30,7 @@ def simulate(N, level_black, level_white):
             elif ot.turn == 2: ot.make_move(AI_move(ot, level_white, False))
         if ot.check_victory() == 1: win_black += 1
         elif ot.check_victory() == 2: win_white += 1
+        print(f"Winner: {ot.check_victory()}")
     print(f"Out of {N} games, black wins {win_black} times, white wins {win_white} times, and {N - win_black - win_white} draws.")
     win_rate_b, win_rate_w = round(win_black * 100 / N, 2), round(win_white * 100 / N, 2)
     print(f"Win rate: black {win_rate_b}%, white {win_rate_w}%, draw {abs(round(100 - win_rate_b - win_rate_w, 2))}%")

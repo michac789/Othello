@@ -542,9 +542,9 @@ if __name__ == "__main__":
 # TODO
 """
 - Custom mode (othello sizes & starting positions)
-3. Create pre_custom feature user interface
+- Create pre_custom feature user interface
 
-5. 'How to play' pages and pics, UI
+- 'How to play' pages and pics, UI
 
 7. Puzzle mode??
 

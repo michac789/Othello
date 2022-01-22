@@ -16,7 +16,7 @@ import pickle
 
 # adjust this
 MODE = 1
-SAVE_PATH = "m00x.sav"
+SAVE_PATH = "m3_3.sav"
 
 # m01: move 51-60
 # m02: move 41-50
@@ -28,7 +28,7 @@ def main():
     # (1) Linear Regression:
     if MODE == 1:
         print("Processing data (linear regression)... please wait...")
-        x_train1, x_test1, y_train1, y_test1 = load_data(os.path.join("data_1.csv"))
+        x_train1, x_test1, y_train1, y_test1 = load_data(os.path.join("data_3.csv"))
         linreg_model = train_model_linreg(x_train1, y_train1)
         predictions1 = linreg_model.predict(x_test1)
         analyze_model_linreg(linreg_model, y_test1, predictions1)
@@ -54,11 +54,11 @@ def load_data(dir):
         reader = csv.reader(file)
         parameters, real_values = [], []
         for row in reader:
-            parameters.append([int(row[1]), int(row[2]), int(row[3]), int(row[4]), int(row[5])])
-            real_values.append((int(row[6])) * 100)
-            # if int(row[0]) <= 20:
-            #     parameters.append([int(row[1]), int(row[2]), int(row[3]), int(row[4]),int(row[5])])
-                # real_values.append((int(row[6])) * 100)
+            # parameters.append([int(row[1]), int(row[2]), int(row[3]), int(row[4]), int(row[5])])
+            # real_values.append((int(row[6])) * 100)
+            if 40 >= int(row[0]) >= 21:
+                parameters.append([int(row[1]), int(row[2]), int(row[3]), int(row[4]),int(row[5])])
+                real_values.append((int(row[6])) * 100)
     x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(parameters, real_values, test_size = 0.2)
     return (x_train, x_test, y_train, y_test)
 

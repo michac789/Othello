@@ -74,7 +74,7 @@ def level4(ot):
     for move in moves:
         temp_ot = deepcopy(ot)
         temp_ot.make_move(move)
-        new_score = negamax3(temp_ot, 2, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
+        new_score = negamax3(temp_ot, 0, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
         if new_score > score_move[0]: score_move = [new_score, [move]]
         elif new_score == score_move[0]: score_move[1].append(move)
     return choice(score_move[1])
@@ -85,16 +85,35 @@ def level5(ot):
     for move in moves:
         temp_ot = deepcopy(ot)
         temp_ot.make_move(move)
-        if ot.move_no < 53:
-            new_score = negamax2(temp_ot, 2, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
-        else:
-            new_score = negamax_late(temp_ot, 10, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
+        new_score = negamax2(temp_ot, 0, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
         if new_score > score_move[0]: score_move = [new_score, [move]]
         elif new_score == score_move[0]: score_move[1].append(move)
     return choice(score_move[1])
 
 def level6(ot):
-    raise NotImplementedError
+    moves = ot.get_possible_moves()
+    score_move = [-99999, []]
+    for move in moves:
+        temp_ot = deepcopy(ot)
+        temp_ot.make_move(move)
+        new_score = negamax4(temp_ot, 0, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
+        if new_score > score_move[0]: score_move = [new_score, [move]]
+        elif new_score == score_move[0]: score_move[1].append(move)
+    return choice(score_move[1])
+
+# def level6(ot):
+#     moves = ot.get_possible_moves()
+#     score_move = [-99999, []]
+#     for move in moves:
+#         temp_ot = deepcopy(ot)
+#         temp_ot.make_move(move)
+#         if ot.move_no < 53:
+#             new_score = negamax2(temp_ot, 2, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
+#         else:
+#             new_score = negamax_late(temp_ot, 10, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
+#         if new_score > score_move[0]: score_move = [new_score, [move]]
+#         elif new_score == score_move[0]: score_move[1].append(move)
+#     return choice(score_move[1])
 
 # Given an othello object state, return the score of that state based on some tile score (max for black aka player 1, min for white)
 def heuristic_eval(state):
@@ -111,11 +130,35 @@ def heuristic_eval3(state):
             score += val2[i][j] * (1 if state[i][j] == 1 else -1 if state[i][j] == 2 else 0)
     return score
 
-def heuristic_eval2(state, turn):
-    model = load(open("trial_model2.sav", 'rb'))
-    prob_array = model.predict_proba([get_values(state, turn)])
-    score = int(prob_array[0][2] * 20 - 10)
-    return score
+def heuristic_eval2(state, turn, move_no):
+    #model = load(open("trial_model2.sav", 'rb'))
+    m01 = load(open("m01.sav", 'rb'))
+    m02 = load(open("m02.sav", 'rb'))
+    m03 = load(open("m03.sav", 'rb'))
+    m04 = load(open("m04.sav", 'rb'))
+    heuristics = heuristics_all(state, turn)
+    if move_no >= 50: prob_array = m01.predict([heuristics])
+    if 41 <= move_no <= 50: prob_array = m02.predict([heuristics])
+    if 21 <= move_no <= 40: prob_array = m03.predict([heuristics])
+    if 1 <= move_no <= 20: prob_array = m04.predict([heuristics])
+    
+    #score = int(prob_array[0][2] * 20 - 10)
+    return prob_array
+
+def heuristic_eval4(state, turn, move_no):
+    #model = load(open("trial_model2.sav", 'rb'))
+    m01 = load(open("m3_1.sav", 'rb'))
+    m02 = load(open("m3_2.sav", 'rb'))
+    m03 = load(open("m3_3.sav", 'rb'))
+    m04 = load(open("m04.sav", 'rb'))
+    heuristics = heuristics_all(state, turn)
+    if move_no >= 50: prob_array = m01.predict([heuristics])
+    if 41 <= move_no <= 50: prob_array = m02.predict([heuristics])
+    if 21 <= move_no <= 40: prob_array = m03.predict([heuristics])
+    if 1 <= move_no <= 20: prob_array = m04.predict([heuristics])
+    
+    #score = int(prob_array[0][2] * 20 - 10)
+    return prob_array
 
 def negamax(ot, depth, alpha, beta): #TESTED OKAY
     if depth == 0 or ot.check_victory() != 0:
@@ -149,7 +192,7 @@ def negamax3(ot, depth, alpha, beta): #TESTED OKAY
 
 def negamax2(ot, depth, alpha, beta):
     if depth == 0 or ot.check_victory() != 0:
-        x = heuristic_eval2(ot.board, ot.turn)
+        x = heuristic_eval2(ot.board, ot.turn, ot.move_no)
         return x
     moves = ot.get_possible_moves()
     ot.check_no_move(moves)
@@ -164,9 +207,26 @@ def negamax2(ot, depth, alpha, beta):
             break
     return score * (1 if ot.turn == 1 else -1)
 
+def negamax4(ot, depth, alpha, beta):
+    if depth == 0 or ot.check_victory() != 0:
+        x = heuristic_eval4(ot.board, ot.turn, ot.move_no)
+        return x
+    moves = ot.get_possible_moves()
+    ot.check_no_move(moves)
+    score = -99999
+    for move in moves:
+        temp_ot = deepcopy(ot)
+        temp_ot.make_move(move)
+        new_score = negamax4(temp_ot, depth - 1, -beta, -alpha) * (1 if ot.turn == 1 else -1)
+        score = max(score, new_score)
+        alpha = max(alpha, score)
+        if beta <= alpha:
+            break
+    return score * (1 if ot.turn == 1 else -1)
+
 def negamax_late(ot, depth, alpha, beta): #BUGGY
     if depth == 0 or ot.check_victory() != 0:
-        return heur_pieces(ot)
+        return heur_pieces(ot.board)
     moves = ot.get_possible_moves()
     ot.check_no_move(moves)
     score = -99999
@@ -179,6 +239,10 @@ def negamax_late(ot, depth, alpha, beta): #BUGGY
         if beta <= alpha:
             break
     return score * (1 if ot.turn == 1 else -1)
+
+def heuristics_all(board, turn):
+    return [heur_pieces(board), heur_weight(board), heur_mobility(board), heur_parity(board, turn), heur_stablility(board)]
+
 
 # Returns the difference between the black pieces and white pieces
 def heur_pieces(board):
@@ -223,13 +287,11 @@ def check_stable_side(tiles):
     score = 0
     if tiles[0] != 0:
         for i in range(6):
-            if tiles[1 + i] == tiles[0]:
-                score += (1 if tiles[0] == 1 else -1)
+            if tiles[1 + i] == tiles[0]: score += (1 if tiles[0] == 1 else -1)
             else: break
     if tiles[7] != 0:
         for i in range(6):
-            if tiles[6 - i] == tiles[7]:
-                score += (1 if tiles[7] == 1 else -1)
+            if tiles[6 - i] == tiles[7]: score += (1 if tiles[7] == 1 else -1)
             else: break
     return score
 
