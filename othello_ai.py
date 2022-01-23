@@ -43,38 +43,54 @@ def level1(ot, delay):
     if delay: sleep(0.5)
     return choice(moves)
 
-# Level 2 AI: the ai tries to capture corners and prevent capturing buffer pieces
+# Level 2 AI: tries to capture corners and prevent capturing buffer pieces
 def level2(ot, delay):
     moves = ot.get_possible_moves()
     score_move = [-99999, []]
     for move in moves:
         temp_ot = deepcopy(ot)
         temp_ot.make_move(move)
-        new_score = heuristic_eval(temp_ot.board) * (1 if temp_ot.turn == 2 else -1)
+        new_score = negamax(temp_ot, 0, -99999, 99999, 1) * (1 if temp_ot.turn == 2 else -1)
         if new_score > score_move[0]: score_move = [new_score, [move]]
         elif new_score == score_move[0]: score_move[1].append(move)
     if delay: sleep(0.5)
     return choice(score_move[1])
 
 # Level 3 AI: looks 3 move ahead, focus on capturing corner and important tiles, prevent from capturing buffer zones
+# def level3(ot):
+#     moves = ot.get_possible_moves()
+#     score_move = [-99999, []]
+#     for move in moves:
+#         temp_ot = deepcopy(ot)
+#         temp_ot.make_move(move)
+#         new_score = negamax(temp_ot, 2, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
+#         if new_score > score_move[0]: score_move = [new_score, [move]]
+#         elif new_score == score_move[0]: score_move[1].append(move)
+#     return choice(score_move[1])
+
+# Level 3 AI: looks 2 moves ahead, evaluate a board state based on a trained model
 def level3(ot):
     moves = ot.get_possible_moves()
     score_move = [-99999, []]
     for move in moves:
         temp_ot = deepcopy(ot)
         temp_ot.make_move(move)
-        new_score = negamax(temp_ot, 2, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
+        new_score = negamax(temp_ot, 1, -99999, 99999, 2) * (1 if temp_ot.turn == 2 else -1)
         if new_score > score_move[0]: score_move = [new_score, [move]]
         elif new_score == score_move[0]: score_move[1].append(move)
     return choice(score_move[1])
 
+# TODO
 def level4(ot):
     moves = ot.get_possible_moves()
     score_move = [-99999, []]
     for move in moves:
         temp_ot = deepcopy(ot)
         temp_ot.make_move(move)
-        new_score = negamax3(temp_ot, 2, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
+        if ot.move_no < 51:
+            new_score = negamax(temp_ot, 0, -99999, 99999, 2) * (1 if temp_ot.turn == 2 else -1)
+        else:
+            new_score = negamax_late(temp_ot, 10, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
         if new_score > score_move[0]: score_move = [new_score, [move]]
         elif new_score == score_move[0]: score_move[1].append(move)
     return choice(score_move[1])
@@ -85,7 +101,7 @@ def level5(ot):
     for move in moves:
         temp_ot = deepcopy(ot)
         temp_ot.make_move(move)
-        new_score = negamax2(temp_ot, 0, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
+        new_score = negamax(temp_ot, 2, -99999, 99999, 2) * (1 if temp_ot.turn == 2 else -1)
         if new_score > score_move[0]: score_move = [new_score, [move]]
         elif new_score == score_move[0]: score_move[1].append(move)
     return choice(score_move[1])
@@ -96,7 +112,7 @@ def level6(ot):
     for move in moves:
         temp_ot = deepcopy(ot)
         temp_ot.make_move(move)
-        new_score = negamax4(temp_ot, 0, -99999, 99999) * (1 if temp_ot.turn == 2 else -1)
+        new_score = negamax(temp_ot, 2, -99999, 99999, 4) * (1 if temp_ot.turn == 2 else -1)
         if new_score > score_move[0]: score_move = [new_score, [move]]
         elif new_score == score_move[0]: score_move[1].append(move)
     return choice(score_move[1])
@@ -115,13 +131,15 @@ def level6(ot):
 #         elif new_score == score_move[0]: score_move[1].append(move)
 #     return choice(score_move[1])
 
-# Given an othello object state, return the score of that state based on some tile score (max for black aka player 1, min for white)
-def heuristic_eval(state):
+
+# Evaluate a board state based on some predetermined tile score, roughly gained through learning process
+def heuristic_eval1(state):
     score = 0
     for i in range(8):
         for j in range(8):
             score += val1[i][j] * (1 if state[i][j] == 1 else -1 if state[i][j] == 2 else 0)
     return score
+
 
 def heuristic_eval3(state):
     score = 0
@@ -130,20 +148,18 @@ def heuristic_eval3(state):
             score += val2[i][j] * (1 if state[i][j] == 1 else -1 if state[i][j] == 2 else 0)
     return score
 
+# Evaluate a board state based on a trained regression model by supervised learning
 def heuristic_eval2(state, turn, move_no):
-    #model = load(open("trial_model2.sav", 'rb'))
-    m01 = load(open("m01.sav", 'rb'))
-    m02 = load(open("m02.sav", 'rb'))
-    m03 = load(open("m03.sav", 'rb'))
-    m04 = load(open("m04.sav", 'rb'))
+    model1 = load(open("m01.sav", 'rb'))
+    model2 = load(open("m02.sav", 'rb'))
+    model3 = load(open("m03.sav", 'rb'))
+    model4 = load(open("m04.sav", 'rb'))
     heuristics = heuristics_all(state, turn)
-    if move_no >= 50: prob_array = m01.predict([heuristics])
-    if 41 <= move_no <= 50: prob_array = m02.predict([heuristics])
-    if 21 <= move_no <= 40: prob_array = m03.predict([heuristics])
-    if 1 <= move_no <= 20: prob_array = m04.predict([heuristics])
-    
-    #score = int(prob_array[0][2] * 20 - 10)
-    return prob_array
+    if move_no >= 50: score = model1.predict([heuristics])
+    if 41 <= move_no <= 50: score = model2.predict([heuristics])
+    if 21 <= move_no <= 40: score = model3.predict([heuristics])
+    if 1 <= move_no <= 20: score = model4.predict([heuristics])
+    return score
 
 def heuristic_eval4(state, turn, move_no):
     #model = load(open("trial_model2.sav", 'rb'))
@@ -160,69 +176,24 @@ def heuristic_eval4(state, turn, move_no):
     #score = int(prob_array[0][2] * 20 - 10)
     return prob_array
 
-def negamax(ot, depth, alpha, beta): #TESTED OKAY
+def negamax(ot, depth, alpha, beta, type): #TESTED OKAY
     if depth == 0 or ot.check_victory() != 0:
-        return heuristic_eval(ot.board)
+        if type == 1: return heuristic_eval1(ot.board)
+        if type == 2: return heuristic_eval2(ot.board, ot.turn, ot.move_no)
+        if type == 3: return heuristic_eval3(ot.board)
+        if type == 4: return heuristic_eval4(ot.board)
     moves = ot.get_possible_moves()
     ot.check_no_move(moves)
     score = -99999
     for move in moves:
         temp_ot = deepcopy(ot)
         temp_ot.make_move(move)
-        new_score = negamax(temp_ot, depth - 1, -beta, -alpha) * (1 if ot.turn == 1 else -1)
+        new_score = negamax(temp_ot, depth - 1, -beta, -alpha, type) * (1 if ot.turn == 1 else -1)
         score = max(score, new_score)
         alpha = max(alpha, score)
         if beta <= alpha: break
     return score * (1 if ot.turn == 1 else -1)
 
-def negamax3(ot, depth, alpha, beta): #TESTED OKAY
-    if depth == 0 or ot.check_victory() != 0:
-        return heuristic_eval3(ot.board)
-    moves = ot.get_possible_moves()
-    ot.check_no_move(moves)
-    score = -99999
-    for move in moves:
-        temp_ot = deepcopy(ot)
-        temp_ot.make_move(move)
-        new_score = negamax3(temp_ot, depth - 1, -beta, -alpha) * (1 if ot.turn == 1 else -1)
-        score = max(score, new_score)
-        alpha = max(alpha, score)
-        if beta <= alpha: break
-    return score * (1 if ot.turn == 1 else -1)
-
-def negamax2(ot, depth, alpha, beta):
-    if depth == 0 or ot.check_victory() != 0:
-        x = heuristic_eval2(ot.board, ot.turn, ot.move_no)
-        return x
-    moves = ot.get_possible_moves()
-    ot.check_no_move(moves)
-    score = -99999
-    for move in moves:
-        temp_ot = deepcopy(ot)
-        temp_ot.make_move(move)
-        new_score = negamax2(temp_ot, depth - 1, -beta, -alpha) * (1 if ot.turn == 1 else -1)
-        score = max(score, new_score)
-        alpha = max(alpha, score)
-        if beta <= alpha:
-            break
-    return score * (1 if ot.turn == 1 else -1)
-
-def negamax4(ot, depth, alpha, beta):
-    if depth == 0 or ot.check_victory() != 0:
-        x = heuristic_eval4(ot.board, ot.turn, ot.move_no)
-        return x
-    moves = ot.get_possible_moves()
-    ot.check_no_move(moves)
-    score = -99999
-    for move in moves:
-        temp_ot = deepcopy(ot)
-        temp_ot.make_move(move)
-        new_score = negamax4(temp_ot, depth - 1, -beta, -alpha) * (1 if ot.turn == 1 else -1)
-        score = max(score, new_score)
-        alpha = max(alpha, score)
-        if beta <= alpha:
-            break
-    return score * (1 if ot.turn == 1 else -1)
 
 def negamax_late(ot, depth, alpha, beta): #BUGGY
     if depth == 0 or ot.check_victory() != 0:

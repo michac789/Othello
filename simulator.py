@@ -9,9 +9,12 @@ from csv import writer
 
 # Modify this function
 def main():
-    simulate(10, 6, 5, False)
+    # for i in range(1, 7, 1):
+    #     for j in range(1, 7, 1):
+    #         simulate(100, i, j, False)
     #export_tile_heur(1000, 3, 3)
     #export_heuristics(10000, 5, 5)
+    simulate(20, 4, 1, True)
 
 
 # This function simulates N games with 2 ai levels representing black and white, printing the number and percentage of wins, loses and draws
