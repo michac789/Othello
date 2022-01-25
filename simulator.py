@@ -13,8 +13,9 @@ def main():
     #     for j in range(1, 7, 1):
     #         simulate(100, i, j, False)
     #export_tile_heur(1000, 3, 3)
-    #export_heuristics(10000, 5, 5)
-    simulate(20, 4, 1, True)
+    export_heuristics(100000, 1, 1)
+    # simulate(20, 6, 5, True)
+    # simulate(20, 5, 6, True)
 
 
 # This function simulates N games with 2 ai levels representing black and white, printing the number and percentage of wins, loses and draws
@@ -64,7 +65,7 @@ def export_heuristics(N, level_black, level_white):
                 turn = ot.moves_made[key][1]
                 row = [move_no]
                 move_no += 1
-                heuristics = heur_pieces(board), heur_weight(board), heur_mobility(board), heur_parity(board, turn), heur_stablility(board)
+                heuristics = heur_pieces(board), heur_weight1(board), heur_mobility(board), heur_parity(board, turn), heur_stablility(board)
                 row.extend(heuristics)
                 if winner == 1: row.append(1)
                 elif winner == 2: row.append(-1)
