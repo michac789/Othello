@@ -149,7 +149,7 @@ class Game():
             if self.classic_ai2_color == "b": self.classic_chosen[self.classic_ai2_level_b + 6] = True
             if self.classic_ai2_color == "w": self.classic_chosen[self.classic_ai2_level_w + 6] = True
     
-    #...
+    # Handles configuration made in pre_custom state
     def custom_choose(self, index):
         if (index == 8 or index == 9): self.dim_height += 1 * (1 if index == 8 else -1)
         if (index == 10 or index == 11): self.dim_width += 1 * (1 if index == 10 else -1)
@@ -351,8 +351,9 @@ class Game():
         self.display_title("Custom Mode")
         self.display_buttons()
         self.display_icon()
+        self.custom_choose(-1)
         button_texts = ["Choose board height:", "Choose board width:", "Time limit (minutes):", "Initial board position:", "",
-                        f"{self.dim_height}", f"{self.dim_width}", f"{self.custom_time} Mins", "+", "-", "+", "-", "+", "-", "Set Board"]
+                        f"{self.dim_height}", f"{self.dim_width}", f"{self.custom_time} Mins" if self.custom_time > 0 else "Unlimited", "+", "-", "+", "-", "+", "-", "Set Board"]
         button_dict = {}
         for i in range(len(button_texts)):
             if 0 <= i <= 4:
@@ -383,13 +384,13 @@ class Game():
         left, _, _ = pygame.mouse.get_pressed()
         mouse = pygame.mouse.get_pos()
         if left == 1:
-            for i in range(8, 15, 1):
+            for i in range(8, 14, 1):
                 if button_dict[i].collidepoint(mouse):
                     if not self.noclick_pre_custom[i]:
                         if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
                         self.custom_choose(i)
                     elif self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_INVALID))
-                if i == 14: raise NotImplementedError # TODO
+            if button_dict[14].collidepoint(mouse): raise NotImplementedError # TODO
         for i in range(8, 15, 1):
             self.hover_pre_custom[i] = False
             if button_dict[i].collidepoint(mouse):
@@ -606,8 +607,6 @@ if __name__ == "__main__":
 
 # TODO
 """
-bug: custom time option
-
 - Finalize AI and its levels
 - Custom mode (othello sizes & starting positions)
 - Create pre_custom feature user interface
