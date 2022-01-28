@@ -41,6 +41,7 @@ class Game():
         self.classic_ai_black = False # AI goes later (second turn) as white by default, can be set to true so AI makes first turn
         self.classic_chosen = [False for i in range(16)] # For UI purposes
         self.classic_ai2_level_b, self.classic_ai2_level_w, self.classic_ai2_color = 1, 1, 'b' # Level for AI VS AI Mode (black and white)
+        self.custom_time = 5 # Custom time in minutes; from untimed up to 60 minutes max
         
         # Choose modes in 'pre_custom' state
         # TODO
@@ -58,6 +59,8 @@ class Game():
         self.hover_main = [False for i in range(9)]
         self.hover_pre_buttons = [False for i in range(2)]
         self.hover_pre_classic = [False for i in range(15)]
+        self.hover_pre_custom = [False for i in range(15)]
+        self.noclick_pre_custom = [False for i in range(15)]
         self.hover_play_util = [False for i in range(11)]
         self.hover_yes, self.hover_no = False, False
     
@@ -149,6 +152,17 @@ class Game():
             else: self.classic_chosen[14] = True
             if self.classic_ai2_color == "b": self.classic_chosen[self.classic_ai2_level_b + 6] = True
             if self.classic_ai2_color == "w": self.classic_chosen[self.classic_ai2_level_w + 6] = True
+            
+    def custom_choose(self, index):
+        if (index == 8 or index == 9): self.dim_height += 1 * (1 if index == 8 else -1)
+        if (index == 10 or index == 11): self.dim_width += 1 * (1 if index == 10 else -1)
+        if (index == 12 or index == 13): self.custom_time += 1 * (1 if index == 12 else -1)
+        self.noclick_pre_custom[8:14:1] = [False for i in range(6)]
+        
+        if self.dim_height == 4 or self.dim_height == 20: self.noclick_pre_custom[(9 if self.dim_height == 4 else 8)] = True
+        if self.dim_width == 4 or self.dim_width == 20: self.noclick_pre_custom[(11 if self.dim_width == 4 else 10)] = True
+        if self.custom_time == 0 or self.custom_time == 60: self.noclick_pre_custom[(13 if self.custom_time == 0 else 12)] = True
+        #print(self.noclick_pre_custom)
 
     # Called upon to play main menu bgm and set its volume when not played yet, also called from several other game states
     def play_main_bgm(self):
@@ -213,8 +227,10 @@ class Game():
                 self.game_menu = "start"
             if button_dict[1].collidepoint(mouse):
                 if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
-                self.init_white, self.init_black = [(3, 3), (4, 4)], [(3, 4), (4, 3)]
-                self.dim_height, self.dim_width = 8, 8
+                if self.game_menu == "pre_classic":
+                    self.init_white, self.init_black = [(3, 3), (4, 4)], [(3, 4), (4, 3)]
+                    self.dim_height, self.dim_width = 8, 8
+                #else: print("Custom mode")
                 self.game_menu = "play"
                 time.sleep(0.2)
         for i in range(2):
@@ -335,14 +351,13 @@ class Game():
             if button_dict[i].collidepoint(mouse):
                 self.hover_pre_classic[i] = True
     
-    def state_pre_custom(self): #TODO        
+    def state_pre_custom(self): #TODO    
+        # Display title and various buttons
         self.display_title("Custom Mode")
         self.display_buttons()
         self.display_icon()
-        
-        timer = 0
         button_texts = ["Choose board height:", "Choose board width:", "Time limit (minutes):", "Initial board position:", "",
-                        f"{self.dim_height}", f"{self.dim_width}", f"{timer}", "+", "-", "+", "-", "+", "-", "Set Board"]
+                        f"{self.dim_height}", f"{self.dim_width}", f"{self.custom_time} Mins", "+", "-", "+", "-", "+", "-", "Set Board"]
         button_dict = {}
         for i in range(len(button_texts)):
             if 0 <= i <= 4:
@@ -353,7 +368,7 @@ class Game():
                 buttonText = self.prepoptionFont.render(button_texts[i], True, prep_option_color1)
             if 8 <= i <= 13:
                 buttonRect = pygame.Rect(self.virtual_width * (0.47 + 0.26 * ((i - 7) % 2)), self.virtual_height * (0.27 + 0.13 * math.floor((i - 8) / 2)), self.virtual_width * 0.05, self.virtual_height / 12)
-                buttonText = self.prepoptionFont.render(button_texts[i], True, (prep_option_color2 if self.hover_pre_classic[i] == False else prep_button_hover_color1))
+                buttonText = self.prepoptionFont.render(button_texts[i], True, prep_option_color1)
             if i == 14:
                 buttonRect = pygame.Rect(self.virtual_width * 0.55, self.virtual_height * 0.67, self.virtual_width * 0.15, self.virtual_height / 11)
                 buttonText = self.prepoptionFont.render(button_texts[i], True, prep_option_color1)
@@ -361,14 +376,22 @@ class Game():
             buttonTextRect = buttonText.get_rect()
             buttonTextRect.center = buttonRect.center
             if 0 <= i <= 4: pygame.draw.rect(self.screen, black, buttonRect) 
-            else: pygame.draw.rect(self.screen, (prep_button_color1 if self.classic_chosen[i] == False else prep_chosen_color), buttonRect)
+            else: pygame.draw.rect(self.screen, (prep_button_color1), buttonRect)
             self.screen.blit(buttonText, buttonTextRect)
-        
-        self.init_white = [(0, 0), (0, 1), (0, 2), (0, 3)]
-        self.init_black = [(1, 0), (1, 1), (1, 2), (1, 3)]
-        self.dim_height, self.dim_width = 4, 4
-        # self.game_menu = "play"
-        # time.sleep(0.2)
+
+        # Buttons functionality when clicked & hover effects
+        left, _, _ = pygame.mouse.get_pressed()
+        mouse = pygame.mouse.get_pos()
+        if left == 1:
+            for i in range(8, 15, 1):
+                if button_dict[i].collidepoint(mouse):
+                    if not self.noclick_pre_custom[i]:
+                        if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
+                        self.custom_choose(i)
+        for i in range(8, 15, 1):
+            self.hover_pre_custom[i] = False
+            if button_dict[i].collidepoint(mouse):
+                self.hover_pre_custom[i] = True
         
         # TEMPORARY PLACEHOLDER TODO
         
