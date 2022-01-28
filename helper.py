@@ -28,6 +28,12 @@ prep_button_hover_color2 = (200, 25, 145)
 prep_rect_hover_color = (179, 255, 255)
 prep_chosen_color = (255, 210, 10)
 
+custom_button_color1 = (255, 230, 204)
+custom_button_color2 = (153, 255, 51)
+custom_button_hover_color1 = (255, 255, 0)
+custom_button_hover_color2 = (0, 204, 0)
+custom_button_noclick_color = (0, 0, 0)
+
 play_scoreboard_color = (115, 77, 38)
 play_timer_color = (104, 43, 203)
 play_score_color = (102, 255, 204)

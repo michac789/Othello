@@ -43,10 +43,6 @@ class Game():
         self.classic_ai2_level_b, self.classic_ai2_level_w, self.classic_ai2_color = 1, 1, 'b' # Level for AI VS AI Mode (black and white)
         self.custom_time = 5 # Custom time in minutes; from untimed up to 60 minutes max
         
-        # Choose modes in 'pre_custom' state
-        # TODO
-        # board width, height, undo (allow / no)
-        
         # Keep track of time (time left & time since pygame was init for starting relative time)
         self.timer_player1, self.timer_player2 = 0, 0
         self.time_start1, self.time_start2 = None, None
@@ -370,13 +366,14 @@ class Game():
                 buttonRect = pygame.Rect(self.virtual_width * (0.47 + 0.26 * ((i - 7) % 2)), self.virtual_height * (0.27 + 0.13 * math.floor((i - 8) / 2)), self.virtual_width * 0.05, self.virtual_height / 12)
                 buttonText = self.prepoptionFont.render(button_texts[i], True, prep_option_color1)
             if i == 14:
-                buttonRect = pygame.Rect(self.virtual_width * 0.55, self.virtual_height * 0.67, self.virtual_width * 0.15, self.virtual_height / 11)
+                buttonRect = pygame.Rect(self.virtual_width * 0.5, self.virtual_height * 0.67, self.virtual_width * 0.25, self.virtual_height / 11)
                 buttonText = self.prepoptionFont.render(button_texts[i], True, prep_option_color1)
             button_dict[i] = buttonRect
             buttonTextRect = buttonText.get_rect()
             buttonTextRect.center = buttonRect.center
-            if 0 <= i <= 4: pygame.draw.rect(self.screen, black, buttonRect) 
-            else: pygame.draw.rect(self.screen, (prep_button_color1), buttonRect)
+            if 0 <= i <= 4: pygame.draw.rect(self.screen, black, buttonRect)
+            elif i == 14: pygame.draw.rect(self.screen, (custom_button_hover_color2 if self.hover_pre_custom[i] else custom_button_color2), buttonRect)
+            else: pygame.draw.rect(self.screen, (custom_button_hover_color1 if self.hover_pre_custom[i] else custom_button_color1), buttonRect)
             self.screen.blit(buttonText, buttonTextRect)
 
         # Buttons functionality when clicked & hover effects
