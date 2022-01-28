@@ -65,7 +65,7 @@ def export_heuristics(N, level_black, level_white):
                 turn = ot.moves_made[key][1]
                 row = [move_no]
                 move_no += 1
-                heuristics = heur_pieces(board), heur_weight1(board), heur_mobility(board), heur_parity(board, turn), heur_stablility(board)
+                heuristics = heur_pieces(board), heur_weight2(board), heur_mobility(board), heur_parity(board, turn), heur_stablility(board)
                 row.extend(heuristics)
                 if winner == 1: row.append(1)
                 elif winner == 2: row.append(-1)

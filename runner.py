@@ -27,7 +27,7 @@ class Game():
         pygame.display.set_caption("Othello")
         self.screen = pygame.display.set_mode((800, 450), pygame.RESIZABLE)
         
-        # State machine updator; Menu: start, play, pre_classic, pre_custom, pre_puzzle, tutorial, leaderboard; 
+        # State machine updator; Menu: start, play, pre_classic, pre_custom, pre_puzzle, how_to_play, about;
         self.game_menu = "start"
         self.game_state = "prep" # State: prep, play, end
         self.confirmation_action = "" # Confirmation window displayer
@@ -44,6 +44,7 @@ class Game():
         
         # Choose modes in 'pre_custom' state
         # TODO
+        # board width, height, undo (allow / no)
         
         # Keep track of time (time left & time since pygame was init for starting relative time)
         self.timer_player1, self.timer_player2 = 0, 0
@@ -111,6 +112,10 @@ class Game():
                 raise NotImplementedError
             elif self.game_menu == "play":
                 self.state_play()
+            elif self.game_menu == "how_to_play":
+                self.state_howtoplay()
+            elif self.game_menu == "about":
+                self.state_about()
             pygame.display.flip()
     
     # Handles all the choosing mode buttons and its action towards self.classic_(xxx) in the 'pre_classic' state
@@ -248,7 +253,7 @@ class Game():
         self.screen.blit(title, titleRect)
         
         # Display buttons (classic mode, custom mode, puzzle mode), supporting buttons and toogle bgm / sfx / full screen buttons
-        button_texts = ["Classic Mode", "Custom Mode", "Puzzle Mode", "", "How To Play", "Leaderboards", "About", "BGM", "SFX"]
+        button_texts = ["Classic Mode", "Custom Mode", "Puzzle Mode", "", "How To Play", "About", "", "BGM", "SFX"]
         button_dict = {}
         for i in range(len(button_texts)):
             if 0 <= i <= 3:
@@ -259,9 +264,9 @@ class Game():
                 if i != 3:
                     if self.hover_main[i] == True: pygame.draw.rect(self.screen, main_button1_hover_color, buttonRect)
                     else: pygame.draw.rect(self.screen, main_button1_color, buttonRect)
-            elif 4 <= i <= 6:
-                buttonRect = pygame.Rect(self.virtual_width * (0.1 + 0.25 * (i - 4)), self.virtual_height * 0.8, self.virtual_width * 0.2, self.virtual_height / 10)
-                if self.hover_main[i] == True: buttonRect = pygame.Rect((self.virtual_width * (0.1 + 0.25 * (i - 4))) - (self.virtual_width * 0.2) * 0.02, self.virtual_height * 0.8, (self.virtual_width * 0.2) * 1.04, (self.virtual_height / 10) * 1.03)
+            elif 4 <= i <= 5:
+                buttonRect = pygame.Rect(self.virtual_width * (0.27 + 0.25 * (i - 4)), self.virtual_height * 0.8, self.virtual_width * 0.2, self.virtual_height / 10)
+                if self.hover_main[i] == True: buttonRect = pygame.Rect((self.virtual_width * (0.27 + 0.25 * (i - 4))) - (self.virtual_width * 0.2) * 0.02, self.virtual_height * 0.8, (self.virtual_width * 0.2) * 1.04, (self.virtual_height / 10) * 1.03)
                 buttonText = self.mainbuttonFont2.render(button_texts[i], True, main_button2_text_color)
                 if self.hover_main[i] == True: buttonText = self.mainbuttonHoverFont2.render(button_texts[i], True, main_button2_text_hover_color)
                 if self.hover_main[i] == True: pygame.draw.rect(self.screen, main_button2_hover_color, buttonRect)
@@ -273,11 +278,11 @@ class Game():
         self.display_icon()
         
         # Change state when respective buttons are clicked, add hover effects
-        states = ["pre_classic", "pre_custom", "pre_puzzle"]
+        states = ["pre_classic", "pre_custom", "pre_puzzle", "how_to_play", "about"]
         mouse = pygame.mouse.get_pos()
         left, _, _ = pygame.mouse.get_pressed()
         if left == 1:
-            for i in range(3):
+            for i in range(5):
                 if button_dict[i].collidepoint(mouse):
                     self.game_menu = states[i]
                     if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
@@ -366,6 +371,12 @@ class Game():
         # time.sleep(0.2)
         
         # TEMPORARY PLACEHOLDER TODO
+        
+    def state_howtoplay(self): # TODO
+        raise NotImplementedError
+    
+    def state_about(self): # TODO
+        raise NotImplementedError
 
     def state_play(self):
         # Initialize game with the required settings; added bgm for gameplay
@@ -572,17 +583,13 @@ if __name__ == "__main__":
 
 # TODO
 """
-
-
-
+- Finalize AI and its levels
 - Custom mode (othello sizes & starting positions)
 - Create pre_custom feature user interface
-
 - 'How to play' pages and pics, UI
 
-7. Puzzle mode??
-
-- Custom othello sizes and vs ai mode
-- etc.. (coming soon)
+- Puzzle mode??
+- Create about page
+- DONE with everything
 
 """

@@ -16,15 +16,15 @@ import pickle
 
 # Adjust these values to customize training
 MODE = 1
-LOAD_PATH = "data_x.csv"
-SAVE_PATH = "md4.sav"
-TURN_LOWER = 1
-TURN_UPPER = 20
+LOAD_PATH = "data_1.csv"
+SAVE_PATH = "model4.sav"
+TURN_LOWER = 51
+TURN_UPPER = 60
 
-# m01: move 51-60
-# m02: move 41-50
-# m03: move 21-40
-# m04: move 01-20
+# model1: move 51-60
+# model2: move 41-50
+# model3: move 21-40
+# model4: move 01-20
 
 # Load training data, split into training and test sets, train and analyze model, getting result from new data
 def main():

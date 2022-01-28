@@ -98,7 +98,8 @@ def level5(ot):
     for move in moves:
         temp_ot = deepcopy(ot)
         temp_ot.make_move(move)
-        new_score = negamax(temp_ot, 2, -99999, 99999, 2) * (1 if temp_ot.turn == 2 else -1)
+        if ot.move_no < 50: new_score = negamax(temp_ot, 2, -99999, 99999, 2) * (1 if temp_ot.turn == 2 else -1)
+        else: new_score = negamax(temp_ot, 6, -99999, 99999, 4) * (1 if temp_ot.turn == 2 else -1)
         if new_score > score_move[0]: score_move = [new_score, [move]]
         elif new_score == score_move[0]: score_move[1].append(move)
     return choice(score_move[1])
@@ -110,10 +111,8 @@ def level6(ot):
     for move in moves:
         temp_ot = deepcopy(ot)
         temp_ot.make_move(move)
-        # if ot.move_no < 50:
-        #     new_score = negamax(temp_ot, 0, -99999, 99999, 3) * (1 if temp_ot.turn == 2 else -1)
-        # else:
-        #     new_score = negamax(temp_ot, 10, -99999, 99999, 4) * (1 if temp_ot.turn == 2 else -1)
+        if ot.move_no < 50: new_score = negamax(temp_ot, 0, -99999, 99999, 3) * (1 if temp_ot.turn == 2 else -1)
+        else: new_score = negamax(temp_ot, 10, -99999, 99999, 4) * (1 if temp_ot.turn == 2 else -1)
         new_score = negamax(temp_ot, 2, -99999, 99999, 3) * (1 if temp_ot.turn == 2 else -1)
         if new_score > score_move[0]: score_move = [new_score, [move]]
         elif new_score == score_move[0]: score_move[1].append(move)
@@ -152,12 +151,13 @@ def heuristic_eval2(state, turn, move_no):
     return round(model.predict([heuristics])[0])
 
 def heuristic_eval3(state, turn, move_no):
-    heuristics = heuristics_all2(state, turn)
-    if move_no >= 50: model = load(open(join("learning_data", "model1.sav"), 'rb'))
-    elif 41 <= move_no <= 50: model = load(open(join("learning_data", "model2.sav"), 'rb'))
-    elif 21 <= move_no <= 40: model = load(open(join("learning_data", "model3.sav"), 'rb'))
-    elif 1 <= move_no <= 20: model = load(open(join("learning_data", "model4.sav"), 'rb'))
-    return round(model.predict([heuristics])[0])
+    # heuristics = heuristics_all2(state, turn)
+    # if move_no >= 50: model = load(open(join("learning_data", "model1.sav"), 'rb'))
+    # elif 41 <= move_no <= 50: model = load(open(join("learning_data", "model2.sav"), 'rb'))
+    # elif 21 <= move_no <= 40: model = load(open(join("learning_data", "model3.sav"), 'rb'))
+    # elif 1 <= move_no <= 20: model = load(open(join("learning_data", "model4.sav"), 'rb'))
+    # return round(model.predict([heuristics])[0])
+    return sum(val1[i][j] * (1 if state[i][j] == 1 else -1 if state[i][j] == 2 else 0) for i in range(8) for j in range(8))
     # if move_no >= 41:
     #     a, b, c, d, e = 1, 1, 1, 5, 4
     # elif 21 <= move_no <= 40:
