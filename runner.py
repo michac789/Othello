@@ -41,7 +41,7 @@ class Game():
         self.classic_ai_black = False # AI goes later (second turn) as white by default, can be set to true so AI makes first turn
         self.classic_chosen = [False for i in range(16)] # For UI purposes
         self.classic_ai2_level_b, self.classic_ai2_level_w, self.classic_ai2_color = 1, 1, 'b' # Level for AI VS AI Mode (black and white)
-        self.custom_time = 5 # Custom time in minutes; from untimed up to 60 minutes max
+        self.custom_time = 0 # Custom time in minutes; from untimed up to 60 minutes max
         
         # Keep track of time (time left & time since pygame was init for starting relative time)
         self.timer_player1, self.timer_player2 = 0, 0
@@ -148,17 +148,16 @@ class Game():
             else: self.classic_chosen[14] = True
             if self.classic_ai2_color == "b": self.classic_chosen[self.classic_ai2_level_b + 6] = True
             if self.classic_ai2_color == "w": self.classic_chosen[self.classic_ai2_level_w + 6] = True
-            
+    
+    #...
     def custom_choose(self, index):
         if (index == 8 or index == 9): self.dim_height += 1 * (1 if index == 8 else -1)
         if (index == 10 or index == 11): self.dim_width += 1 * (1 if index == 10 else -1)
         if (index == 12 or index == 13): self.custom_time += 1 * (1 if index == 12 else -1)
         self.noclick_pre_custom[8:14:1] = [False for i in range(6)]
-        
         if self.dim_height == 4 or self.dim_height == 20: self.noclick_pre_custom[(9 if self.dim_height == 4 else 8)] = True
         if self.dim_width == 4 or self.dim_width == 20: self.noclick_pre_custom[(11 if self.dim_width == 4 else 10)] = True
         if self.custom_time == 0 or self.custom_time == 60: self.noclick_pre_custom[(13 if self.custom_time == 0 else 12)] = True
-        #print(self.noclick_pre_custom)
 
     # Called upon to play main menu bgm and set its volume when not played yet, also called from several other game states
     def play_main_bgm(self):
@@ -226,7 +225,6 @@ class Game():
                 if self.game_menu == "pre_classic":
                     self.init_white, self.init_black = [(3, 3), (4, 4)], [(3, 4), (4, 3)]
                     self.dim_height, self.dim_width = 8, 8
-                #else: print("Custom mode")
                 self.game_menu = "play"
                 time.sleep(0.2)
         for i in range(2):
@@ -263,6 +261,7 @@ class Game():
         titleRect = title.get_rect()
         titleRect.center = (self.virtual_width / 2, self.virtual_height * 0.2)
         self.screen.blit(title, titleRect)
+        self.classic_time = -1
         
         # Display buttons (classic mode, custom mode, puzzle mode), supporting buttons and toogle bgm / sfx / full screen buttons
         button_texts = ["Classic Mode", "Custom Mode", "Puzzle Mode", "", "How To Play", "About", "", "BGM", "SFX"]
@@ -373,9 +372,13 @@ class Game():
             buttonTextRect.center = buttonRect.center
             if 0 <= i <= 4: pygame.draw.rect(self.screen, black, buttonRect)
             elif i == 14: pygame.draw.rect(self.screen, (custom_button_hover_color2 if self.hover_pre_custom[i] else custom_button_color2), buttonRect)
-            else: pygame.draw.rect(self.screen, (custom_button_hover_color1 if self.hover_pre_custom[i] else custom_button_color1), buttonRect)
+            else: pygame.draw.rect(self.screen, (custom_button_noclick_color if self.noclick_pre_custom[i] else custom_button_hover_color1 if self.hover_pre_custom[i] else custom_button_color1), buttonRect)
             self.screen.blit(buttonText, buttonTextRect)
 
+        # Timer functionality
+        if self.custom_time > 0: self.timer_player1, self.timer_player2, self.classic_time = 60000 * self.custom_time, 60000 * self.custom_time, -2
+        else: self.classic_time = -1
+        
         # Buttons functionality when clicked & hover effects
         left, _, _ = pygame.mouse.get_pressed()
         mouse = pygame.mouse.get_pos()
@@ -385,12 +388,12 @@ class Game():
                     if not self.noclick_pre_custom[i]:
                         if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
                         self.custom_choose(i)
+                    elif self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_INVALID))
+                if i == 14: raise NotImplementedError # TODO
         for i in range(8, 15, 1):
             self.hover_pre_custom[i] = False
             if button_dict[i].collidepoint(mouse):
                 self.hover_pre_custom[i] = True
-        
-        # TEMPORARY PLACEHOLDER TODO
         
     def state_howtoplay(self): # TODO
         raise NotImplementedError
@@ -603,6 +606,8 @@ if __name__ == "__main__":
 
 # TODO
 """
+bug: custom time option
+
 - Finalize AI and its levels
 - Custom mode (othello sizes & starting positions)
 - Create pre_custom feature user interface
