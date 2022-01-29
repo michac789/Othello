@@ -30,6 +30,7 @@ prep_chosen_color = (255, 210, 10)
 
 custom_button_color1 = (255, 230, 204)
 custom_button_color2 = (153, 255, 51)
+custom_button_color3 = (255, 51, 153)
 custom_button_hover_color1 = (255, 255, 0)
 custom_button_hover_color2 = (0, 204, 0)
 custom_button_noclick_color = (70, 70, 70)

@@ -37,11 +37,15 @@ class Game():
         self.classic_mode = "Human" # 'Human' by default for 2 players, or 'AI' against computer, or "AI2" for both computer players
         self.classic_time = -1 # '-1' for no time limit by default, or 5/10/15/20/30 mins for each player
         self.classic_undo = True # Allow undo move by default, can be set to False
-        self.classic_ai_level = 1 # Level 1 AI (easiest) by default, available up to level 6 (hopefully) #TODO
+        self.classic_ai_level = 1 # Level 1 AI (easiest) by default, available up to level 6
         self.classic_ai_black = False # AI goes later (second turn) as white by default, can be set to true so AI makes first turn
         self.classic_chosen = [False for i in range(16)] # For UI purposes
         self.classic_ai2_level_b, self.classic_ai2_level_w, self.classic_ai2_color = 1, 1, 'b' # Level for AI VS AI Mode (black and white)
+        
+        # Handles custom mode configuration
         self.custom_time = 0 # Custom time in minutes; from untimed up to 60 minutes max
+        self.custom_init = None
+        self.custom_setboard = False
         
         # Keep track of time (time left & time since pygame was init for starting relative time)
         self.timer_player1, self.timer_player2 = 0, 0
@@ -107,6 +111,8 @@ class Game():
                 self.state_pre_classic()
             elif self.game_menu == "pre_custom":
                 self.state_pre_custom()
+            elif self.game_menu == "set_board":
+                self.state_set_board()
             elif self.game_menu == "pre_puzzle":
                 raise NotImplementedError
             elif self.game_menu == "play":
@@ -346,7 +352,7 @@ class Game():
             if button_dict[i].collidepoint(mouse):
                 self.hover_pre_classic[i] = True
     
-    def state_pre_custom(self): #TODO    
+    def state_pre_custom(self):
         # Display title and various buttons
         self.display_title("Custom Mode")
         self.display_buttons()
@@ -364,7 +370,7 @@ class Game():
                 buttonText = self.prepoptionFont.render(button_texts[i], True, prep_option_color1)
             if 8 <= i <= 13:
                 buttonRect = pygame.Rect(self.virtual_width * (0.47 + 0.26 * ((i - 7) % 2)), self.virtual_height * (0.27 + 0.13 * math.floor((i - 8) / 2)), self.virtual_width * 0.05, self.virtual_height / 12)
-                buttonText = self.prepoptionFont.render(button_texts[i], True, prep_option_color1)
+                buttonText = self.preptextFont.render(button_texts[i], True, (prep_option_color3 if self.hover_pre_custom[i] and not self.noclick_pre_custom[i] else prep_option_color1))
             if i == 14:
                 buttonRect = pygame.Rect(self.virtual_width * 0.5, self.virtual_height * 0.67, self.virtual_width * 0.25, self.virtual_height / 11)
                 buttonText = self.prepoptionFont.render(button_texts[i], True, prep_option_color1)
@@ -390,12 +396,55 @@ class Game():
                         if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
                         self.custom_choose(i)
                     elif self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_INVALID))
-            if button_dict[14].collidepoint(mouse): raise NotImplementedError # TODO
+            if button_dict[14].collidepoint(mouse):
+                if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
+                self.custom_init = [[0 for i in range(self.dim_width)] for i in range(self.dim_height)]
+                self.game_menu = "set_board"
         for i in range(8, 15, 1):
             self.hover_pre_custom[i] = False
             if button_dict[i].collidepoint(mouse):
                 self.hover_pre_custom[i] = True
+    
+    def state_set_board(self):
+        self.play_main_bgm()
+        self.display_buttons()
+        self.screen.fill(black)
+        tiles = []
+        for i in range(self.dim_height):
+            row_tiles = []
+            for j in range(self.dim_width):
+                rect = pygame.Rect(self.board_start[0] + j * self.tile_size, self.board_start[1] + i * self.tile_size, self.tile_size, self.tile_size)
+                pygame.draw.rect(self.screen, tile_color, rect)
+                pygame.draw.rect(self.screen, board_color, rect, 3)
+                row_tiles.append(rect)
+            tiles.append(row_tiles)
+        self.display_icon()
+        for i in range(self.dim_height):
+            for j in range(self.dim_width):
+                coordinate = (self.board_start[0] + j * self.tile_size + self.tile_size / 2, self.board_start[1] + i * self.tile_size + self.tile_size / 2)
+                if self.custom_init[i][j] != 0:
+                    circ = pygame.draw.circle(self.screen, tile_border_color, coordinate, self.piece_radius + 2)
+                    circ = pygame.draw.circle(self.screen, (white if self.custom_init[i][j] == 2 else black), coordinate, self.piece_radius)
         
+        # Update custom disks position when tiles are clicked; left click for black, right click for white
+        mouse = pygame.mouse.get_pos()
+        left, mid, right = pygame.mouse.get_pressed()
+        for i in range(self.dim_height):
+            for j in range(self.dim_width):
+                if tiles[i][j].collidepoint(mouse):
+                    if left == 1:
+                        if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
+                        if self.custom_init[i][j] != 1: self.custom_init[i][j] = 1
+                        elif self.custom_init[i][j] == 1: self.custom_init[i][j] = 0
+                    elif right == 1:
+                        if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
+                        if self.custom_init[i][j] != 2: self.custom_init[i][j] = 2
+                        elif self.custom_init[i][j] == 2: self.custom_init[i][j] = 0
+                        time.sleep(0.2)
+                        
+        # TODO
+    
+    
     def state_howtoplay(self): # TODO
         raise NotImplementedError
     
@@ -523,7 +572,6 @@ class Game():
         if self.confirmation_action == "":
             left, _, _ = pygame.mouse.get_pressed()
             if left == 1:
-                #if self.game_state == "play" and (self.classic_mode == "human" or self.human_turn == self.ot.turn):
                 if self.game_state == "play":
                     for i in range(self.dim_height):
                         for j in range(self.dim_width):
