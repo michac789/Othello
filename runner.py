@@ -19,7 +19,7 @@ class Game():
     def __init__(self):
         # Initialize pygame, board default configuration, set title, set default 16:9 resizable screen
         self.dim_height, self.dim_width = 8, 8
-        self.init_white, self.init_black = [(3, 3), (4, 4)], [(3, 4), (4, 3)]
+        self.init_white, self.init_black = None, None
         self.ot = None
         self.screen_width, self.screen_height = 800, 450
         pygame.init()
@@ -232,6 +232,14 @@ class Game():
                 if self.game_menu == "pre_classic":
                     self.init_white, self.init_black = [(3, 3), (4, 4)], [(3, 4), (4, 3)]
                     self.dim_height, self.dim_width = 8, 8
+                elif self.game_menu == "pre_custom":
+                    self.classic_mode = "Human"
+                    self.init_white, self.init_black = [], []
+                    if self.custom_init is None: self.custom_init = [[0 for i in range(self.dim_width)] for j in range(self.dim_height)]
+                    for i in range(self.dim_height):
+                        for j in range(self.dim_width):
+                            if self.custom_init[i][j] == 1: self.init_white.append((i, j))
+                            if self.custom_init[i][j] == 2: self.init_black.append((i, j))
                 self.game_menu = "play"
                 time.sleep(0.2)
         for i in range(2):
@@ -399,7 +407,7 @@ class Game():
                     elif self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_INVALID))
             if button_dict[14].collidepoint(mouse):
                 if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
-                if self.custom_changesize or self.custom_init is None: self.custom_init = [[0 for i in range(self.dim_width)] for i in range(self.dim_height)]
+                if self.custom_changesize or self.custom_init is None: self.custom_init = [[0 for i in range(self.dim_width)] for j in range(self.dim_height)]
                 self.game_menu = "set_board"
         for i in range(8, 15, 1):
             self.hover_pre_custom[i] = False
@@ -436,7 +444,7 @@ class Game():
         
         # Update custom disks position when tiles are clicked; left click for black, right click for white, update button functionality
         mouse = pygame.mouse.get_pos()
-        left, mid, right = pygame.mouse.get_pressed()
+        left, _, right = pygame.mouse.get_pressed()
         for i in range(self.dim_height):
             for j in range(self.dim_width):
                 if tiles[i][j].collidepoint(mouse):
@@ -456,9 +464,7 @@ class Game():
                 self.custom_changesize = False
                 self.game_menu = "pre_custom"
                         
-        # TODO - update button functionality DONE
         # TODO - add how to use image
-        # TODO - set config before play custom game
     
     def state_howtoplay(self): # TODO
         raise NotImplementedError
