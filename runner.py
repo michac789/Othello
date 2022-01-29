@@ -114,7 +114,7 @@ class Game():
             elif self.game_menu == "set_board":
                 self.state_set_board()
             elif self.game_menu == "pre_puzzle":
-                raise NotImplementedError
+                self.state_pre_puzzle()
             elif self.game_menu == "play":
                 self.state_play()
             elif self.game_menu == "how_to_play":
@@ -304,7 +304,7 @@ class Game():
         self.display_icon()
         
         # Change state when respective buttons are clicked, add hover effects
-        states = ["pre_classic", "pre_custom", "pre_puzzle", "how_to_play", "about"]
+        states = ["pre_classic", "pre_custom", "pre_puzzle",  "about", "how_to_play",]
         mouse = pygame.mouse.get_pos()
         left, _, _ = pygame.mouse.get_pressed()
         if left == 1:
@@ -470,9 +470,21 @@ class Game():
                 self.game_menu = "pre_custom"
     
     def state_howtoplay(self): # TODO
-        raise NotImplementedError
+        self.screen.fill(black)
+        self.play_main_bgm()
+        self.display_icon()
+        
+        image = pygame.transform.scale(IMG_HTP1, (int(self.virtual_width * 0.9), int(self.virtual_height * 0.9)))
+        buttonRect = pygame.Rect(0, 0, self.virtual_width * 0.9, self.virtual_height * 0.9)
+        buttonTextRect = image.get_rect()
+        buttonTextRect.center = buttonRect.center
+        self.screen.blit(image, buttonTextRect)
+        
     
     def state_about(self): # TODO
+        raise NotImplementedError
+    
+    def state_pre_puzzle(self): # TODO
         raise NotImplementedError
 
     def state_play(self):

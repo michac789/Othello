@@ -100,6 +100,10 @@ SFX_FALSE_HOVER = image.load(SFX_FALSE_HOVER)
 
 # Define all other images here
 IMG_INSTR = path.join("assets", "images", "img_instr.png")
+IMG_HTP1 = path.join("assets", "images", "img_htp1.png")
+IMG_HTP2 = path.join("assets", "images", "img_htp2.png")
+IMG_HTP3 = path.join("assets", "images", "img_htp3.png")
 IMG_INSTR = image.load(IMG_INSTR)
-
-#TODO
+IMG_HTP1 = image.load(IMG_HTP1)
+IMG_HTP2 = image.load(IMG_HTP2)
+IMG_HTP3 = image.load(IMG_HTP3)
