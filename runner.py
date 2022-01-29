@@ -238,8 +238,8 @@ class Game():
                     if self.custom_init is None: self.custom_init = [[0 for i in range(self.dim_width)] for j in range(self.dim_height)]
                     for i in range(self.dim_height):
                         for j in range(self.dim_width):
-                            if self.custom_init[i][j] == 1: self.init_white.append((i, j))
-                            if self.custom_init[i][j] == 2: self.init_black.append((i, j))
+                            if self.custom_init[i][j] == 1: self.init_black.append((i, j))
+                            if self.custom_init[i][j] == 2: self.init_white.append((i, j))
                 self.game_menu = "play"
                 time.sleep(0.2)
         for i in range(2):
@@ -419,7 +419,7 @@ class Game():
         self.play_main_bgm()
         self.display_icon()
         
-        # Draw board and all the tiles, show current custom tile settings, draw button
+        # Draw board and all the tiles, show current custom tile settings, draw button, show instructions image
         tiles = []
         for i in range(self.dim_height):
             row_tiles = []
@@ -441,6 +441,11 @@ class Game():
         buttonTextRect.center = buttonRect.center
         pygame.draw.rect(self.screen, (custom_button_hover_color1 if self.hover_pre_custom[0] else custom_button_color1), buttonRect)
         self.screen.blit(buttonText, buttonTextRect)
+        image = pygame.transform.scale(IMG_INSTR, (int(self.virtual_width * 0.4), int(self.virtual_height * 0.4)))
+        buttonRect2 = pygame.Rect(self.virtual_width * 0.5, self.virtual_height * 0.2, int(self.virtual_width * 0.5), int(self.virtual_height * 0.3))
+        buttonTextRect2 = image.get_rect()
+        buttonTextRect2.center = buttonRect2.center
+        self.screen.blit(image, buttonTextRect2)
         
         # Update custom disks position when tiles are clicked; left click for black, right click for white, update button functionality
         mouse = pygame.mouse.get_pos()
@@ -463,8 +468,6 @@ class Game():
                 if self.sfx_on: pygame.mixer.Channel(1).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
                 self.custom_changesize = False
                 self.game_menu = "pre_custom"
-                        
-        # TODO - add how to use image
     
     def state_howtoplay(self): # TODO
         raise NotImplementedError

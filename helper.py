@@ -98,5 +98,8 @@ SFX_FALSE = image.load(SFX_FALSE)
 SFX_TRUE_HOVER = image.load(SFX_TRUE_HOVER)
 SFX_FALSE_HOVER = image.load(SFX_FALSE_HOVER)
 
-# Define images in 'how to play' section
+# Define all other images here
+IMG_INSTR = path.join("assets", "images", "img_instr.png")
+IMG_INSTR = image.load(IMG_INSTR)
+
 #TODO
