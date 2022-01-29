@@ -21,3 +21,4 @@ print(round(4.51))
 print(round(4.43))
 
 
+print(-1 % 5)

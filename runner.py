@@ -42,10 +42,11 @@ class Game():
         self.classic_chosen = [False for i in range(16)] # For UI purposes
         self.classic_ai2_level_b, self.classic_ai2_level_w, self.classic_ai2_color = 1, 1, 'b' # Level for AI VS AI Mode (black and white)
         
-        # Handles custom mode configuration
+        # Handles custom mode configuration & how to play section
         self.custom_time = 0 # Custom time in minutes; from untimed up to 60 minutes max
-        self.custom_init = None
-        self.custom_changesize = False
+        self.custom_init = None # Used for starting state of the board
+        self.custom_changesize = False # Changed to true when board size is changed
+        self.htp_page = 0 # Used in 'how_to_play' state page
         
         # Keep track of time (time left & time since pygame was init for starting relative time)
         self.timer_player1, self.timer_player2 = 0, 0
@@ -105,22 +106,14 @@ class Game():
             self.resize()
 
             # Based on 'state machine' concept, launch different states of the game depending on self.game_state
-            if self.game_menu == "start":
-                self.state_mainmenu()
-            elif self.game_menu == "pre_classic":
-                self.state_pre_classic()
-            elif self.game_menu == "pre_custom":
-                self.state_pre_custom()
-            elif self.game_menu == "set_board":
-                self.state_set_board()
-            elif self.game_menu == "pre_puzzle":
-                self.state_pre_puzzle()
-            elif self.game_menu == "play":
-                self.state_play()
-            elif self.game_menu == "how_to_play":
-                self.state_howtoplay()
-            elif self.game_menu == "about":
-                self.state_about()
+            if self.game_menu == "start": self.state_mainmenu()
+            elif self.game_menu == "pre_classic": self.state_pre_classic()
+            elif self.game_menu == "pre_custom": self.state_pre_custom()
+            elif self.game_menu == "set_board": self.state_set_board()
+            elif self.game_menu == "pre_puzzle": self.state_pre_puzzle()
+            elif self.game_menu == "play": self.state_play()
+            elif self.game_menu == "how_to_play": self.state_howtoplay()
+            elif self.game_menu == "about": self.state_about()
             pygame.display.flip()
     
     # Handles all the choosing mode buttons and its action towards self.classic_(xxx) in the 'pre_classic' state
@@ -211,7 +204,8 @@ class Game():
         # Draw 'back to menu' and 'play game' buttons
         buttons = ["Back to Menu", "Play Game"]
         button_dict = {}
-        for i in range(2):
+        n = (1 if self.game_menu == "how_to_play" else 2)
+        for i in range(n):
             buttonRect = pygame.Rect(self.virtual_width * (0.1 + 0.4 * (i)), self.virtual_height * 0.88, self.virtual_width * 0.3, self.virtual_height / 10)
             buttonText = self.prepgoFont.render(buttons[i], True, (prep_option_color3 if self.hover_pre_buttons[i] == False else prep_button_hover_color2))
             button_dict[i] = buttonRect
@@ -227,22 +221,24 @@ class Game():
             if button_dict[0].collidepoint(mouse):
                 if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
                 self.game_menu = "start"
-            if button_dict[1].collidepoint(mouse):
-                if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
-                if self.game_menu == "pre_classic":
-                    self.init_white, self.init_black = [(3, 3), (4, 4)], [(3, 4), (4, 3)]
-                    self.dim_height, self.dim_width = 8, 8
-                elif self.game_menu == "pre_custom":
-                    self.classic_mode = "Human"
-                    self.init_white, self.init_black = [], []
-                    if self.custom_init is None: self.custom_init = [[0 for i in range(self.dim_width)] for j in range(self.dim_height)]
-                    for i in range(self.dim_height):
-                        for j in range(self.dim_width):
-                            if self.custom_init[i][j] == 1: self.init_black.append((i, j))
-                            if self.custom_init[i][j] == 2: self.init_white.append((i, j))
-                self.game_menu = "play"
-                time.sleep(0.2)
-        for i in range(2):
+            elif self.game_menu != "how_to_play":
+                if button_dict[1].collidepoint(mouse):
+                    if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
+                    if self.game_menu == "pre_classic":
+                        self.init_white, self.init_black = [(3, 3), (4, 4)], [(3, 4), (4, 3)]
+                        self.dim_height, self.dim_width = 8, 8
+                    elif self.game_menu == "pre_custom":
+                        self.classic_mode = "Human"
+                        self.init_white, self.init_black = [], []
+                        if self.custom_init is None: self.custom_init = [[0 for i in range(self.dim_width)] for j in range(self.dim_height)]
+                        for i in range(self.dim_height):
+                            for j in range(self.dim_width):
+                                if self.custom_init[i][j] == 1: self.init_black.append((i, j))
+                                if self.custom_init[i][j] == 2: self.init_white.append((i, j))
+                    self.game_menu = "play"
+                    time.sleep(0.2)
+        for i in range(n):
+            if i == 1 and self.game_menu == "how_to_play": continue
             self.hover_pre_buttons[i] = False
             if button_dict[i].collidepoint(mouse):
                 self.hover_pre_buttons[i] = True
@@ -473,12 +469,36 @@ class Game():
         self.screen.fill(black)
         self.play_main_bgm()
         self.display_icon()
+        self.display_buttons()
         
-        image = pygame.transform.scale(IMG_HTP1, (int(self.virtual_width * 0.9), int(self.virtual_height * 0.9)))
-        buttonRect = pygame.Rect(0, 0, self.virtual_width * 0.9, self.virtual_height * 0.9)
+        # Display image according to the current page
+        img_source = (IMG_HTP1 if self.htp_page == 0 else IMG_HTP2 if self.htp_page == 1 else IMG_HTP3 if self.htp_page == 2 else IMG_HTP4 if self.htp_page == 3 else IMG_HTP5)
+        image = pygame.transform.scale(img_source, (int(self.virtual_width * 0.95), int(self.virtual_height * 0.95)))
+        buttonRect = pygame.Rect(0, 0, self.virtual_width * 0.95, self.virtual_height * 0.95)
         buttonTextRect = image.get_rect()
         buttonTextRect.center = buttonRect.center
         self.screen.blit(image, buttonTextRect)
+        
+        # 2 Buttons and its functionality to switch the pages
+        button_texts = ["1➡", "2➡"]
+        button_dict = {}
+        for i in range(2):
+            buttonRect = pygame.Rect(self.virtual_width * (0.6 + 0.15 * i), self.virtual_height * 0.87, self.virtual_width * 0.1, self.virtual_height / 11)
+            buttonText = self.mainbuttonFont1.render(button_texts[i], True, prep_option_color1)
+            button_dict[i] = buttonRect
+            buttonTextRect = buttonText.get_rect()
+            buttonTextRect.center = buttonRect.center
+            pygame.draw.rect(self.screen, dark_grey, buttonRect)
+            self.screen.blit(buttonText, buttonTextRect)
+        left, _, _ = pygame.mouse.get_pressed()
+        mouse = pygame.mouse.get_pos()
+        if left == 1:
+            if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
+            if button_dict[0].collidepoint(mouse): self.htp_page = (self.htp_page - 1) % 5
+            elif button_dict[1].collidepoint(mouse): self.htp_page = (self.htp_page + 1) % 5
+            time.sleep(0.1)
+        
+        # TODO - IMPROVE!
         
     
     def state_about(self): # TODO
