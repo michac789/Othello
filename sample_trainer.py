@@ -18,7 +18,7 @@ import pickle
 # Load training data, split into training and test sets, train and analyze model, getting result from new data
 def main():
     # (1) Linear Regression:
-    x_train1, x_test1, y_train1, y_test1 = load_data(os.path.join("learning_data", "sample1.csv"), 1)
+    x_train1, x_test1, y_train1, y_test1 = load_data(os.path.join("sample.csv"), 1)
     linreg_model = train_model_linreg(x_train1, y_train1)
     predictions1 = linreg_model.predict(x_test1)
     analyze_model_linreg(linreg_model, y_test1, predictions1)
@@ -53,8 +53,9 @@ def load_data(dir, type):
         parameters, real_values = [], []
         for row in reader:
             parameters.append([int(row[0]), int(row[1]), int(row[2])])
-            if type == 1: real_values.append(int(row[3]))
-            elif type == 2: real_values.append(row[3])
+            # if type == 1: real_values.append(int(row[3]))
+            # elif type == 2: real_values.append(row[3])
+    print(parameters)
     x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(parameters, real_values, test_size = 0.2)
     return (x_train, x_test, y_train, y_test)
 
