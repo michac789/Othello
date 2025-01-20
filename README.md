@@ -38,3 +38,15 @@ Please follow these steps to download and play the game, it assumes you have pyt
 Warning!!! Please execute runner.py, and NOT othello.py itself. In othello.py, it only contains the basic othello logic and on-terminal gameplay for early development and debugging purpose. The full game with complete user interfaces are to be launched from runner.py.
 
 The other files (such as simulator.py, tests.py, trainer.py, etc.) and 'learning_data' folder is not used for the game itself, but was used during the development for the learning process. You do not need to open or have any of those files to play the game. Those files might contain other modules such as scikit-learn to train the model.
+
+## Create App Executable
+
+An executable file is created using `pyinstaller` module. It allows user to run the game without having to clone the repository and install python and pygame. The executable file is created using the following command:
+
+```powershell
+    # install pyinstaller
+    pip install pyinstaller
+
+    # create the executable file
+    pyinstaller --windowed --onefile --noconsole --add-data "assets;assets" --add-data "learning_data;learning_data" --icon=my_icon.ico --name "My Othello" runner.py
+```
