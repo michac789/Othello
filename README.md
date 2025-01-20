@@ -22,11 +22,14 @@ Please follow these steps to download and play the game, it assumes you have pyt
     # clone entire repository, or you may also choose to download only the files needed
     git clone https://github.com/michac789/Othello.git
 
-    # change your directory to the newly cloned folder
-    cd OTHELLO
+    # create a virtual environment (optional, but recommended)
+    python -m venv venv
+
+    # activate the virtual environment
+    .\venv\Scripts\activate
 
     # do this if you haven't had pygame installed
-    pip install requirements.txt
+    pip install -r requirements.txt
 
     # execute runner.py to run the game
     python runner.py
@@ -35,11 +38,3 @@ Please follow these steps to download and play the game, it assumes you have pyt
 Warning!!! Please execute runner.py, and NOT othello.py itself. In othello.py, it only contains the basic othello logic and on-terminal gameplay for early development and debugging purpose. The full game with complete user interfaces are to be launched from runner.py.
 
 The other files (such as simulator.py, tests.py, trainer.py, etc.) and 'learning_data' folder is not used for the game itself, but was used during the development for the learning process. You do not need to open or have any of those files to play the game. Those files might contain other modules such as scikit-learn to train the model.
-
-## Future Improvements
-
-The 'puzzle' feature is not completely done yet, so don't click that option :(
-Also, the 'about' page is not yet implemented as well :(
-And I might not be able to complete it in near time due to some other work, afterall the project itself might need some restructuring as well and it has been a while since I last touched this project.
-I am also considering to develop a stronger AI and create the game executable or zip file so people do not have to download everything.
-All of these coming soon...
