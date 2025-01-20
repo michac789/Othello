@@ -275,7 +275,7 @@ class Game():
         self.classic_time = -1
         
         # Display buttons (classic mode, custom mode, puzzle mode), supporting buttons and toogle bgm / sfx / full screen buttons
-        button_texts = ["Classic Mode", "Custom Mode", "Puzzle Mode", "", "How To Play", "About", "", "BGM", "SFX"]
+        button_texts = ["Classic Mode", "Custom Mode", "How To Play", "", "", "", "", "BGM", "SFX"]
         button_dict = {}
         for i in range(len(button_texts)):
             if 0 <= i <= 3:
@@ -286,13 +286,6 @@ class Game():
                 if i != 3:
                     if self.hover_main[i] == True: pygame.draw.rect(self.screen, main_button1_hover_color, buttonRect)
                     else: pygame.draw.rect(self.screen, main_button1_color, buttonRect)
-            elif 4 <= i <= 5:
-                buttonRect = pygame.Rect(self.virtual_width * (0.27 + 0.25 * (i - 4)), self.virtual_height * 0.8, self.virtual_width * 0.2, self.virtual_height / 10)
-                if self.hover_main[i] == True: buttonRect = pygame.Rect((self.virtual_width * (0.27 + 0.25 * (i - 4))) - (self.virtual_width * 0.2) * 0.02, self.virtual_height * 0.8, (self.virtual_width * 0.2) * 1.04, (self.virtual_height / 10) * 1.03)
-                buttonText = self.mainbuttonFont2.render(button_texts[i], True, main_button2_text_color)
-                if self.hover_main[i] == True: buttonText = self.mainbuttonHoverFont2.render(button_texts[i], True, main_button2_text_hover_color)
-                if self.hover_main[i] == True: pygame.draw.rect(self.screen, main_button2_hover_color, buttonRect)
-                else: pygame.draw.rect(self.screen, main_button2_color, buttonRect)
             button_dict[i] = buttonRect
             buttonTextRect = buttonText.get_rect()
             buttonTextRect.center = buttonRect.center
@@ -300,11 +293,11 @@ class Game():
         self.display_icon()
         
         # Change state when respective buttons are clicked, add hover effects
-        states = ["pre_classic", "pre_custom", "pre_puzzle",  "about", "how_to_play",]
+        states = ["pre_classic", "pre_custom", "how_to_play"]
         mouse = pygame.mouse.get_pos()
         left, _, _ = pygame.mouse.get_pressed()
         if left == 1:
-            for i in range(5):
+            for i in range(len(states)):
                 if button_dict[i].collidepoint(mouse):
                     self.game_menu = states[i]
                     if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
@@ -465,14 +458,14 @@ class Game():
                 self.custom_changesize = False
                 self.game_menu = "pre_custom"
     
-    def state_howtoplay(self): # TODO
+    def state_howtoplay(self):
         self.screen.fill(black)
         self.play_main_bgm()
         self.display_icon()
         self.display_buttons()
         
         # Display image according to the current page
-        img_source = (IMG_HTP1 if self.htp_page == 0 else IMG_HTP2 if self.htp_page == 1 else IMG_HTP3 if self.htp_page == 2 else IMG_HTP4 if self.htp_page == 3 else IMG_HTP5)
+        img_source = (IMG_HTP1 if self.htp_page == 0 else IMG_HTP2 if self.htp_page == 1 else IMG_HTP3)
         image = pygame.transform.scale(img_source, (int(self.virtual_width * 0.95), int(self.virtual_height * 0.95)))
         buttonRect = pygame.Rect(0, 0, self.virtual_width * 0.95, self.virtual_height * 0.95)
         buttonTextRect = image.get_rect()
@@ -480,11 +473,11 @@ class Game():
         self.screen.blit(image, buttonTextRect)
         
         # 2 Buttons and its functionality to switch the pages
-        button_texts = ["1➡", "2➡"]
+        button_texts = ["<-", "->"]
         button_dict = {}
         for i in range(2):
             buttonRect = pygame.Rect(self.virtual_width * (0.6 + 0.15 * i), self.virtual_height * 0.87, self.virtual_width * 0.1, self.virtual_height / 11)
-            buttonText = self.mainbuttonFont1.render(button_texts[i], True, prep_option_color1)
+            buttonText = self.mainbuttonFont1.render(button_texts[i], True, prep_option_color4)
             button_dict[i] = buttonRect
             buttonTextRect = buttonText.get_rect()
             buttonTextRect.center = buttonRect.center
@@ -494,18 +487,9 @@ class Game():
         mouse = pygame.mouse.get_pos()
         if left == 1:
             if self.sfx_on: pygame.mixer.Channel(3).play(pygame.mixer.Sound(SFX_BUTTON_CLICK))
-            if button_dict[0].collidepoint(mouse): self.htp_page = (self.htp_page - 1) % 5
-            elif button_dict[1].collidepoint(mouse): self.htp_page = (self.htp_page + 1) % 5
+            if button_dict[0].collidepoint(mouse): self.htp_page = (self.htp_page - 1) % 3
+            elif button_dict[1].collidepoint(mouse): self.htp_page = (self.htp_page + 1) % 3
             time.sleep(0.1)
-        
-        # TODO - IMPROVE!
-        
-    
-    def state_about(self): # TODO
-        raise NotImplementedError
-    
-    def state_pre_puzzle(self): # TODO
-        raise NotImplementedError
 
     def state_play(self):
         # Initialize game with the required settings; added bgm for gameplay
@@ -708,16 +692,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# TODO
-"""
-- Finalize AI and its levels
-- Custom mode (othello sizes & starting positions)
-- Create pre_custom feature user interface
-- 'How to play' pages and pics, UI
-
-- Puzzle mode??
-- Create about page
-- DONE with everything
-
-"""
