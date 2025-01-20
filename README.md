@@ -1,5 +1,9 @@
 # Othello
 
+## Download Game
+
+You can download the game executable from the [release page](https://github.com/michac789/Othello/releases/tag/v1.0.0) and play the game in your computer.
+
 ## Overview
 
 This is a fully functional Othello game with complete user interface. The game features are as follows:
@@ -48,5 +52,5 @@ An executable file is created using `pyinstaller` module. It allows user to run 
     pip install pyinstaller
 
     # create the executable file
-    pyinstaller --windowed --onefile --noconsole --add-data "assets;assets" --add-data "learning_data;learning_data" --icon=my_icon.ico --name "My Othello" runner.py
+    pyinstaller --windowed --onefile --noconsole --add-data "assets;assets" --add-data "learning_data;learning_data" --icon=my_icon.ico --name "Othello" runner.py
 ```

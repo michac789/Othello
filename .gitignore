@@ -5,3 +5,5 @@ build
 dist
 *.spec
 *.ico
+config.bat
+node_modules

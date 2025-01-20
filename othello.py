@@ -4,6 +4,7 @@ This file is where Othello object is located, that contains all attributes and m
 Launching this file will only display a simple command line interface, used on the early development stage for testing purpose.
 """
 
+import utils.session
 import copy
 # from othello_ai import AI_move
 
