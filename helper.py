@@ -2,7 +2,18 @@
 from pygame import font, init, image
 
 # This library is used to ensure that the assets can be loaded independently of user's operating system
-from os import path
+import os, sys
+
+def resource_path(relative_path):
+    """
+    Get absolute path to resource, works for PyInstaller and development mode.
+    """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
 
 # Define all RGB colors for various components here
 main_title_color = (0, 255, 255)
@@ -61,54 +72,40 @@ conf_text2_color = (179, 0, 0)
 conf_hover_color = (159, 200, 45)
 
 # Define all fonts used here
-OPEN_SANS = path.join("assets", "fonts", "OpenSans-Regular.ttf")
-PACIFICO = path.join("assets", "fonts", "Pacifico.ttf")
-BLACKJACK = path.join("assets", "fonts", "blackjack.otf")
-LOBSTER = path.join("assets", "fonts", "Lobster.otf")
-ARIZONIA = path.join("assets", "fonts", "Arizonia-Regular.ttf")
+OPEN_SANS = resource_path(os.path.join("assets", "fonts", "OpenSans-Regular.ttf"))
+PACIFICO = resource_path(os.path.join("assets", "fonts", "Pacifico.ttf"))
+BLACKJACK = resource_path(os.path.join("assets", "fonts", "blackjack.otf"))
+LOBSTER = resource_path(os.path.join("assets", "fonts", "Lobster.otf"))
+ARIZONIA = resource_path(os.path.join("assets", "fonts", "Arizonia-Regular.ttf"))
 
 # Define all background musics used here
-BGM_MENU = path.join("assets", "bgm", "menumusic.mp3")
-BGM_GAME = path.join("assets", "bgm", "gamemusic.mp3")
+BGM_MENU = resource_path(os.path.join("assets", "bgm", "menumusic.mp3"))
+BGM_GAME = resource_path(os.path.join("assets", "bgm", "gamemusic.mp3"))
 
 # Define all sfx used here
-SFX_BLACK_MOVE = path.join("assets", "sfx", "black_move.wav")
-SFX_WHITE_MOVE = path.join("assets", "sfx", "white_move.wav")
-SFX_RESET_GAME = path.join("assets", "sfx", "reset_game.wav")
-SFX_UNDO_GAME = path.join("assets", "sfx", "undo_game.wav")
-SFX_QUIT_GAME = path.join("assets", "sfx", "quit_game.wav")
-SFX_WIN_GAME = path.join("assets", "sfx", "win_game.wav")
-SFX_BUTTON_CLICK = path.join("assets", "sfx", "button_click.wav")
-SFX_BUTTON_INVALID = path.join("assets", "sfx", "button_invalid.wav")
+SFX_BLACK_MOVE = resource_path(os.path.join("assets", "sfx", "black_move.wav"))
+SFX_WHITE_MOVE = resource_path(os.path.join("assets", "sfx", "white_move.wav"))
+SFX_RESET_GAME = resource_path(os.path.join("assets", "sfx", "reset_game.wav"))
+SFX_UNDO_GAME = resource_path(os.path.join("assets", "sfx", "undo_game.wav"))
+SFX_QUIT_GAME = resource_path(os.path.join("assets", "sfx", "quit_game.wav"))
+SFX_WIN_GAME = resource_path(os.path.join("assets", "sfx", "win_game.wav"))
+SFX_BUTTON_CLICK = resource_path(os.path.join("assets", "sfx", "button_click.wav"))
+SFX_BUTTON_INVALID = resource_path(os.path.join("assets", "sfx", "button_invalid.wav"))
 
 # Define all icons (images) used here
-BGM_TRUE = path.join("assets", "icons", "bgm_true.jpg")
-BGM_FALSE = path.join("assets", "icons", "bgm_false.jpg")
-BGM_TRUE_HOVER = path.join("assets", "icons", "bgm_true_hover.jpg")
-BGM_FALSE_HOVER = path.join("assets", "icons", "bgm_false_hover.jpg")
-SFX_TRUE = path.join("assets", "icons", "sfx_true.jpg")
-SFX_FALSE = path.join("assets", "icons", "sfx_false.jpg")
-SFX_TRUE_HOVER = path.join("assets", "icons", "sfx_true_hover.jpg")
-SFX_FALSE_HOVER = path.join("assets", "icons", "sfx_false_hover.jpg")
-BGM_TRUE = image.load(BGM_TRUE)
-BGM_FALSE = image.load(BGM_FALSE)
-BGM_TRUE_HOVER = image.load(BGM_TRUE_HOVER)
-BGM_FALSE_HOVER = image.load(BGM_FALSE_HOVER)
-SFX_TRUE = image.load(SFX_TRUE)
-SFX_FALSE = image.load(SFX_FALSE)
-SFX_TRUE_HOVER = image.load(SFX_TRUE_HOVER)
-SFX_FALSE_HOVER = image.load(SFX_FALSE_HOVER)
+BGM_TRUE = image.load(resource_path(os.path.join("assets", "icons", "bgm_true.jpg")))
+BGM_FALSE = image.load(resource_path(os.path.join("assets", "icons", "bgm_false.jpg")))
+BGM_TRUE_HOVER = image.load(resource_path(os.path.join("assets", "icons", "bgm_true_hover.jpg")))
+BGM_FALSE_HOVER = image.load(resource_path(os.path.join("assets", "icons", "bgm_false_hover.jpg")))
+SFX_TRUE = image.load(resource_path(os.path.join("assets", "icons", "sfx_true.jpg")))
+SFX_FALSE = image.load(resource_path(os.path.join("assets", "icons", "sfx_false.jpg")))
+SFX_TRUE_HOVER = image.load(resource_path(os.path.join("assets", "icons", "sfx_true_hover.jpg")))
+SFX_FALSE_HOVER = image.load(resource_path(os.path.join("assets", "icons", "sfx_false_hover.jpg")))
 
 # Define all other images here
-IMG_INSTR = path.join("assets", "images", "img_instr.png")
-IMG_HTP1 = path.join("assets", "images", "img_htp1.png")
-IMG_HTP2 = path.join("assets", "images", "img_htp2.png")
-IMG_HTP3 = path.join("assets", "images", "img_htp3.png")
-IMG_HTP4 = path.join("assets", "images", "img_htp4.png")
-IMG_HTP5 = path.join("assets", "images", "img_htp5.png")
-IMG_INSTR = image.load(IMG_INSTR)
-IMG_HTP1 = image.load(IMG_HTP1)
-IMG_HTP2 = image.load(IMG_HTP2)
-IMG_HTP3 = image.load(IMG_HTP3)
-IMG_HTP4 = image.load(IMG_HTP4)
-IMG_HTP5 = image.load(IMG_HTP5)
+IMG_INSTR = image.load(resource_path(os.path.join("assets", "images", "img_instr.png")))
+IMG_HTP1 = image.load(resource_path(os.path.join("assets", "images", "img_htp1.png")))
+IMG_HTP2 = image.load(resource_path(os.path.join("assets", "images", "img_htp2.png")))
+IMG_HTP3 = image.load(resource_path(os.path.join("assets", "images", "img_htp3.png")))
+IMG_HTP4 = image.load(resource_path(os.path.join("assets", "images", "img_htp4.png")))
+IMG_HTP5 = image.load(resource_path(os.path.join("assets", "images", "img_htp5.png")))
