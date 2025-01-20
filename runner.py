@@ -99,7 +99,7 @@ class Game():
         while True:
             # Terminate application when the game is quit, resizable window feature
             for event in pygame.event.get():
-                if event.type == pygame.QUIT: sys.ext()
+                if event.type == pygame.QUIT: sys.exit()
                 elif event.type == pygame.VIDEORESIZE:
                     pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
                     self.screen_height, self.screen_width = event.h, event.w
